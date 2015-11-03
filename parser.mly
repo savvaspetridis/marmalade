@@ -4,6 +4,7 @@
 %token SEMI COMMA PLUS MINUS TIMES
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH
+%token S E Q H W
 %token IF ELSE ELIF AND OR CONT BREAK
 %token INC DEC PERIOD COLON
 %token RETURN FOR WHILE TO
@@ -126,13 +127,17 @@ phrase_branch:
 |	phrase_exp {0}
 
 app_measure:
-	measure_exp APPEND note_regex {0}
+	measure_exp APPEND app_note {0}
 |	measure_exp {0}
 
 song_exp:
 	tempo funk regex {0}
 |	tempo regex {0}
 |	funk regex {0}
+|	regex {0}
+
+app_note:
+	funk regex {0}
 |	regex {0}
 
 phrase_exp:
@@ -190,8 +195,15 @@ t_sig:
 tempo:
 	DOLLAR LPAREN INT_LIT LPAREN {0}
 
-instrument:
+instruments:
 	DOLLAR LPAREN INSTRUMENT LPAREN {0}
+
+note:
+	INT_LIT PERIOD S {0}
+|	INT_LIT PERIOD E {0}
+|	INT_LIT PERIOD Q {0}
+|	INT_LIT PERIOD H {0}
+|	INT_LIT PERIOD W {0}
 
 
 
