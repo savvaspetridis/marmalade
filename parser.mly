@@ -3,11 +3,11 @@
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
-%token GT GEQ DASH
+%token GT GEQ DASH APPEND NOT
 %token S E Q H W
-%token IF ELSE ELIF AND OR CONT BREAK
-%token INC DEC PERIOD COLON
-%token RETURN FOR WHILE TO
+%token IF ELSE ELIF AND OR
+%token PERIOD COLON
+%token RETURN WHILE
 %token FUNK AT DOLLAR SQU
 %token <int> INT_LIT
 %token <string> STRING_LIT ID INSTRUMENT
@@ -15,16 +15,15 @@
 
 %nonassoc ELSE
 %nonassoc NOELSE
-%right ASSIGN APPEND
-%left LBRACK
+/*%right ASSIGN APPEND
+%left LBRACK*/
 %left OR
 %left AND
-%left EQ NEQ
+/*%left EQ NEQ
 %left LT GT LEQ GEQ
-%left IN NOT_IN
 %left PLUS MINUS
 %left TIMES DIVIDE 
-%right NOT
+%right NOT*/
 
 %start program
 %type <Ast.program> program
@@ -70,7 +69,7 @@ elif_list:
 
 expr:
 	app_gen  {0}
-|	val_blah_blah {0}
+|	value {0}
 |	boolean {0}
 |	LPAREN expr RPAREN {0}
 
@@ -96,15 +95,15 @@ lit:
 boolean:
 	expr AND expr {0}
 |	expr OR expr {0}
-|	val_blah GT val_blah {0}
-|	val_blah LT val_blah {0}
-|	val_blah LEQ val_blah {0}
-|	val_blah GEQ val_blah {0}
-|	val_blah EQ val_blah {0}
-| 	val_blah NEQ val_blah {0}
-| 	NOT val_blah {0}
+|	value GT value {0}
+|	value LT value {0}
+|	value LEQ value {0}
+|	value GEQ value {0}
+|	value EQ value {0}
+| 	value NEQ value {0}
+| 	NOT value {0}
 
-val_blah:
+value:
 	arithmetic {0}
 |	ID {0}
 
@@ -153,21 +152,22 @@ measure_exp:
 |	regex {0}
 
 funk:
-	LPAREN f_val_blahs RPAREN {0}
+	LPAREN f_values RPAREN {0}
 
-f_val_blahs:
-	f_val_blahs COMMA function_invocation {0}
+f_values:
+	f_values COMMA function_invocation {0}
+| function_invocation {0}
 
 function_invocation:
 	ID LPAREN funk_args RPAREN {0}
 
 funk_args:
-	funk_args COMMA val_blahID_arg {0}
-|	val_blahID_arg {0}
+	funk_args COMMA valueID_arg {0}
+|	valueID_arg {0}
 
-val_blahID_arg:
+valueID_arg:
 	app_gen {0}
-|	val_blah {0}
+|	value {0}
 
 regex:
 	AT LBRACE special_exp RBRACE {0}
