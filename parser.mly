@@ -70,7 +70,7 @@ elif_list:
 
 expr:
 	app_gen  {0}
-|	val {0}
+|	val_blah_blah {0}
 |	boolean {0}
 |	LPAREN expr RPAREN {0}
 
@@ -96,15 +96,15 @@ lit:
 boolean:
 	expr AND expr {0}
 |	expr OR expr {0}
-|	val GT val {0}
-|	val LT val {0}
-|	val LEQ val {0}
-|	val GEQ val {0}
-|	val EQ val {0}
-| 	val NEQ val {0}
-| 	NOT val {0}
+|	val_blah GT val_blah {0}
+|	val_blah LT val_blah {0}
+|	val_blah LEQ val_blah {0}
+|	val_blah GEQ val_blah {0}
+|	val_blah EQ val_blah {0}
+| 	val_blah NEQ val_blah {0}
+| 	NOT val_blah {0}
 
-val:
+val_blah:
 	arithmetic {0}
 |	ID {0}
 
@@ -153,21 +153,21 @@ measure_exp:
 |	regex {0}
 
 funk:
-	LPAREN f_vals RPAREN {0}
+	LPAREN f_val_blahs RPAREN {0}
 
-f_vals:
-	f_vals COMMA function_invocation {0}
+f_val_blahs:
+	f_val_blahs COMMA function_invocation {0}
 
 function_invocation:
 	ID LPAREN funk_args RPAREN {0}
 
 funk_args:
-	funk_args COMMA valID_arg {0}
-|	valID_arg {0}
+	funk_args COMMA val_blahID_arg {0}
+|	val_blahID_arg {0}
 
-valID_arg:
+val_blahID_arg:
 	app_gen {0}
-|	val {0}
+|	val_blah {0}
 
 regex:
 	AT LBRACE special_exp RBRACE {0}
