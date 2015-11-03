@@ -3,16 +3,17 @@
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
-%token GT GEQ
+%token GT GEQ DASH
 %token IF ELSE ELIF AND OR CONT BREAK
 %token INC DEC PERIOD COLON
 %token RETURN FOR WHILE TO
-%token FUNK
+%token FUNK AT DOLLAR SQU
 %token <int> INT_LIT
 %token <string> STRING_LIT ID INSTRUMENT
 %token EOF
 
 %nonassoc ELSE
+%nonassoc NOELSE
 %right ASSIGN APPEND
 %left LBRACK
 %left OR
@@ -31,16 +32,16 @@
 program:
     /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {{0; 0}}
     /* List is built backwards */
-|   program fdecl /*{ { stmts = $1.stmts; funcs = $2::$1.funcs } } */ {{0; 0}}
+|   program funkdecl /*{ { stmts = $1.stmts; funcs = $2::$1.funcs } } */ {{0; 0}}
 |	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{0; 0}}
 
 funkdecl:
-	FUNK Id LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
+	FUNK ID LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
 
 param_list:
 	/* nothing */ { [] }
-|	ID	/*{ [VarDecl($1, Id($2))] }*/ {0}
-|	param_list COMMA ID /*{ VarDecl($3, Id($4))::$1}*/ {0}
+|	ID	/*{ [VarDecl($1, ID($2))] }*/ {0}
+|	param_list COMMA ID /*{ VarDecl($3, ID($4))::$1}*/ {0}
 
 stmt_list:
 	/* nothing */ { [] }
@@ -55,8 +56,8 @@ stmt:
 |	vmod SEMI	  /*{ VarDeclS($1) }*/ {0}
 
 vmod:
-	Id APPEND expr
-|	Id ASSIGN expr
+	ID APPEND expr {0}
+|	ID ASSIGN expr {0}
 
 conditional_stmt:
 	IF LPAREN expr RPAREN stmt elif_list %prec NOELSE /*{ If(($3,$5)::$6, Block([])) }*/ {0}
@@ -67,103 +68,136 @@ elif_list:
 |	elif_list ELIF LPAREN expr RPAREN stmt /*{ ($4, $6)::$1 }*/ {0}
 
 expr:
-	app_gen 
-|	val
-|	boolean
-|	LPAREN expr RPAREN
+	app_gen  {0}
+|	val {0}
+|	boolean {0}
+|	LPAREN expr RPAREN {0}
 
 arithmetic:
-	lit PLUS int_term
-|	lit MINUS int_term
-|	int_term
+	lit PLUS int_term {0}
+|	lit MINUS int_term {0}
+|	int_term {0}
 
 int_term:
-	int_term TIMES atom
-|	int_term DIVIDE atom
-|	atom
+	int_term TIMES atom {0}
+|	int_term DIVIDE atom {0}
+|	atom {0}
 
 atom:
-	INT_LIT
-|	Id
+	INT_LIT {0}
+|	ID {0}
 
 lit:
-	INT_LIT
-|	note
-|	Id
+	INT_LIT {0}
+|	note {0}
+|	ID {0}
 
 boolean:
-	expr AND expr
-|	exp OR exp
-|	val GT val
-|	val LT val
-|	val LEQ val
-|	val GEQ val
-|	val EQ val
-| 	val NEQ val
-| 	NOT val
+	expr AND expr {0}
+|	expr OR expr {0}
+|	val GT val {0}
+|	val LT val {0}
+|	val LEQ val {0}
+|	val GEQ val {0}
+|	val EQ val {0}
+| 	val NEQ val {0}
+| 	NOT val {0}
 
 val:
-	arithmetic
-|	Id
+	arithmetic {0}
+|	ID {0}
 
 app_gen:
-	app_s
-|	app_phrases
-|	app_measure
-|	app_note
+	app_s {0}
+|	app_phrases {0}
+|	app_measure {0}
+|	app_note {0}
 
 app_s:
-	song_exp APPEND app_phrases 
-|	song_exp
+	song_exp APPEND app_phrases {0}
+|	song_exp {0}
 
 app_phrases:
-	app_phrases APPEND phrase_branch
-|	phrase_conglomorate
+	app_phrases APPEND phrase_branch {0}
+|	phrase_branch {0}
 
 phrase_branch:
-	phrase_exp APPEND app_measure
-|	phrase_exp
+	phrase_exp APPEND app_measure {0}
+|	phrase_exp {0}
 
 app_measure:
-	measure_exp APPEND note_regex
-|	measure_exp
+	measure_exp APPEND note_regex {0}
+|	measure_exp {0}
 
 song_exp:
-	tempo funk songvals 
-|	temp songvals
-|	funk songvals 
-|	song
+	tempo funk regex {0}
+|	tempo regex {0}
+|	funk regex {0}
+|	regex {0}
 
 phrase_exp:
-	instruments	funk phrase_vals
-|	instruments phrase_vals
-|	funk phrase_vals
-|	phrase_vals
+	instruments	funk regex {0}
+|	instruments regex {0}
+|	funk regex {0}
+|	regex {0}
 
 measure_exp:
-	t_sig funk measure_vals
-|	t_sig measure_vals
-|	funk measure_vals
-|	measure_vals
+	t_sig funk regex {0}
+|	t_sig regex {0}
+|	funk regex {0}
+|	regex {0}
 
 funk:
-	LPAREN f_vals RPAREN
+	LPAREN f_vals RPAREN {0}
 
 f_vals:
-	f_vals COMMA function_invocation
+	f_vals COMMA function_invocation {0}
 
 function_invocation:
-	Id LPAREN funk_args RPAREN
+	ID LPAREN funk_args RPAREN {0}
 
 funk_args:
-	funk_args COMMA valid_arg
-|	valid_arg
+	funk_args COMMA valID_arg {0}
+|	valID_arg {0}
 
-valid_arg:
-	app_gen
-|	val
+valID_arg:
+	app_gen {0}
+|	val {0}
 
- 
+regex:
+	AT LBRACE special_exp RBRACE {0}
+
+special_exp:
+	STRING_LIT LPAREN indicies RPAREN special_exp {0}
+|	STRING_LIT {0}
+
+indicies:
+	indicies COMMA range {0}
+|	indicies COMMA indivIDual {0}
+| 	range {0}
+|	indivIDual {0}
+
+range:
+	SQU INT_LIT SQU DASH SQU INT_LIT SQU {0}
+
+indivIDual:
+	SQU INT_LIT SQU {0}
+/* t_sig instrument tempo */
+
+t_sig:
+	DOLLAR LPAREN INT_LIT COLON INT_LIT LPAREN {0}
+
+tempo:
+	DOLLAR LPAREN INT_LIT LPAREN {0}
+
+instrument:
+	DOLLAR LPAREN INSTRUMENT LPAREN {0}
+
+
+
+	
+
+
 
 
 
