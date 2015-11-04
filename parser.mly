@@ -105,19 +105,19 @@ boolean:
 
 value:
 	arithmetic {0}
-|	ID {0}
+/*|	ID {0}*/
 
 app_gen:
 	app_s {0}
-|	app_phrases {0}
+/*|	app_phrases {0}
 |	app_measure {0}
-|	app_note {0}
+|	app_note {0}*/
 
 app_s:
-	song_exp APPEND app_phrases {0}
+	song_exp APPEND song_exp {0} /*app_phrases {0}*/
 |	song_exp {0}
 
-app_phrases:
+/*app_phrases:
 	app_phrases APPEND phrase_branch {0}
 |	phrase_branch {0}
 
@@ -127,15 +127,15 @@ phrase_branch:
 
 app_measure:
 	measure_exp APPEND app_note {0}
-|	measure_exp {0}
+|	measure_exp {0}*/
 
 song_exp:
-	tempo funk regex {0}
-|	tempo regex {0}
+	/*tempo*/ mod_data_type funk regex {0}
+|	/*tempo*/ mod_data_type regex {0}
 |	funk regex {0}
 |	regex {0}
 
-app_note:
+/*app_note:
 	funk regex {0}
 |	regex {0}
 
@@ -149,7 +149,12 @@ measure_exp:
 	t_sig funk regex {0}
 |	t_sig regex {0}
 |	funk regex {0}
-|	regex {0}
+|	regex {0}*/
+
+mod_data_type:
+	tempo {0}
+|	t_sig {0}
+|	instruments {0}
 
 funk:
 	LPAREN f_values RPAREN {0}
