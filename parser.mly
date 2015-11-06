@@ -34,11 +34,6 @@ program:
     /* List is built backwards */
 |	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{0; 0}}
 
-
-stmt_list:
-    /* nothing */ { [] }
-|   stmt_list stmt /*{ $2::$1 }*/ {0}
-
 stmt:
 	expr SEMI /*{ Expr($1) }*/ {0}
 |	vmod SEMI	  /*{ VarDeclS($1) }*/ {0}
@@ -68,6 +63,7 @@ lit:
 	INT_LIT {0}
 |	note {0}
 |	ID {0}
+|   STRING_LIT {0}
 
 app_gen:
 	funk reg_list {0}
@@ -86,6 +82,7 @@ function_invocation:
 funk_args:
 	funk_args COMMA arithmeticID_arg {0}
 |	arithmeticID_arg {0}
+|   STRING_LIT {0}
 
 arithmeticID_arg:
     {0}
