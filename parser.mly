@@ -69,7 +69,7 @@ elif_list:
 
 expr:
 	app_gen  {0}
-|	value {0}
+|	arithmetic {0}
 |	boolean {0}
 |	LPAREN expr RPAREN {0}
 
@@ -95,17 +95,17 @@ lit:
 boolean:
 	expr AND expr {0}
 |	expr OR expr {0}
-|	value GT value {0}
-|	value LT value {0}
-|	value LEQ value {0}
-|	value GEQ value {0}
-|	value EQ value {0}
-| 	value NEQ value {0}
-| 	NOT value {0}
+|	arithmetic GT arithmetic {0}
+|	arithmetic LT arithmetic {0}
+|	arithmetic LEQ arithmetic {0}
+|	arithmetic GEQ arithmetic {0}
+|	arithmetic EQ arithmetic {0}
+| 	arithmetic NEQ arithmetic {0}
+| 	NOT arithmetic {0}
 
-value:
+/*arithmetic:
 	arithmetic {0}
-/*|	STRING_LIT {0}*/
+|	STRING_LIT {0}*/
 
 app_gen:
 	app_s {0}
@@ -157,22 +157,22 @@ mod_data_type:
 |	instruments {0}
 
 funk:
-	LPAREN f_values RPAREN {0}
+	LPAREN f_arithmetics RPAREN {0}
 
-f_values:
-	f_values COMMA function_invocation {0}
+f_arithmetics:
+	f_arithmetics COMMA function_invocation {0}
 | function_invocation {0}
 
 function_invocation:
 	STRING_LIT LPAREN funk_args RPAREN {0}
 
 funk_args:
-	funk_args COMMA valueID_arg {0}
-|	valueID_arg {0}
+	funk_args COMMA arithmeticID_arg {0}
+|	arithmeticID_arg {0}
 
-valueID_arg:
+arithmeticID_arg:
 	app_gen {0}
-|	value {0}
+|	arithmetic {0}
 
 regex:
 	AT LBRACE special_exp RBRACE {0}
