@@ -8,9 +8,9 @@
 %token IF ELSE ELIF AND OR
 %token PERIOD COLON
 %token RETURN WHILE
-%token FUNK AT DOLLAR SQU
+%token FUNK AT DOLLAR
 %token <int> INT_LIT
-%token <string> STRING_LIT ID INSTRUMENT
+%token <string> STRING_LIT INSTRUMENT
 %token EOF
 
 %nonassoc ELSE
@@ -36,12 +36,12 @@ program:
 |	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{0; 0}}
 
 funkdecl:
-	FUNK ID LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
+	FUNK STRING_LIT LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
 
 param_list:
 	/* nothing */ { [] }
-|	ID	/*{ [VarDecl($1, ID($2))] }*/ {0}
-|	param_list COMMA ID /*{ VarDecl($3, ID($4))::$1}*/ {0}
+|	STRING_LIT	/*{ [VarDecl($1, STRING_LIT($2))] }*/ {0}
+|	param_list COMMA STRING_LIT /*{ VarDecl($3, STRING_LIT($4))::$1}*/ {0}
 
 stmt_list:
 	/* nothing */ { [] }
@@ -56,8 +56,8 @@ stmt:
 |	vmod SEMI	  /*{ VarDeclS($1) }*/ {0}
 
 vmod:
-	ID APPEND expr {0}
-|	ID ASSIGN expr {0}
+	STRING_LIT APPEND expr {0}
+|	STRING_LIT ASSIGN expr {0}
 
 conditional_stmt:
 	IF LPAREN expr RPAREN stmt elif_list %prec NOELSE /*{ If(($3,$5)::$6, Block([])) }*/ {0}
@@ -85,12 +85,12 @@ int_term:
 
 atom:
 	INT_LIT {0}
-|	ID {0}
+|	STRING_LIT {0}
 
 lit:
 	INT_LIT {0}
 |	note {0}
-|	ID {0}
+|	STRING_LIT {0}
 
 boolean:
 	expr AND expr {0}
@@ -105,7 +105,7 @@ boolean:
 
 value:
 	arithmetic {0}
-/*|	ID {0}*/
+/*|	STRING_LIT {0}*/
 
 app_gen:
 	app_s {0}
@@ -164,7 +164,7 @@ f_values:
 | function_invocation {0}
 
 function_invocation:
-	ID LPAREN funk_args RPAREN {0}
+	STRING_LIT LPAREN funk_args RPAREN {0}
 
 funk_args:
 	funk_args COMMA valueID_arg {0}
@@ -188,10 +188,10 @@ indicies:
 |	indivIDual {0}
 
 range:
-	SQU INT_LIT SQU DASH SQU INT_LIT SQU {0}
+	STRING_LIT INT_LIT STRING_LIT DASH STRING_LIT INT_LIT STRING_LIT {0}
 
 indivIDual:
-	SQU INT_LIT SQU {0}
+	STRING_LIT INT_LIT STRING_LIT {0}
 /* t_sig instrument tempo */
 
 t_sig:
@@ -213,20 +213,5 @@ note:
 
 
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
