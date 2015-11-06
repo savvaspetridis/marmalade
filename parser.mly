@@ -103,53 +103,25 @@ boolean:
 | 	arithmetic NEQ arithmetic {0}
 | 	NOT arithmetic {0}
 
-/*arithmetic:
-	arithmetic {0}
-|	STRING_LIT {0}*/
+
 
 app_gen:
 	app_s {0}
-/*|	app_phrases {0}
-|	app_measure {0}
-|	app_note {0}*/
+
 
 app_s:
 	song_exp APPEND song_exp {0} /*app_phrases {0}*/
 |	song_exp {0}
 
-/*app_phrases:
-	app_phrases APPEND phrase_branch {0}
-|	phrase_branch {0}
 
-phrase_branch:
-	phrase_exp APPEND app_measure {0}
-|	phrase_exp {0}
-
-app_measure:
-	measure_exp APPEND app_note {0}
-|	measure_exp {0}*/
 
 song_exp:
-	/*tempo*/ mod_data_type funk regex {0}
-|	/*tempo*/ mod_data_type regex {0}
+	mod_data_type funk regex {0}
+|	mod_data_type regex {0}
 |	funk regex {0}
 |	regex {0}
 
-/*app_note:
-	funk regex {0}
-|	regex {0}
 
-phrase_exp:
-	instruments	funk regex {0}
-|	instruments regex {0}
-|	funk regex {0}
-|	regex {0}
-
-measure_exp:
-	t_sig funk regex {0}
-|	t_sig regex {0}
-|	funk regex {0}
-|	regex {0}*/
 
 mod_data_type:
 	tempo {0}
@@ -193,7 +165,7 @@ range:
 
 indivIDual:
 	STRING_LIT INT_LIT STRING_LIT {0}
-/* t_sig instrument tempo */
+
 
 t_sig:
 	DOLLAR LPAREN INT_LIT COLON INT_LIT LPAREN {0}
