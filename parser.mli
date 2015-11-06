@@ -40,6 +40,7 @@ type token =
   | DOLLAR
   | INT_LIT of (int)
   | STRING_LIT of (string)
+  | ID of (string)
   | INSTRUMENT of (string)
   | EOF
 

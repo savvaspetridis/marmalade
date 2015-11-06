@@ -10,7 +10,7 @@
 %token RETURN WHILE
 %token FUNK AT DOLLAR
 %token <int> INT_LIT
-%token <string> STRING_LIT INSTRUMENT
+%token <string> STRING_LIT ID INSTRUMENT
 %token EOF
 
 %nonassoc ELSE
@@ -36,12 +36,12 @@ program:
 |	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{0; 0}}
 
 funkdecl:
-	FUNK STRING_LIT LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
+	FUNK ID LPAREN param_list RPAREN LBRACE stmt_list RBRACE {0}
 
 param_list:
 	/* nothing */ { [] }
-|	STRING_LIT	/*{ [VarDecl($1, STRING_LIT($2))] }*/ {0}
-|	param_list COMMA STRING_LIT /*{ VarDecl($3, STRING_LIT($4))::$1}*/ {0}
+|	ID	/*{ [VarDecl($1, ID($2))] }*/ {0}
+|	param_list COMMA ID /*{ VarDecl($3, ID($4))::$1}*/ {0}
 
 stmt_list:
 	/* nothing */ { [] }
@@ -56,8 +56,8 @@ stmt:
 |	vmod SEMI	  /*{ VarDeclS($1) }*/ {0}
 
 vmod:
-	STRING_LIT APPEND expr {0}
-|	STRING_LIT ASSIGN expr {0}
+	ID APPEND expr {0}
+|	ID ASSIGN expr {0}
 
 conditional_stmt:
 	IF LPAREN expr RPAREN stmt elif_list %prec NOELSE /*{ If(($3,$5)::$6, Block([])) }*/ {0}
@@ -85,12 +85,12 @@ int_term:
 
 atom:
 	INT_LIT {0}
-|	STRING_LIT {0}
+|	ID {0}
 
 lit:
 	INT_LIT {0}
 |	note {0}
-|	STRING_LIT {0}
+|	ID {0}
 
 boolean:
 	expr AND expr {0}
@@ -103,25 +103,18 @@ boolean:
 | 	arithmetic NEQ arithmetic {0}
 | 	NOT arithmetic {0}
 
-
-
 app_gen:
 	app_s {0}
-
 
 app_s:
 	song_exp APPEND song_exp {0} /*app_phrases {0}*/
 |	song_exp {0}
-
-
 
 song_exp:
 	mod_data_type funk regex {0}
 |	mod_data_type regex {0}
 |	funk regex {0}
 |	regex {0}
-
-
 
 mod_data_type:
 	tempo {0}
@@ -136,7 +129,7 @@ f_arithmetics:
 | function_invocation {0}
 
 function_invocation:
-	STRING_LIT LPAREN funk_args RPAREN {0}
+	ID LPAREN funk_args RPAREN {0}
 
 funk_args:
 	funk_args COMMA arithmeticID_arg {0}

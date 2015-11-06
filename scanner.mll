@@ -46,7 +46,9 @@ rule token = parse
 |   '@'         { AT }
 |   '$'         { DOLLAR } 
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
-|   (letter)(letter | digit | '_')* as lxm { STRING_LIT(lxm) }
+|   '"' ((letter | digit | '_' | ' ')* as lxm) '"' { STRING_LIT(lxm) }
+|   (letter | digit | '_')* as lxm  { ID(lxm) }
+    
 |   (letter)+ as lxm { INSTRUMENT(lxm) }
 |   eof       { EOF }
 |   _ as char { raise (Failure("illegal character: " ^ Char.escaped char)) }
