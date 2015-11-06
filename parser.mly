@@ -176,6 +176,7 @@ valueID_arg:
 
 regex:
 	AT LBRACE special_exp RBRACE {0}
+|	LBRACK funk_args RBRACK {0}
 
 special_exp:
 	STRING_LIT LPAREN indicies RPAREN special_exp {0}
