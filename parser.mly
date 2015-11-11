@@ -36,10 +36,10 @@ program:
 
 stmt:
 	expr SEMI { Expr($1) }
-|	vmod SEMI	  { VarDeclS($1) }
+|	vmod SEMI	  { VarDecls($1) }
 
 vmod:
-	ID ASSIGN expr {Binop($1, Equal, $3)}
+	ID ASSIGN expr {Assign($1, $3)}
 
 expr:
 	app_gen  {$1}
