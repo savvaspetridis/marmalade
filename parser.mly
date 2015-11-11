@@ -30,71 +30,71 @@
 
 %%
 program:
-    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {{0; 0}}
+    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {[]}
     /* List is built backwards */
-|	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{0; 0}}
+|	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {$2 :: $1 } /* statement head list which is program */
 
 stmt:
-	expr SEMI /*{ Expr($1) }*/ {0}
-|	vmod SEMI	  /*{ VarDeclS($1) }*/ {0}
+	expr SEMI { Expr($1) }
+|	vmod SEMI	  { VarDeclS($1) }
 
 vmod:
-	ID ASSIGN expr {0}
+	ID ASSIGN expr {Binop($1, Equal, $3)}
 
 expr:
-	app_gen  {0}
-|	arithmetic {0}
+	app_gen  {$1}
+|	arithmetic {$1}
 	
 arithmetic:
-    lit PLUS int_term {0}
-|	lit MINUS int_term {0}
-|	int_term {0}
+    lit PLUS int_term {Binop($1, Plus, $2)}
+|	lit MINUS int_term {Binop($1, Minus, $3)}
+|	int_term {$1}
 
 int_term:
-	int_term TIMES atom {0}
-|	int_term DIVIDE atom {0}
-|	atom {0}
+	int_term TIMES atom {Binop($1, Times, $2)}
+|	int_term DIVIDE atom {Binop($1, Divide, $2)}
+|	atom {$1}
 
 atom:
-	INT_LIT {0}
-|	ID {0}
+	INT_LIT {IntLit($1)}
+|	ID {Val($1)}
 
 lit:
-	INT_LIT {0}
-|	note {0}
-|	ID {0}
-|   STRING_LIT {0}
+	INT_LIT {IntLit($1)}
+|	note {$1}
+|	ID {Val($1)}
+|   STRING_LIT {StringLit($1)}
 
 app_gen:
-	funk reg_list {0}
-|   reg_list {0}
+	funk reg_list {List($1, $2)}
+|   reg_list {List(0, $2)}
 
 funk:
-	LPAREN f_arithmetics RPAREN {0}
+	LPAREN f_arithmetics RPAREN {$2}
 
 f_arithmetics:
-	f_arithmetics COMMA function_invocation {0}
-| function_invocation {0}
+	f_arithmetics COMMA function_invocation {$3 :: $1}
+| 	function_invocation {$1}
 
 function_invocation:
-	ID LPAREN funk_args RPAREN {0}
+	ID LPAREN funk_args RPAREN {FunkCall($1, $3)}
 
 funk_args:
-	funk_args COMMA arithmeticID_arg {0}
-|	arithmeticID_arg {0}
-|   STRING_LIT {0}
+	funk_args COMMA arithmeticID_arg {$1 :: $3}
+|	arithmeticID_arg {$1}
+|   STRING_LIT {String_Lit($1)}
 
 arithmeticID_arg:
-    {0}
-|	app_gen {0}
-|	arithmetic {0}
+   /* {0} no clue why we'd have nothing */
+	app_gen {$1}
+|	arithmetic {$1}
 
 reg_list:
-	LBRACK funk_args RBRACK {0}
+	LBRACK funk_args RBRACK {$2}
 
 note:
-	INT_LIT PERIOD S {0}
-|	INT_LIT PERIOD E {0}
-|	INT_LIT PERIOD Q {0}
-|	INT_LIT PERIOD H {0}
-|	INT_LIT PERIOD W {0}
+	INT_LIT PERIOD S {Note($1, $3)}
+|	INT_LIT PERIOD E {Note($1, $3)}
+|	INT_LIT PERIOD Q {Note($1, $3)}
+|	INT_LIT PERIOD H {Note($1, $3)}
+|	INT_LIT PERIOD W {Note($1, $3)}
