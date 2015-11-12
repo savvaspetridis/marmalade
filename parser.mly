@@ -58,17 +58,17 @@ int_term:
 
 atom:
 	INT_LIT {IntLit($1)}
-|	ID {Val($1)}
+|	ID {Id($1)}
 
 lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
-|	ID {Val($1)}
+|	ID {Id($1)}
 |   STRING_LIT {StringLit($1)} /* why is this here? */
 
 app_gen:
-	funk reg_list {List($1, $2)}
-|   reg_list {List(0, $2)}
+	funk reg_list {FuncList($1, $2)}
+|   reg_list {$1}
 
 funk:
 	LPAREN f_arithmetics RPAREN {$2}
@@ -78,7 +78,7 @@ f_arithmetics:
 | 	function_invocation {$1}
 
 function_invocation:
-	ID LPAREN funk_args RPAREN {FunkCall($1, $3)}
+	ID LPAREN funk_args RPAREN {FunkCall($1, List.rev $3)}
 
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
@@ -91,7 +91,7 @@ arithmeticID_arg:
 |	arithmetic {$1}
 
 reg_list:
-	LBRACK funk_args RBRACK {$2}
+	LBRACK funk_args RBRACK {BasicList(List.rev $2)}
 
 note:
 	INT_LIT PERIOD S {Note($1, $3)}
