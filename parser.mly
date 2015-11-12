@@ -36,7 +36,7 @@ program:
 
 stmt:
 	expr SEMI { Expr($1) }
-|	vmod SEMI	  { VarDeclS($1) }
+|	vmod SEMI	  { VarDecl($1) }
 
 vmod:
 	ID ASSIGN expr {Binop($1, Equal, $3)}
@@ -63,7 +63,7 @@ lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
 |	ID {Val($1)}
-|   STRING_LIT {StringLit($1)}
+|   STRING_LIT {StringLit($1)} /* why is this here? */
 
 app_gen:
 	funk reg_list {List($1, $2)}
@@ -80,7 +80,7 @@ function_invocation:
 	ID LPAREN funk_args RPAREN {FunkCall($1, $3)}
 
 funk_args:
-	funk_args COMMA arithmeticID_arg {$1 :: $3}
+	funk_args COMMA arithmeticID_arg {$3 :: $1}
 |	arithmeticID_arg {$1}
 |   STRING_LIT {String_Lit($1)}
 
