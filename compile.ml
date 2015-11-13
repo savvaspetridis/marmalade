@@ -44,7 +44,7 @@ let write_expr e =
 	| StringLit(str, t) -> "\"" ^ str ^ "\""
 	| Id(x, t) -> x
 	| Binop(e_1, op, e_2, t) -> write_bin_op e_1 op e_2 t
-	| 
+	| BasicList(l) -> write_basic_list l
 
 let write_bin_op ex1 op ex2 typ = 
 	let e1 = write_expr ex1 and e2 = write_expr ex2 in
@@ -57,7 +57,7 @@ let write_bin_op ex1 op ex2 typ =
 			| PhraseType 
 			| SongType
 
-
+let write_basic_list l =   
 
 
 
