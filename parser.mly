@@ -5,7 +5,7 @@
 %token INT NOTE STRING MEASURE PHRASE SONG LIST
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
-%token S E Q H W
+%token <char> S E Q H W
 %token IF ELSE ELIF AND OR
 %token PERIOD COLON
 %token RETURN WHILE
@@ -105,5 +105,8 @@ reg_list:
 	LBRACK funk_args RBRACK {BasicList(List.rev $2)}
 
 note:
-	INT_LIT PERIOD STRING_LIT {Note_S($1, $3)}
-
+	INT_LIT PERIOD S {Note($1, $3)}
+|	INT_LIT PERIOD E {Note($1, $3)}
+|	INT_LIT PERIOD Q {Note($1, $3)}
+|	INT_LIT PERIOD H {Note($1, $3)}
+|	INT_LIT PERIOD W {Note($1, $3)}
