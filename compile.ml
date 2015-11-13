@@ -50,12 +50,13 @@ let write_bin_op ex1 op ex2 typ =
 	let e1 = write_expr ex1 and e2 = write_expr ex2 in
 		let helper e1 op e2 = 
 			match typ with
-			IntType
-			| StringType
-			| NoteType
-			| MeasureType
-			| PhraseType 
-			| SongType
+			Int
+			| String
+			| Note
+			| Measure
+			| Phrase
+			| Song
+			| List
 
 let write_basic_list l =   
 
