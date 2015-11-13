@@ -42,7 +42,7 @@ let write_type ty =
 	Int -> "int"
 	| String -> "String"
 	| Note -> "Note"
-	| Measure -> "Node[]"
+	| Measure -> "Note []"
 	| Phrase -> "Note [][]"
 	| Song -> "Note [][][]"
 	| List -> "ArrayList<Our_Object>"
