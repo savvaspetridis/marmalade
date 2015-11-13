@@ -30,24 +30,35 @@ VarDecl(v) -> write_var_decl v
 
 let write_var_decl v = 
 	match v with 
-	Assign(id, exp) -> write_assign id exp
+	Assign(typ, id, exp) -> write_assign id exp typ
 	| 
 
-let write_assign i e = 
-	match e with
+let write_assign i e t = 
+	match e with 
 	_ -> write_type e ^ " " ^ i ^ " = " ^ write_expr e
 
 
 let write_expr e = 
 	match e with
-	IntLit(i) -> string_of_int i
-	| StringLit(str) -> "\"" ^ str ^ "\""
-	| Id(x) -> x
-	| Binop(e_1, op, e_2) -> write_bin_op e_1 op e_2
+	IntLit(i, t) -> string_of_int i
+	| StringLit(str, t) -> "\"" ^ str ^ "\""
+	| Id(x, t) -> x
+	| Binop(e_1, op, e_2, t) -> write_bin_op e_1 op e_2 t
 	| 
 
+let write_bin_op ex1 op ex2 typ = 
+	let e1 = write_expr ex1 and e2 = write_expr ex2 in
+		let helper e1 op e2 = 
+			match typ with
+			IntType
+			| StringType
+			| NoteType
+			| MeasureType
+			| PhraseType 
+			| SongType
 
-let write_bin_op e1 op e2 = 
+
+
 
 
 
