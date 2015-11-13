@@ -2,7 +2,7 @@
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
-/*%token INT NOTE STRING */
+%token INT NOTE STRING MEASURE PHRASE SONG
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
 %token S E Q H W
@@ -39,9 +39,17 @@ stmt:
 	expr SEMI { Expr($1) }
 |	vmod SEMI	  { VarDecl($1) }
 
+type_dec:
+	INT 	{String}
+|	NOTE 	{Note}
+|	MEASURE	{Measure}
+|	PHRASE	{Phrase}
+|	SONG	{Song}
+|	STRING 	{String}
+
 
 vmod:
-	ID ASSIGN expr {Assign($1, $3)}
+	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 
 expr:
 	app_gen  {$1}

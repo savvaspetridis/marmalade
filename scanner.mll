@@ -43,6 +43,12 @@ rule token = parse
 |   "return"    { RETURN }
 |   "while"     { WHILE }
 |   "funk"      { FUNK }
+| 	"int"    	{ INT }                      
+| 	"note"		{ NOTE}
+| 	"string" 	{ STRING }
+|	"measure" 	{ MEASURE }
+|	"phrase"	{ PHRASE }
+|	"song"		{ SONG }
 |   '@'         { AT }
 |   '$'         { DOLLAR } 
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
