@@ -105,8 +105,5 @@ reg_list:
 	LBRACK funk_args RBRACK {BasicList(List.rev $2)}
 
 note:
-	INT_LIT PERIOD S {Note_S($1)}
-|	INT_LIT PERIOD E {Note_E($1)}
-|	INT_LIT PERIOD Q {Note_Q($1)}
-|	INT_LIT PERIOD H {Note_H($1)}
-|	INT_LIT PERIOD W {Note_W($1)}
+	INT_LIT PERIOD STRING_LIT {Note_S($1, $3)}
+
