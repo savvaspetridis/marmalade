@@ -37,6 +37,16 @@ let write_assign i e t =
 	match e with 
 	_ -> write_type e ^ " " ^ i ^ " = " ^ write_expr e
 
+let write_type ty =
+	match ty with
+	Int -> "int"
+	| String -> "String"
+	| Note -> "Note"
+	| Measure -> "Node[]"
+	| Phrase -> "Note [][]"
+	| Song -> "Note [][][]"
+	| List -> "ArrayList<Our_Object>"
+
 
 let write_expr e = 
 	match e with
