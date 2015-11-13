@@ -2,6 +2,7 @@
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
+/*%token INT NOTE STRING */
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
 %token S E Q H W
@@ -47,18 +48,19 @@ expr:
 |	arithmetic {$1}
 	
 arithmetic:
-    lit PLUS int_term {Binop($1, Plus, $2)}
+    lit PLUS int_term {Binop($1, Plus, $3)}
 |	lit MINUS int_term {Binop($1, Minus, $3)}
 |	int_term {$1}
 
 int_term:
-	int_term TIMES atom {Binop($1, Times, $2)}
-|	int_term DIVIDE atom {Binop($1, Divide, $2)}
-|	atom {$1}
+	int_term TIMES lit {Binop($1, Times, $3)}
+|	int_term DIVIDE lit {Binop($1, Divide, $3)}
+/*|	atom {$1}*/
+|	lit {$1}
 
-atom:
+/*atom:
 	INT_LIT {IntLit($1)}
-|	ID {Id($1)}
+|	ID {Id($1)}*/
 
 lit:
 	INT_LIT {IntLit($1)}
@@ -83,7 +85,7 @@ function_invocation:
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
 |	arithmeticID_arg {$1}
-|   STRING_LIT {String_Lit($1)}
+/*|   STRING_LIT {String_Lit($1)}*/
 
 arithmeticID_arg:
    /* {0} no clue why we'd have nothing */
@@ -94,8 +96,8 @@ reg_list:
 	LBRACK funk_args RBRACK {BasicList(List.rev $2)}
 
 note:
-	INT_LIT PERIOD S {Note($1, $3)}
-|	INT_LIT PERIOD E {Note($1, $3)}
-|	INT_LIT PERIOD Q {Note($1, $3)}
-|	INT_LIT PERIOD H {Note($1, $3)}
-|	INT_LIT PERIOD W {Note($1, $3)}
+	INT_LIT PERIOD S {Note_S($1)}
+|	INT_LIT PERIOD E {Note_E($1)}
+|	INT_LIT PERIOD Q {Note_Q($1)}
+|	INT_LIT PERIOD H {Note_H($1)}
+|	INT_LIT PERIOD W {Note_W($1)}

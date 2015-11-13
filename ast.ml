@@ -17,13 +17,17 @@ type expr =
 	IntLit of int
 	| Id of string
 	| String_Lit of string
-	| Note of int * note_type
+	| Note_S of int * note_type
+	| Note_E of int * note_type
+	| Note_Q of int * note_type
+	| Note_H of int * note_type
+	| Note_W of int * note_type
 	| Binop of expr * op * expr
 	| BasicList of expr list
 	| FuncList of invocation list * expr list
 
 type vmod =
-	Assign of string * expr
+	Assign of string * expr 
 
 type stmt = 
 	Expr of expr
