@@ -49,6 +49,7 @@ rule token = parse
 |	"measure" 	{ MEASURE }
 |	"phrase"	{ PHRASE }
 |	"song"		{ SONG }
+|	"list"		{ LIST }
 |   '@'         { AT }
 |   '$'         { DOLLAR } 
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }

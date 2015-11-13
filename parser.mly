@@ -2,7 +2,7 @@
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
-%token INT NOTE STRING MEASURE PHRASE SONG
+%token INT NOTE STRING MEASURE PHRASE SONG LIST
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
 %token S E Q H W
@@ -40,12 +40,13 @@ stmt:
 |	vmod SEMI	  { VarDecl($1) }
 
 type_dec:
-	INT 	{String}
+	INT 	{Int}
 |	NOTE 	{Note}
 |	MEASURE	{Measure}
 |	PHRASE	{Phrase}
 |	SONG	{Song}
 |	STRING 	{String}
+| 	LIST 	{List}
 
 
 vmod:
