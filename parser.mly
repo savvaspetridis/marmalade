@@ -31,7 +31,7 @@
 
 %%
 program:
-    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {[]}
+    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {0; []} 
     /* List is built backwards */
 |	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {$2 :: $1 } /* statement head list which is program */
 
