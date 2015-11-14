@@ -14,12 +14,6 @@ let to_java marma =
 		String.concat "\n" (List.map stmt_write marma.stmts) ^
 		"\n}\n}"
 
-(* let stmt_write = *)
-
-
-
-
-
 (* Below: From Fry *)
 
 let stmt_write = function
@@ -48,8 +42,7 @@ let write_type ty =
 	| Measure -> "Note []"
 	| Phrase -> "Note [][]"
 	| Song -> "Note [][][]"
-	| List -> "ArrayList<Our_Object>"
-
+    | List -> "ArrayList<Our_Object>"
 
 
 
@@ -61,7 +54,7 @@ let write_expr e =
 	| Binop(e_1, op, e_2, t) -> write_bin_op e_1 op e_2 t
 	| BasicList(l) -> "[" ^ List.map (fun e -> write_expr e ^ "," ) l ^  "]"
 	| Note_S(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
-	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l)) ^ write_expr l
+	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l) ^ write_expr l
 
 
 let mapcall func param = 
@@ -96,7 +89,7 @@ let write_bin_op ex1 op ex2 typ =
 
 
 (* Functions below were copied from Corgi - Fall 2014 *)
-
+(*
 let write_op_primitive = function
 	Add -> " + "
 	| Sub -> " - "
@@ -120,15 +113,4 @@ let write_op_compares e1 op e2 =
 	| Geq -> "(" ^ e1 ^ ").compareTo(" ^ e2 ^ ")" ^ " >= 0"
 	| Neq -> "(" ^ e1 ^ ").compareTo(" ^ e2 ^ ")" ^ " != 0"
 	| _ -> raise (Failure "not a comparator operation")
-
-
-
-
-
-(* let write_assign *)
-
-
-
-
-
-
+*)
