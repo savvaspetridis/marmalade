@@ -10,6 +10,13 @@ type token =
   | PLUS
   | MINUS
   | TIMES
+  | INT
+  | NOTE
+  | STRING
+  | MEASURE
+  | PHRASE
+  | SONG
+  | LIST
   | DIVIDE
   | ASSIGN
   | EQ
@@ -21,11 +28,7 @@ type token =
   | DASH
   | APPEND
   | NOT
-  | S
-  | E
-  | Q
-  | H
-  | W
+  | NOTE_TYPE of (char)
   | IF
   | ELSE
   | ELIF
