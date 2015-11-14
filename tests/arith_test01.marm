@@ -1,0 +1,8 @@
+/# 
+Tests the basic arithmetic operations
+#/
+
+print (10 + 35);
+print (30 - 25);
+print (25 * 3);
+print (18 / 6);
