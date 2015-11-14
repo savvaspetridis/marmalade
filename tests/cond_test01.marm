@@ -1,0 +1,8 @@
+string x = "true";
+string y = "Fail";
+
+if (x == "true") {
+    y = "Success";
+}
+
+print y;
