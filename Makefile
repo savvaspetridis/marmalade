@@ -4,7 +4,7 @@ TESTS = \
 
 # Choose one
 YACC = ocamlyacc
-# YACC = menhir --explain
+#YACC = menhir --explain
 
 marmalade : $(OBJS)
 	ocamlc -o marmalade $(OBJS)

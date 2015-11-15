@@ -5,7 +5,7 @@
 %token INT NOTE STRING MEASURE PHRASE SONG LIST
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
-%token <char> S E Q H W
+%token <char> NOTE_TYPE
 %token IF ELSE ELIF AND OR
 %token PERIOD COLON
 %token RETURN WHILE
@@ -31,9 +31,9 @@
 
 %%
 program:
-    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {0; []} 
+    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {[], []} 
     /* List is built backwards */
-|	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {$2 :: $1 } /* statement head list which is program */
+|	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {$2 :: fst $1, []} /* statement head list which is program */
 
 stmt:
 	expr SEMI { Expr($1) }
@@ -47,7 +47,6 @@ type_dec:
 |	SONG	{Song}
 |	STRING 	{String}
 | 	LIST 	{List}
-
 
 vmod:
 	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
@@ -75,25 +74,25 @@ lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
 |	ID {Id($1)}
-|   STRING_LIT {StringLit($1)} /* why is this here? */
+/*|   STRING_LIT {StringLit($1)}  why is this here? */
 
 app_gen:
 	funk reg_list {FuncList($1, $2)}
-|   reg_list {$1}
+|   reg_list  {BasicList($1)}
 
 funk:
 	LPAREN f_arithmetics RPAREN {$2}
 
 f_arithmetics:
 	f_arithmetics COMMA function_invocation {$3 :: $1}
-| 	function_invocation {$1}
+| 	function_invocation {[$1]}
 
 function_invocation:
 	ID LPAREN funk_args RPAREN {FunkCall($1, List.rev $3)}
 
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
-|	arithmeticID_arg {$1}
+|	arithmeticID_arg {[$1]}
 /*|   STRING_LIT {String_Lit($1)}*/
 
 arithmeticID_arg:
@@ -102,11 +101,12 @@ arithmeticID_arg:
 |	arithmetic {$1}
 
 reg_list:
-	LBRACK funk_args RBRACK {BasicList(List.rev $2)}
+	LBRACK funk_args RBRACK {List.rev $2}
 
 note:
-	INT_LIT PERIOD S {Note($1, $3)}
+	INT_LIT PERIOD NOTE_TYPE {Note($1, $3)}
+/*|   INT_LIT PERIOD S {Note($1, $3)}
 |	INT_LIT PERIOD E {Note($1, $3)}
 |	INT_LIT PERIOD Q {Note($1, $3)}
 |	INT_LIT PERIOD H {Note($1, $3)}
-|	INT_LIT PERIOD W {Note($1, $3)}
+|	INT_LIT PERIOD W {Note($1, $3)}*/

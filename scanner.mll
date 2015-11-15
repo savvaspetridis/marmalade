@@ -28,11 +28,11 @@ rule token = parse
 |   '-'         { DASH }
 |   "<<"        { APPEND } 
 |   '!'         { NOT }
-|   's'         { S }
+(*|   's'         { S }
 |   'e'         { E }
 |   'q'         { Q }
 |   'h'         { H }
-|   'w'         { W }
+|   'w'         { W }*)
 |   "if"        { IF }
 |   "else"      { ELSE }
 |   "elif"      { ELIF }
@@ -51,7 +51,8 @@ rule token = parse
 |	"song"		{ SONG }
 |	"list"		{ LIST }
 |   '@'         { AT }
-|   '$'         { DOLLAR } 
+|   '$'         { DOLLAR }
+|   ('s'|'e'|'q'|'h'|'w') as lxm { NOTE_TYPE(lxm) }
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ')* as lxm) '"' { STRING_LIT(lxm) }
 |   (letter | digit | '_')* as lxm  { ID(lxm) }

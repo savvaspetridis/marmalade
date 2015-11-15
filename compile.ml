@@ -14,12 +14,6 @@ let to_java marma =
 		String.concat "\n" (List.map stmt_write marma.stmts) ^
 		"\n}\n}"
 
-(* let stmt_write = *)
-
-
-
-
-
 (* Below: From Fry *)
 
 let stmt_write = function
@@ -48,8 +42,7 @@ let write_type ty =
 	| Measure -> "Note []"
 	| Phrase -> "Note [][]"
 	| Song -> "Note [][][]"
-	| List -> "ArrayList<Our_Object>"
-
+    | List -> "ArrayList<Our_Object>"
 
 
 
@@ -61,7 +54,7 @@ let write_expr e =
 	| Binop(e_1, op, e_2, t) -> write_bin_op e_1 op e_2 t
 	| BasicList(l) -> "[" ^ List.map (fun e -> write_expr e ^ "," ) l ^  "]"
 	| Note_S(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
-	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l)) ^ write_expr l
+	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l) ^ write_expr l
 
 
 let mapcall func param = 
@@ -83,34 +76,27 @@ let write_bin_op ex1 op ex2 typ =
 	let e1 = write_expr ex1 and e2 = write_expr ex2 in
 		let helper e1 op e2 = 
 			match typ with
-			Int
-			| String
-			| Note
-			| Measure
-			| Phrase
-			| Song
-			| List
-
-
-
-
+            Int -> (match op with (Plus | Minus | Times | Divide | Equal | Neq |
+            Less | Leq | Greater | Geq) -> e1 ^ write_op_primitive op ^ e2)
+            | Note -> e1 ^ ".setPitch( " ^ e1 ^ ".getPitch() + " ^ e2 ^
+            ".getPitch());\n"
+            Note n = new Note(C4+i, CROTCHET);
 
 (* Functions below were copied from Corgi - Fall 2014 *)
 
 let write_op_primitive = function
-	Add -> " + "
-	| Sub -> " - "
-	| Mult -> " * "
-	| Div -> " / "
+	Plus -> " + "
+	| Minus -> " - "
+	| Times -> " * "
+	| Divide -> " / "
 	| Equal -> " == "
 	| Neq -> " != "
 	| Less -> " < " 	
 	| Leq -> " <= "
 	| Greater -> " > "
 	| Geq -> " >= "
-	| Mod -> " % "
 	| _ -> raise (Failure "and/or begin applied to a java primitive")
-
+(*
 let write_op_compares e1 op e2 =
 	match op with 
 	Equal -> "(" ^ e1 ^ ").equals(" ^ e2 ^ ")"
@@ -120,15 +106,4 @@ let write_op_compares e1 op e2 =
 	| Geq -> "(" ^ e1 ^ ").compareTo(" ^ e2 ^ ")" ^ " >= 0"
 	| Neq -> "(" ^ e1 ^ ").compareTo(" ^ e2 ^ ")" ^ " != 0"
 	| _ -> raise (Failure "not a comparator operation")
-
-
-
-
-
-(* let write_assign *)
-
-
-
-
-
-
+*)
