@@ -31,9 +31,9 @@
 
 %%
 program:
-    /* nothing */ /*{ { stmts = []; funcs = [] } }*/ {{stmts = []; funcs = []} }
+    /* nothing */  {{stmts = []; funcs = []} }
     /* List is built backwards */
-|	program stmt  /*{ { stmts = $2::$1.stmts; funcs = $1.funcs } } */ {{stmts = $2 :: fst $1.stmts; funcs = $1.funcs}} /* statement head list which is program */
+|	program stmt {{stmts = $2 :: $1.stmts; funcs = $1.funcs}} /* statement head list which is program */
 
 stmt:
 	expr SEMI { Expr($1) }
