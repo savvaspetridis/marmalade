@@ -11,8 +11,8 @@ let rec to_java marma =
 
 
 
-	"\n\npublic static void main(String[] args) {\n" ^
-		String.concat "\n" (List.map stmt_write marma.stmts) ^
+	"\n\npublic static void main(String[] args) {\n" ^ "int i = 0;\n" ^
+		String.concat "\n" (List.map stmt_write (List.rev marma.stmts)) ^
 		"\n}\n}" 
 
 (* Below: From Fry *)
@@ -40,9 +40,9 @@ and write_type ty =
 	Int -> "int"
 	| String -> "String"
 	| Note -> "Note"
-	| Measure -> "Note []"
-	| Phrase -> "Note [][]"
-	| Song -> "Note [][][]"
+	| Measure -> "Note[]"
+	| Phrase -> "Note[][]"
+	| Song -> "Note[][][]"
     | List -> "ArrayList<Our_Object>"
 
 and write_expr e = 
@@ -55,7 +55,7 @@ and write_expr e =
 	| BasicList(l) -> "{" ^ String.concat "," (List.map write_expr l) ^  "}"
 	| Note(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
 	| FuncList(funk_args, l) -> "{" ^ String.concat "," (List.map write_expr l)
-    ^ "};\n" ^ String.concat ";\n" (List.map2 mapcall funk_args l) ^ "int i = 0"
+    ^ "};\n" ^ String.concat ";\n" (List.map2 mapcall funk_args l) ^ "i = 0"
     | FunkCall(name, args) -> name ^ "(" ^ String.concat "," (List.map
     write_expr args) ^ ");\n"
 
