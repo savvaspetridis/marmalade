@@ -56,4 +56,4 @@ type fdecl = {
     body : stmt list;
 }
 
-type program = stmt list * fdecl list
+type program = {stmts: stmt list; funcs: fdecl list}
