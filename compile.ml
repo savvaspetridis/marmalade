@@ -7,7 +7,7 @@ let rec to_java marma =
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.Play;\n" ^
-	"public class marma{\n" ^
+	"public class marma implements JMC{\n" ^
 
 
 
@@ -52,18 +52,18 @@ and write_expr e =
 	| Id(x) -> x
 (*	| Binop(e_1, op, e_2, t) -> writeBinOp e_1 op e_2 t *)
 	| Binop(e_1, op, e_2) -> writeBinOp e_1 op e_2
-	| BasicList(l) -> "[" ^ String.concat "," (List.map write_expr l) ^  "]"
+	| BasicList(l) -> "{" ^ String.concat "," (List.map write_expr l) ^  "}"
 	| Note(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
-	| FuncList(funk_args, l) -> "[" ^ String.concat "," (List.map write_expr l)
-    ^ "];\n" ^ String.concat ";\n" (List.map2 mapcall funk_args l)
+	| FuncList(funk_args, l) -> "{" ^ String.concat "," (List.map write_expr l)
+    ^ "};\n" ^ String.concat ";\n" (List.map2 mapcall funk_args l) ^ "int i = 0"
     | FunkCall(name, args) -> name ^ "(" ^ String.concat "," (List.map
     write_expr args) ^ ");\n"
 
 and mapcall func param = 
 	match func with 
     FunkCall(name, args) -> (match name with 
-    "print" -> "System.out.println(" ^ String.concat "," (List.map write_expr args) ^ ");\n" 
-    | "play" -> "Play.midi(" ^ String.concat "," (List.map write_expr args) ^
+    "print" -> "System.out.println(" ^ (*String.concat "," (List.map write_expr args)*) write_expr param ^ ");\n" 
+    | "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr param ^
     ");\n")
 
 and write_rhythm dr =
