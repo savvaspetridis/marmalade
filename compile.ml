@@ -44,8 +44,6 @@ and write_type ty =
 	| Song -> "Note [][][]"
     | List -> "ArrayList<Our_Object>"
 
-
-
 and write_expr e = 
 	match e with
 	IntLit(i) -> string_of_int i
@@ -53,31 +51,34 @@ and write_expr e =
 	| Id(x) -> x
 (*	| Binop(e_1, op, e_2, t) -> writeBinOp e_1 op e_2 t *)
 	| Binop(e_1, op, e_2) -> writeBinOp e_1 op e_2
-	| BasicList(l) -> "[" ^ List.map (fun e -> write_expr e ^ "," ) l ^  "]"
+	| BasicList(l) -> "[" ^ String.concat "," (List.map write_expr l) ^  "]"
 	| Note(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
-	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l) ^ write_expr l
-
+	| FuncList(funk_args, l) -> "[" ^ String.concat "," (List.map write_expr l)
+    ^ "];\n" ^ String.concat ";\n" (List.map2 mapcall funk_args l)
+    | FunkCall(name, args) -> name ^ "(" ^ String.concat "," (List.map
+    write_expr args) ^ ");\n"
 
 and mapcall func param = 
-	match func with
-		"print" -> "System.out.println(" ^ param ^ ")"
-		| "play" -> "Play.midi(" ^ write_expr param ^ ")"
+	match func with 
+    FunkCall(name, args) -> (match name with 
+    "print" -> "System.out.println(" ^ String.concat "," (List.map write_expr args) ^ ");\n" 
+    | "play" -> "Play.midi(" ^ String.concat "," (List.map write_expr args) ^
+    ");\n")
 
 and write_rhythm dr =
-			match dr with 
-			S -> "0.25"
-			| E -> "0.5"
-			| Q -> "1.0"
-			| H -> "1.5"
-			| W -> "2.0"
-
+	match dr with 
+	's' -> "0.25"
+	| 'e' -> "0.5"
+    | 'q' -> "1.0"
+	| 'h' -> "1.5"
+	| 'w' -> "2.0"
 
 (* This is a replacement from Fry *)
 and writeBinOp e1 o e2 = 
 	match o with 
 	Equal -> write_expr e1 ^".equals("^ write_expr e2^") " 
 	| Neq -> "!" ^ write_expr e1 ^".equals("^ write_expr e2^") " 
-	| _ -> j_expr e1 ^ 
+	| _ -> write_expr e1 ^ 
 		(match o with Plus -> "+" | Minus -> "-" | Times -> "*" |
 				  Divide -> "/" |  
 				  Less -> "<" | Leq -> "<=" | Greater -> ">" |
