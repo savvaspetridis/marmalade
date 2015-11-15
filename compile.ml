@@ -16,7 +16,7 @@ let rec to_java marma =
 
 (* Below: From Fry *)
 
-and stmt_write stmt = function
+and stmt_write = function
 (*	S_Block(_,ss) -> "{\n" ^ String.concat "\n" ( List.rev (List.map j_stmt ss)) ^ "\n}"	
 | 	S_Expr(e,_) -> j_expr e ^ ";"
 |   S_Return(e,_) -> "return " ^ j_expr e ^";"
@@ -28,7 +28,7 @@ VarDecl(v) -> write_var_decl v ^ ";\n"
 
 and write_var_decl v = 
 	match v with 
-	Assign(typ, id, exp) -> write_assign id exp typ
+	Assign(typ, id, exp) ->  write_assign id exp typ
 
 and write_assign i e t = 
 	match e with 
@@ -48,20 +48,20 @@ and write_type ty =
 
 and write_expr e = 
 	match e with
-	IntLit(i, t) -> string_of_int i
-	| StringLit(str, t) -> "\"" ^ str ^ "\""
-	| Id(x, t) -> x
-(*	| Binop(e_1, op, e_2, t) -> write_bin_op e_1 op e_2 t *)
-	| Binop(e_1, op, e_2) -> write_bin_op e_1 op e_2
+	IntLit(i) -> string_of_int i
+	| String_Lit(str) -> "\"" ^ str ^ "\""
+	| Id(x) -> x
+(*	| Binop(e_1, op, e_2, t) -> writeBinOp e_1 op e_2 t *)
+	| Binop(e_1, op, e_2) -> writeBinOp e_1 op e_2
 	| BasicList(l) -> "[" ^ List.map (fun e -> write_expr e ^ "," ) l ^  "]"
-	| Note_S(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
+	| Note(nt, dr) -> "new Note(" ^ string_of_int nt ^ ", " ^ write_rhythm dr  ^ ")"
 	| FuncList(funk_args, l) -> (List.map2 map_calls funk_args l) ^ write_expr l
 
 
 and mapcall func param = 
 	match func with
-		"print" -> "System.out.println(" ^ param ^ ");\n"
-		| "play" -> "Play.midi(" ^ write_expr param ^ ");\n"
+		"print" -> "System.out.println(" ^ param ^ ")"
+		| "play" -> "Play.midi(" ^ write_expr param ^ ")"
 
 and write_rhythm dr =
 			match dr with 
@@ -87,7 +87,7 @@ and writeBinOp e1 o e2 =
 
 	I don't think this will work becasue we don't have types in writeBinOp in AST
 
-let write_bin_op ex1 op ex2 typ = 
+let writeBinOp ex1 op ex2 typ = 
 	let e1 = write_expr ex1 and e2 = write_expr ex2 in
 		let helper e1 op e2 = 
 			match typ with
