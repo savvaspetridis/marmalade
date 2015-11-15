@@ -4,10 +4,11 @@ open Ast
 let rec to_java marma =
 	"import java.util.Arrays;\n" ^
 	"import java.util.ArrayList;\n" ^ 
-	"public class marmalade{\n" ^
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.Play;\n" ^
+	"public class marma{\n" ^
+
 
 
 	"\n\npublic static void main(String[] args) {\n" ^

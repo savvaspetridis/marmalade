@@ -89,6 +89,7 @@ f_arithmetics:
 
 function_invocation:
 	ID LPAREN funk_args RPAREN {FunkCall($1, List.rev $3)}
+|	ID LPAREN RPAREN {FunkCall($1, [])}
 
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
@@ -96,7 +97,7 @@ funk_args:
 /*|   STRING_LIT {String_Lit($1)}*/
 
 arithmeticID_arg:
-   /* {0} no clue why we'd have nothing */
+   /* {0} no clue why we'd have nothing */ 
 	app_gen {$1}
 |	arithmetic {$1}
 
