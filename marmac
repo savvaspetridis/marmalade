@@ -1,0 +1,19 @@
+#!/bin/bash
+
+./marmalade < $1 
+
+javac -classpath ./javaclasses/jMusic1.6.4.jar:. marma.java 
+
+
+if [ $# -eq 2 ];
+	then 
+	STR=$'#!/bin/bash\njava -classpath ./javaclasses/jMusic1.6.4.jar:. marma'
+	echo "$STR" > ./$2
+	chmod 755 ./$2
+else
+	STR=$'#!/bin/bash\njava -classpath ./javaclasses/jMusic1.6.4.jar:. marma'
+	echo "$STR" > ./a.out
+	chmod 755 ./a.out
+fi
+
+

@@ -1,0 +1,5 @@
+/* Hello World in marmalade!! */
+
+measure hello = (print(), print(), print()) [55.q, 44.s, 76.h];
+measure world = (play(), play(), play()) [55.q, 44.s, 76.h];
+
