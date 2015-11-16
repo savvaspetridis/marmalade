@@ -12,7 +12,7 @@ type note_type =
 	| H of string
 	| W of string 
 *)
-type declare_type = Int | Note | String | Song | Phrase | Measure | List
+type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist
 (*
 type funk_expr = 
     IntLit of int

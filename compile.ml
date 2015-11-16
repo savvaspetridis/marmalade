@@ -44,6 +44,8 @@ and write_type ty =
 	| Phrase -> "Note[][]"
 	| Song -> "Note[][][]"
     | List -> "ArrayList<Our_Object>"
+    | Intlist -> "int []"
+    | Stringlist -> "String []"
 
 and write_expr e = 
 	match e with

@@ -2,7 +2,7 @@
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
-%token INT NOTE STRING MEASURE PHRASE SONG LIST
+%token INT NOTE STRING MEASURE PHRASE SONG LIST INTLIST STRL
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
 %token <char> NOTE_TYPE
@@ -47,6 +47,8 @@ type_dec:
 |	SONG	{Song}
 |	STRING 	{String}
 | 	LIST 	{List}
+|	INTLIST	{Intlist}
+|	STRL 	{Stringlist}
 
 vmod:
 	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
@@ -74,7 +76,7 @@ lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
 |	ID {Id($1)}
-/*|   STRING_LIT {StringLit($1)}  why is this here? */
+|   STRING_LIT {String_Lit($1)}  /*why is this here? */
 
 app_gen:
 	funk reg_list {FuncList($1, $2)}

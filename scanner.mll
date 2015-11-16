@@ -45,6 +45,8 @@ rule token = parse
 |   "funk"      { FUNK }
 | 	"int"    	{ INT }                      
 | 	"note"		{ NOTE}
+|	"int_list"	{ INTLIST }
+|	"str_list"	{ STRL}
 | 	"string" 	{ STRING }
 |	"measure" 	{ MEASURE }
 |	"phrase"	{ PHRASE }
