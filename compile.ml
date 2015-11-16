@@ -30,6 +30,7 @@ VarDecl(v) -> write_var_decl v ^ ";\n"
 and write_var_decl v = 
 	match v with 
 	Assign(typ, id, exp) ->  write_assign id exp typ
+	| Update(id, exp) -> write_assign id exp Wild
 
 and write_assign i e t = 
 	match e with 
@@ -46,6 +47,7 @@ and write_type ty =
     | List -> "ArrayList<Our_Object>"
     | Intlist -> "int []"
     | Stringlist -> "String []"
+    | _ -> ""
 
 and write_expr e = 
 	match e with

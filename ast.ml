@@ -12,7 +12,7 @@ type note_type =
 	| H of string
 	| W of string 
 *)
-type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist
+type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist | Wild
 (*
 type funk_expr = 
     IntLit of int
@@ -44,6 +44,7 @@ type expr =
 *)
 type vmod =
 	Assign of declare_type * string * expr 
+	| Update of string * expr
 
 type stmt = 
 	Expr of expr

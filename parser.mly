@@ -52,6 +52,7 @@ type_dec:
 
 vmod:
 	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
+|	ID ASSIGN expr {Update($1, $3)}
 
 expr:
 	app_gen  {$1}
