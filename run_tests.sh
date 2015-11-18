@@ -1,13 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
 #Skeleton from MicroC Regression Test Suite Script (microc/testall.sh)
 
-MARMALADE="./marmalade"
+MARMALADE="./marmac"
+    #marmac depends on "marmalade" compiler
 
 # Set time limit for all operations
 ulimit -t 30
 
-globallog=testall.log
+globallog=tests.log
 rm -f $globallog
 error=0
 globalerror=0
@@ -15,7 +16,7 @@ globalerror=0
 keep=0
 
 Usage() {
-    echo "Usage: testall.sh [options] [.marm files]"
+    echo "Usage: run_tests.sh [options] [.marm files]"
     echo "-k    Keep intermediate files"
     echo "-h    Print this help"
     exit 1
