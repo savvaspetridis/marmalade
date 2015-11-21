@@ -6,7 +6,7 @@ let rec to_java marma =
 	"import java.util.ArrayList;\n" ^ 
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
-	"import jm.util.Play;\n" ^
+	"import jm.util.*;\n" ^
 	"public class marma implements JMC{\n" ^
 
 
@@ -68,7 +68,8 @@ and mapcall func param =
     FunkCall(name, args) -> (match name with 
     "print" -> "System.out.println(" ^ (*String.concat "," (List.map write_expr args)*) write_expr param ^ ");\n" 
     | "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr param ^
-    ");\n")
+    ");\n"
+    | "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr param ^ ", \"out.mid\");\n")
 
 and write_rhythm dr =
 	match dr with 
