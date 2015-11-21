@@ -2,6 +2,12 @@
 
 #Skeleton from MicroC Regression Test Suite Script (microc/testall.sh)
 
+
+# 0 stdin
+# 1 stdout
+# 2 stderr
+
+
 MARMALADE="./marmac"
     #marmac depends on "marmalade" compiler
 
@@ -65,13 +71,18 @@ Check() {
 
     generatedfiles=""
 
-    generatedfiles="$generatedfiles ${basename}.i.out" &&
-    Run "$MARMALADE" "-i" "<" $1 ">" ${basename}.i.out &&
-    Compare ${basename}.i.out ${reffile}.out ${basename}.i.diff
+    generatedfiles="$generatedfiles ${basename}.t.out" &&
+    #Run "$MARMALADE" "-i" "<" $1 ">" ${basename}.i.out &&
+    Run "$MARMALADE" $1 ${basename} &&
+    ./${basename} > ${basename}.t.out &&
+    Compare ${basename}.t.out ${reffile}.out ${basename}.t.diff
 
-    generatedfiles="$generatedfiles ${basename}.c.out" &&
-    Run "$MARMALADE" "-c" "<" $1 ">" ${basename}.c.out &&
-    Compare ${basename}.c.out ${reffile}.out ${basename}.c.diff
+    cat "${basename}.t.out"
+
+    #generatedfiles="$generatedfiles ${basename}.c.out" &&
+    #Run "$MARMALADE" "-c" "<" $1 ">" ${basename}.c.out &&
+    #Run "$MARMALADE" $1 ">" ${basename}.c.out &&
+    #Compare ${basename}.c.out ${reffile}.out ${basename}.c.diff
 
     # Report the status and clean up the generated files
 
@@ -104,16 +115,19 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/fail-*.marm tests/test-*.marm"
+    files="tests/fail_* tests/test_*"
+    # files="tests/fail_*.marm tests/test_*.marm"
 fi
 
 for file in $files
 do
     case $file in
-	*test-*)
+    *.out)
+        ;;
+	*test_*)
 	    Check $file 2>> $globallog
 	    ;;
-	*fail-*)
+	*fail_*)
 	    CheckFail $file 2>> $globallog
 	    ;;
 	*)
