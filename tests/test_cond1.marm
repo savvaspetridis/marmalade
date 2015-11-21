@@ -1,3 +1,6 @@
+/* Testing conditionals in marmalade */
+
+/*
 string x = "true";
 string y = "Fail";
 
@@ -5,4 +8,5 @@ if (x == "true") {
     y = "Success";
 }
 
-print y;
+(print()) [y];
+*/

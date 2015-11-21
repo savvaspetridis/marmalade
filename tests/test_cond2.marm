@@ -1,3 +1,6 @@
+/* Testing conditionals in marmalade */
+
+/*
 string x = "true";
 int z = 5;
 string y = "Fail";
@@ -11,4 +14,5 @@ elif (z < 4){
 else {
     y = "Success";
 }
-print y;
+(print()) [y];
+*/
