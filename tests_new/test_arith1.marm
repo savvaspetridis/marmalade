@@ -1,0 +1,13 @@
+/*
+Tests the basic arithmetic operations
+*/
+
+int a = 10 + 35;
+int b = 30 - 25;
+int c = 25 * 3;
+int d = 18 / 6;
+
+(print()) [a];
+(print()) [b];
+(print()) [c];
+(print()) [d];

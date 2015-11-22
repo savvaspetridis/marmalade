@@ -1,0 +1,5 @@
+/* Testing Variable Assignment */
+
+int i = 5;
+
+(print()) [i];
