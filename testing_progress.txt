@@ -1,0 +1,78 @@
+---------------------
+ARITHMETIC
+---------------------
+
+/* MARMALADE CODE */
+
+int a = 10;
+a = a + 10;
+
+(print()) [a];
+
+
+
+// JAVA CODE GENERATED
+
+import java.util.Arrays;
+import java.util.ArrayList;
+import jm.JMC;
+import jm.music.data.*;
+import jm.util.*;
+public class marma implements JMC{
+
+
+public static void main(String[] args) {
+int i = 0;
+int a = 10;
+
+ a = a+10;
+
+{a};
+System.out.println(a);
+i = 0;
+
+}
+}
+
+
+
+----------------------
+ARITH REPORT OUT
+----------------------
+
+> Random line {a}; is created 
+> Need to look into parser to rectify issue
+
+
+
+-----------------
+PLAY NOTE
+-----------------
+
+Works great.
+
+
+
+------------------
+HELLO WORLD
+------------------
+
+Works great.
+
+
+
+
+------------------
+CONDITIONAL
+------------------
+
+To do.
+
+
+
+
+------------------
+FUNK
+------------------
+
+To do.
