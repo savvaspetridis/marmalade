@@ -78,7 +78,7 @@ Check() {
     generatedfiles="$2/${basename}.t.out" &&
     Run "$MARMALADE" $1 $2/${basename} &&
     $2/${basename} > $2/${basename}.t.out &&
-    Compare $2/${basename}.t.out $2/${reffile}.out $2/${basename}.t.diff
+    Compare $2/${basename}.t.out ${reffile}.out $2/${basename}.t.diff
 
     generatedfiles="$generatedfiles $2/${basename}.t.out $2/${reffile}.out $2${basename}.t.diff"
     generatedfiles="$generatedfiles $2/${basename} $2/marma.java $2/marma.class"
