@@ -59,6 +59,9 @@ Run() {
 }
 
 Check() {
+    # $1    name of basename file
+    # $2    name of test directory
+
     error=0
     basename=`echo $1 | sed 's/.*\\///
                              s/.marm//'`
@@ -72,19 +75,14 @@ Check() {
 
     generatedfiles=""
 
-    generatedfiles="$generatedfiles ${basename}.t.out" &&
-    #Run "$MARMALADE" "-i" "<" $1 ">" ${basename}.i.out &&
-    Run "$MARMALADE" $1 ${basename} &&
-    ./${basename} > ${basename}.t.out &&
-    Compare ${basename}.t.out ${reffile}.out ${basename}.t.diff
+    generatedfiles="$2/${basename}.t.out" &&
+    Run "$MARMALADE" $1 $2/${basename} &&
+    $2/${basename} > $2/${basename}.t.out &&
+    Compare $2/${basename}.t.out $2/${reffile}.out $2/${basename}.t.diff
 
-    cat "${basename}.t.out"
-
-    #generatedfiles="$generatedfiles ${basename}.c.out" &&
-    #Run "$MARMALADE" "-c" "<" $1 ">" ${basename}.c.out &&
-    #Run "$MARMALADE" $1 ">" ${basename}.c.out &&
-    #Compare ${basename}.c.out ${reffile}.out ${basename}.c.diff
-
+    generatedfiles="$generatedfiles $2/${basename}.t.out $2/${reffile}.out $2${basename}.t.diff"
+    generatedfiles="$generatedfiles $2/${basename} $2/marma.java $2/marma.class"
+    
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
@@ -97,6 +95,8 @@ Check() {
 	echo "###### FAILED" 1>&2
 	globalerror=$error
     fi
+
+    #cd ..
 }
 
 while getopts kdpsh c; do
@@ -120,16 +120,21 @@ else
     # files="tests/fail_*.marm tests/test_*.marm"
 fi
 
-for file in $files
+
+date=`date +%F_%H%M%S`
+testdir="testdir_${date}"
+mkdir "$testdir"
+
+for file in ../$files
 do
     case $file in
     *.out)
         ;;
 	*test_*)
-	    Check $file 2>> $globallog
+	    Check $file $testdir 2>> $globallog
 	    ;;
 	*fail_*)
-	    CheckFail $file 2>> $globallog
+	    CheckFail $file $testdir 2>> $globallog
 	    ;;
 	*)
 	    echo "unknown file type $file"
