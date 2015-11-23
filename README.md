@@ -16,6 +16,13 @@ The Marmalade Group, Inc.
     Uzo Amuzie        -   Role
 
 
+--------------------------
+REGRESSION TEST SUITE
+--------------------------
+
+./run_tests	in project TLD (marmalade)
+
+
 
 --------------------------
 DEPENDENCIES
