@@ -73,21 +73,31 @@ Check() {
     echo 1>&2
     echo "###### Testing $basename" 1>&2
 
-    generatedfiles=""
+    #  generatedfiles=""
 
     generatedfiles="$2/${basename}.t.out" &&
-    Run "$MARMALADE" $1 $2/${basename} &&
-    $2/${basename} > $2/${basename}.t.out &&
+    Run "$MARMALADE" "$1" "${basename}" &&
+    "./${basename}" > "$2/${basename}.t.out" &&
+    mv "${basename}" "$2/${basename}" &&
+    mv "${basename}.java" "$2/${basename}.java" &&
+    mv "${basename}.class" "$2/${basename}.class"
+#     $2/${basename} > $2/${basename}.t.out 
     Compare $2/${basename}.t.out ${reffile}.out $2/${basename}.t.diff
 
+    echo $2
+    echo ${basename}
+
+#     Run "$2/${basename}"
+
     generatedfiles="$generatedfiles $2/${basename}.t.out $2/${reffile}.out $2${basename}.t.diff"
-    generatedfiles="$generatedfiles $2/${basename} $2/marma.java $2/marma.class"
+    generatedfiles="$generatedfiles $2/${basename} $2/${basename}.java $2/${basename}.class"
     
     # Report the status and clean up the generated files
 
     if [ $error -eq 0 ] ; then
 	if [ $keep -eq 0 ] ; then
-	    rm -f $generatedfiles
+	   # rm -f $generatedfiles
+       echo ""
 	fi
 	echo "OK"
 	echo "###### SUCCESS" 1>&2
