@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#Skeleton from MicroC Regression Test Suite Script (microc/testall.sh)
-
+# Based on MicroC Regression Test Suite Script (microc/testall.sh)
 
 # 0 stdin
 # 1 stdout
@@ -59,8 +58,8 @@ Run() {
 }
 
 Check() {
-    # $1    name of basename file
-    # $2    name of test directory
+    # $1    name of basename file   (i.e. test_arith_add1)
+    # $2    name of testdir         (i.e. testdir_2015-11-24_061339)
 
     error=0
     basename=`echo $1 | sed 's/.*\\///
@@ -74,7 +73,9 @@ Check() {
     echo "###### Testing $basename" 1>&2
 
     generatedfiles=""
-    touch
+
+
+    # GENERATE .java .class <outfile>.t.out .t.diff FILES
 
     generatedfiles="$2/${basename}.t.out" 
     Run "$MARMALADE" "$1" "${basename}" 
@@ -82,16 +83,14 @@ Check() {
     mv "${basename}" "$2/${basename}" 
     mv "${basename}.java" "$2/${basename}.java" 
     mv "${basename}.class" "$2/${basename}.class"
-#     $2/${basename} > $2/${basename}.t.out 
+
     Compare $2/${basename}.t.out ${reffile}.out $2/${basename}.t.diff
 
-    echo $2
-    echo ${basename}
-
-#     Run "$2/${basename}"
+    echo
 
     generatedfiles="$generatedfiles $2/${basename}.t.out $2/${reffile}.out $2${basename}.t.diff"
     generatedfiles="$generatedfiles $2/${basename} $2/${basename}.java $2/${basename}.class"
+    
     
     # Report the status and clean up the generated files
 
@@ -106,9 +105,13 @@ Check() {
 	echo "###### FAILED" 1>&2
 	globalerror=$error
     fi
-
-    #cd ..
 }
+
+
+
+#BEGINNING OF SCRIPT
+#BEGINNING OF SCRIPT
+#BEGINNING OF SCRIPT
 
 while getopts kdpsh c; do
     case $c in
@@ -133,7 +136,7 @@ fi
 
 
 
-# KEEP TLD CLEAN
+# AUTO ARCHIVE TEST FILES
 if [ -d "testing_archive" ]; then
     mv testdir_* testing_archive/
 else
@@ -141,10 +144,11 @@ else
 fi
 
 
-
+# CREATE NEW TEST DIR FOR INTERMEDIATE FILES
 date=`date +%F_%H%M%S`
 testdir="testdir_${date}"
 mkdir "$testdir"
+
 
 for file in $files
 do
@@ -163,9 +167,6 @@ do
 	    ;;
     esac
 done
-
-
-
 
 
 exit $globalerror
