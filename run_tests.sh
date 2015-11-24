@@ -125,7 +125,7 @@ date=`date +%F_%H%M%S`
 testdir="testdir_${date}"
 mkdir "$testdir"
 
-for file in ../$files
+for file in $files
 do
     case $file in
     *.out)

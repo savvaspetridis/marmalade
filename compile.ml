@@ -1,13 +1,13 @@
 (* open Sast *)
 open Ast
 
-let rec to_java marma =
+let rec to_java marma name =
 	"import java.util.Arrays;\n" ^
 	"import java.util.ArrayList;\n" ^ 
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.*;\n" ^
-	"public class marma implements JMC{\n" ^
+	"public class " ^ name ^ " implements JMC{\n" ^
 
 
 
