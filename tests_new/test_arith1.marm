@@ -7,7 +7,9 @@ int b = 30 - 25;
 int c = 25 * 3;
 int d = 18 / 6;
 
-(print()) [a];
-(print()) [b];
-(print()) [c];
-(print()) [d];
+
+int_list hello = (print()) [a];
+int_list fall = (print()) [b];
+int_list gl = (print()) [c];
+int_list he = (print()) [d];
+

@@ -73,13 +73,14 @@ Check() {
     echo 1>&2
     echo "###### Testing $basename" 1>&2
 
-    #  generatedfiles=""
+    generatedfiles=""
+    touch
 
-    generatedfiles="$2/${basename}.t.out" &&
-    Run "$MARMALADE" "$1" "${basename}" &&
-    "./${basename}" > "$2/${basename}.t.out" &&
-    mv "${basename}" "$2/${basename}" &&
-    mv "${basename}.java" "$2/${basename}.java" &&
+    generatedfiles="$2/${basename}.t.out" 
+    Run "$MARMALADE" "$1" "${basename}" 
+    ./${basename} &> "./$2/${basename}.t.out"
+    mv "${basename}" "$2/${basename}" 
+    mv "${basename}.java" "$2/${basename}.java" 
     mv "${basename}.class" "$2/${basename}.class"
 #     $2/${basename} > $2/${basename}.t.out 
     Compare $2/${basename}.t.out ${reffile}.out $2/${basename}.t.diff

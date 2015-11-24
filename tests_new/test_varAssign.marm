@@ -1,5 +1,5 @@
 /* Testing Variable Assignment */
 
-int i = 5;
+int il = 5;
 
-(print()) [i];
+int_list belt = (print()) [il];
