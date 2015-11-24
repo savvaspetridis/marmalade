@@ -132,6 +132,16 @@ else
 fi
 
 
+
+# KEEP TLD CLEAN
+if [ -d "testing_archive" ]; then
+    mv testdir_* testing_archive/
+else
+    mkdir "testing_archive"
+fi
+
+
+
 date=`date +%F_%H%M%S`
 testdir="testdir_${date}"
 mkdir "$testdir"
@@ -153,5 +163,9 @@ do
 	    ;;
     esac
 done
+
+
+
+
 
 exit $globalerror
