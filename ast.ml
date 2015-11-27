@@ -49,9 +49,13 @@ type vmod =
 type stmt = 
 	Expr of expr
 	| VarDecl of vmod
+	(*| Fdecl of fdecl*)
+	| Fdecl of string * declare_type * expr list * stmt list
 
 type fdecl = {
     fname : string;
+    ret_type : declare_type;
+    args : expr list;
 (*    formals : string list;
     locals : string list; *)
     body : stmt list;

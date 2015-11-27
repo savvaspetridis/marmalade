@@ -1,4 +1,4 @@
-OBJS = ast.cmo parser.cmo scanner.cmo compile.cmo marmalade.cmo
+OBJS = ast.cmo table.cmo parser.cmo scanner.cmo compile.cmo marmalade.cmo
 
 TESTS = \
 
