@@ -1,4 +1,11 @@
- %{ open Ast %}
+ %{ open Ast 
+
+let scope_id = ref 1
+
+let inc_block_id (u:unit) =
+    let x = scope_id.contents in
+    scope_id := x + 1; x
+%}
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
@@ -38,6 +45,7 @@ program:
 stmt:
 	expr SEMI { Expr($1) }
 |	vmod SEMI	  { VarDecl($1) }
+|	conditional_stmt { $1 }
 
 type_dec:
 	INT 	{Int}
@@ -50,6 +58,34 @@ type_dec:
 |	INTLIST	{Intlist}
 |	STRL 	{Stringlist}
 
+/*
+conditional_stmt:
+	IF LPAREN expr RPAREN block %prec NOELSE { If($3, $5, [], {locals = []; statements = []; block_id = inc_block_id ()}) }
+| 	IF LPAREN expr RPAREN block elif_list ELSE block { If($3, $5, $6, $8) }
+|	WHILE LPAREN expr RPAREN block { While($3, $5) }
+
+*/
+
+conditional_stmt:
+	IF LPAREN expr RPAREN block %prec NOELSE { If($3, $5, {locals = []; statements = []; block_id = inc_block_id ()}) }
+| 	IF LPAREN expr RPAREN block ELSE block { If($3, $5, $7) }
+|	WHILE LPAREN expr RPAREN block { While($3, $5) }
+
+block:
+	LBRACE stmt_list RBRACE { {locals = []; statements = List.rev $2; block_id = inc_block_id ()} }
+
+/*
+elif_list: 
+	 nothing  { [] }
+	| elif_list elif_stmt { $2 :: $1 } 
+
+elif_stmt:
+	ELIF LPAREN expr RPAREN block*/
+
+stmt_list:
+    /* nothing */  { [] }
+    | stmt_list stmt { $2 :: $1 } 
+	
 vmod:
 	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
@@ -57,6 +93,18 @@ vmod:
 expr:
 	app_gen  {$1}
 |	arithmetic {$1}
+| 	bool_expr {$1}
+
+bool_expr: 
+	expr EQ     expr { Binop($1, Equal, $3) }
+  | expr NEQ    expr { Binop($1, Neq,   $3) }
+  | expr LT     expr { Binop($1, Less,  $3) }
+  | expr LEQ    expr { Binop($1, Leq,   $3) }
+  | expr GT     expr { Binop($1, Greater,  $3) }
+  | expr GEQ    expr { Binop($1, Geq,   $3) }
+  | expr AND    expr { Binop($1, And, $3) }
+  | expr OR     expr { Binop($1, Or, $3) }
+
 	
 arithmetic:
     lit PLUS int_term {Binop($1, Plus, $3)}
