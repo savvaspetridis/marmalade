@@ -28,9 +28,17 @@ type vmod =
 	Assign of declare_type * string * expr 
 	| Update of string * expr
 
-type stmt = 
+type d_stmt = 
 	Expr of expr
 	| VarDecl of vmod
+	| D_While of d_expr * d_block
+	| D_If of d_expr * d_stmt * d_stmt
+
+and d_block = {
+	d_locals : scope_var_decl list;
+	d_statements: d_stmt list;
+	d_block_id: int;
+}
 
 type fdecl = {
     fname : string;
