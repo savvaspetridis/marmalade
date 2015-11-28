@@ -23,15 +23,15 @@ let inc_block_id (u:unit) =
 
 %nonassoc ELSE
 %nonassoc NOELSE
-/*%right ASSIGN APPEND
-%left LBRACK*/
+%right ASSIGN
+/* %left LBRACK */
 %left OR
 %left AND
-/*%left EQ NEQ
+%left EQ NEQ
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE 
-%right NOT*/
+%right NOT
 
 %start program
 %type <Ast.program> program
@@ -91,9 +91,30 @@ vmod:
 |	ID ASSIGN expr {Update($1, $3)}
 
 expr:
-	app_gen  {$1}
-|	arithmetic {$1}
-| 	bool_expr {$1}
+  /*| literal							{ $1 }*/
+  | app_gen  {$1}
+  | arith {$1}
+  /*|	arithmetic {$1}*/
+  /*| ID 								{ Id($1) } 
+  | bool_expr {$1}
+  | expr PLUS expr                  { Binop($1, Add, $3) }
+  | expr MINUS expr                 { Binop($1, Sub, $3) }
+  | expr TIMES expr                 { Binop($1, Mult, $3) }
+  | expr DIVIDE expr                { Binop($1, Div, $3) }
+  | LPAREN expr RPAREN { $2 } */
+
+
+
+/*
+bool_expr_OR:
+	bool_expr_AND {$1}
+	| bool_expr_OR OR bool_expr_OR { Binop($1, Or, $3) }
+
+bool_expr_AND:*/
+
+
+
+/*
 
 bool_expr: 
 	expr EQ     expr { Binop($1, Equal, $3) }
@@ -102,10 +123,57 @@ bool_expr:
   | expr LEQ    expr { Binop($1, Leq,   $3) }
   | expr GT     expr { Binop($1, Greater,  $3) }
   | expr GEQ    expr { Binop($1, Geq,   $3) }
-  | expr AND    expr { Binop($1, And, $3) }
-  | expr OR     expr { Binop($1, Or, $3) }
 
-	
+*/
+
+/* ATTEMPT 1  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+arith: 
+	logical_OR_expr { $1 }
+
+primary_expr:
+    ID              { Id($1) }
+|	literal 		{ $1 }
+|	LPAREN expr RPAREN { $2 }
+
+literal:
+	INT_LIT {IntLit($1)}
+|	note {$1}
+|   STRING_LIT {String_Lit($1)}  
+
+multi_expr:
+	primary_expr		{ $1 }
+|	multi_expr TIMES lit { Binop($1, Times,$3) }
+|   multi_expr DIVIDE lit { Binop($1, Divide, $3) } 
+
+add_expr:
+	multi_expr { $1 }
+|	lit PLUS multi_expr  { Binop($1, Plus, $3) }
+|   lit MINUS multi_expr { Binop($1, Minus, $3) }
+
+relational_expr:
+	add_expr		{ $1 }
+|   relational_expr LT relational_expr    { Binop($1, Less, $3) }
+|   relational_expr LEQ relational_expr   { Binop($1, Leq, $3) }
+|   relational_expr GT relational_expr    { Binop($1, Greater, $3) }
+|   relational_expr GEQ relational_expr   { Binop($1, Geq, $3) }
+
+equality_expr:
+	relational_expr { $1 }
+|   equality_expr EQ equality_expr    { Binop($1, Equal, $3) } 
+|   equality_expr NEQ equality_expr   { Binop($1, Neq, $3) }
+
+logical_AND_expr:
+	equality_expr { $1 }
+|	logical_AND_expr AND logical_AND_expr   { Binop($1, And, $3) }
+
+logical_OR_expr:
+	logical_AND_expr { $1 }
+|   logical_AND_expr OR logical_OR_expr    { Binop($1, Or, $3) }
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+
 arithmetic:
     lit PLUS int_term {Binop($1, Plus, $3)}
 |	lit MINUS int_term {Binop($1, Minus, $3)}
@@ -114,22 +182,30 @@ arithmetic:
 int_term:
 	int_term TIMES lit {Binop($1, Times, $3)}
 |	int_term DIVIDE lit {Binop($1, Divide, $3)}
-/*|	atom {$1}*/
 |	lit {$1}
 
 /*atom:
 	INT_LIT {IntLit($1)}
 |	ID {Id($1)}*/
 
+
+
+app_gen: 
+|	funk reg_list {FuncList($1, $2)}
+|   reg_list  {BasicList($1)}
+
+
+
+
+
+
+
+
 lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
 |	ID {Id($1)}
 |   STRING_LIT {String_Lit($1)}  /*why is this here? */
-
-app_gen:
-	funk reg_list {FuncList($1, $2)}
-|   reg_list  {BasicList($1)}
 
 funk:
 	LPAREN f_arithmetics RPAREN {$2}
@@ -142,15 +218,24 @@ function_invocation:
 	ID LPAREN funk_args RPAREN {FunkCall($1, List.rev $3)}
 |	ID LPAREN RPAREN {FunkCall($1, [])}
 
+
+/*
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
-|	arithmeticID_arg {[$1]}
+|	arithmeticID_arg {[$1]}*/
 /*|   STRING_LIT {String_Lit($1)}*/
 
-arithmeticID_arg:
+/*arithmeticID_arg:*/
    /* {0} no clue why we'd have nothing */ 
-	app_gen {$1}
-|	arithmetic {$1}
+	/*app_gen {$1}*/
+   /*| arithmetic {$1}*/
+    /*| arith {$1}*/
+
+funk_args:
+	funk_args COMMA expr {$3 :: $1}
+|	expr {[$1]}
+
+
 
 reg_list:
 	LBRACK funk_args RBRACK {List.rev $2}
