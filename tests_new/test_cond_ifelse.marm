@@ -1,10 +1,15 @@
 /* Testing Conditional Control Flow */
 
-int condition;
-condition = 1;
+int condition = 1;
 
 if (condition == 1) {
+<<<<<<< HEAD
+	str_list good = (print()) [condition];
+} else {
+	str_list bad = (print()) [0];;
+=======
 	int_list (print()) [condition];
 } else {
 	string_list (print()) ["error"];
+>>>>>>> 245448667cd78faf471b618be6c8a11392d71605
 }
