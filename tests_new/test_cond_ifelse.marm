@@ -4,7 +4,7 @@ int condition;
 condition = 1;
 
 if (condition == 1) {
-	(print()) [condition];
+	int_list (print()) [condition];
 } else {
-	(print()) ["error"];
+	string_list (print()) ["error"];
 }
