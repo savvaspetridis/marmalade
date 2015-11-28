@@ -1,16 +1,9 @@
 /* Testing while loop */
 
-int i;
-i = 0;
+int i = 0;
 
 while (i<10 ) {
-<<<<<<< HEAD
 	i = i+1;
 }
 
-int_list out = (print()) [i]
-=======
-	int_list (print()) [i];
-	i = i+1;
-}
->>>>>>> 245448667cd78faf471b618be6c8a11392d71605
+int_list out = (print()) [i];
