@@ -64,25 +64,28 @@ let add_var var exp env =
 
 let rec add_stmt stmt env =
 	match stmt with
+
 	(*Expr(exp) -> (match exp with 
 	  Block(block) -> add_block block env
 	  | If(expr, block1, block2) -> 
 	  		let env = add_block block1 env in add_block block2 env
-	  | For(expr1, expr2, expr3, block) -> add_block block env
+	  (*| For(expr1, expr2, expr3, block) -> add_block block env*)
 	  | While(expr, block) -> add_block block env
-	  | '_' -> env )
-	|*) VarDecl(chan) -> (match chan with 
+	  | '_' -> env )*)
+	| If(e, bl_1, bl_2) -> let env_1 = add_block bl_1 env in add_block bl_2 env_1
+	| While(e, bl) -> add_block bl env
+	| VarDecl(chan) -> (match chan with 
 		Assign(typ, id, blah) -> add_var (id, typ) blah env
 	 	| _ -> env )
 	(*| '_' -> env*)
 
-(*and add_block block env =  
+and add_block block env =  
 	let (table, scope) = env in 
 	let id = block.block_id in
-	let env = map_to_list_env add_var block.locals (table, id) in
+	(*let env = map_to_list_env add_var block.locals (table, id) in*)
 	let env = map_to_list_env add_stmt block.statements env in
 	parent_scope.(id) <- scope; 
-	((env_table env), scope)*)
+	((env_table env), scope)
 (*
 and add_func func env =
 	let (table, scope) = env in
