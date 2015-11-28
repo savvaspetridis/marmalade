@@ -40,7 +40,35 @@ let inc_block_id (u:unit) =
 program:
     /* nothing */  {{stmts = []; funcs = []} }
     /* List is built backwards */
+|   program fdecl {{ stmts = $1.stmts; funcs = $2 :: $1.funcs }} 
 |	program stmt {{stmts = $2 :: $1.stmts; funcs = $1.funcs}} /* statement head list which is program */
+
+
+fdecl:
+   type_dec ID LPAREN arguments RPAREN LBRACE vdecl_list stmt_list RBRACE
+     {{ ret_type = $1;
+        fname = $2;
+	    args = $4;
+	    body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} } }
+
+arguments: 
+	/* nothing */ { [] }
+	| arg_list    { List.rev $1 }
+
+arg_list:
+	fvmod { [$1] }
+	| arg_list COMMA fvmod { $3 :: $1 }
+
+fvmod:
+	type_dec ID { ($2, $1) }
+
+
+vdecl_list: 
+					   { [] }
+	| vdecl_list vdecl { $2 :: $1 }
+
+vdecl: 
+	type_dec ID ASSIGN expr {($2, $1)}
 
 stmt:
 	expr SEMI { Expr($1) }
@@ -91,42 +119,9 @@ vmod:
 |	ID ASSIGN expr {Update($1, $3)}
 
 expr:
-  /*| literal							{ $1 }*/
   | app_gen  {$1}
   | arith {$1}
-  /*|	arithmetic {$1}*/
-  /*| ID 								{ Id($1) } 
-  | bool_expr {$1}
-  | expr PLUS expr                  { Binop($1, Add, $3) }
-  | expr MINUS expr                 { Binop($1, Sub, $3) }
-  | expr TIMES expr                 { Binop($1, Mult, $3) }
-  | expr DIVIDE expr                { Binop($1, Div, $3) }
-  | LPAREN expr RPAREN { $2 } */
 
-
-
-/*
-bool_expr_OR:
-	bool_expr_AND {$1}
-	| bool_expr_OR OR bool_expr_OR { Binop($1, Or, $3) }
-
-bool_expr_AND:*/
-
-
-
-/*
-
-bool_expr: 
-	expr EQ     expr { Binop($1, Equal, $3) }
-  | expr NEQ    expr { Binop($1, Neq,   $3) }
-  | expr LT     expr { Binop($1, Less,  $3) }
-  | expr LEQ    expr { Binop($1, Leq,   $3) }
-  | expr GT     expr { Binop($1, Greater,  $3) }
-  | expr GEQ    expr { Binop($1, Geq,   $3) }
-
-*/
-
-/* ATTEMPT 1  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 arith: 
 	logical_OR_expr { $1 }
@@ -219,21 +214,25 @@ function_invocation:
 |	ID LPAREN RPAREN {FunkCall($1, [])}
 
 
-/*
+
 funk_args:
 	funk_args COMMA arithmeticID_arg {$3 :: $1}
-|	arithmeticID_arg {[$1]}*/
+|	arithmeticID_arg {[$1]}
 /*|   STRING_LIT {String_Lit($1)}*/
 
-/*arithmeticID_arg:*/
+arithmeticID_arg:
    /* {0} no clue why we'd have nothing */ 
-	/*app_gen {$1}*/
+	app_gen {$1}
    /*| arithmetic {$1}*/
-    /*| arith {$1}*/
+    | arith {$1}
 
+
+/*
 funk_args:
 	funk_args COMMA expr {$3 :: $1}
 |	expr {[$1]}
+
+*/
 
 
 
