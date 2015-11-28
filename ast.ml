@@ -3,7 +3,7 @@
 *)
 
 
-type op = Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | Geq
+type op = Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | Geq | And | Or
 (*
 type note_type = 
 	S of string
@@ -25,6 +25,29 @@ type funk_expr =
 type invocation = 
     FunkCall of string * funk_expr list
 *)
+
+(*
+type prim_type = 
+	Int
+	| Note
+	| String
+	| Song
+	| Phrase
+	| Measure
+	| List
+	| Intlist
+	| Stringlist
+
+*)
+
+
+
+(* type var = string * declare_type *)
+
+type scope_var_decl = string * declare_type * int
+
+type var = string * declare_type
+
 type expr = 
 	IntLit of int
 	| Id of string
@@ -51,6 +74,14 @@ type stmt =
 	| VarDecl of vmod
 	(*| Fdecl of fdecl*)
 	| Fdecl of string * declare_type * expr list * stmt list
+	| If of expr * block * block
+	| While of expr * block
+
+and block = {
+	locals: var list;
+	statements: stmt list;
+	block_id: int
+}
 
 type fdecl = {
     fname : string;
