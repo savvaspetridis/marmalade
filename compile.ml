@@ -11,7 +11,7 @@ let rec to_java marma name =
 
 
 
-	"\n\npublic static void main(String[] args) {\n" ^ "int i = 0;\n" ^
+	"\n\npublic static void main(String[] args) {\n" ^ "int who_would_guess_this = 0;\n" ^
 		String.concat "\n" (List.map stmt_write (List.rev marma.stmts)) ^
 		"\n}\n}" 
 
@@ -26,6 +26,18 @@ and stmt_write = function
 | 	S_While(e, s) -> writeWhileLoop e s *)
 VarDecl(v) -> write_var_decl v ^ ";\n"
 | Expr(e) -> write_expr e ^ ";\n"
+| While(e, s) -> "while(" ^ write_expr e ^ ")" ^ write_block s
+| If(e, b1, b2) -> "if(" ^ write_expr e ^  ")" ^  write_block b1 ^ "else"  ^ write_block b2
+
+and write_block b =
+	"{\n" ^  String.concat "\n" (List.map write_scope_var_decl b.locals) ^ String.concat "\n" (List.map stmt_write b.statements) ^ "\n}"
+
+and write_scope_var_decl svd =
+	write_scope_var_decl_func svd ^ ";\n"
+
+and write_scope_var_decl_func svd = 
+	let (name, typ) = svd in 
+		write_type typ ^ " " ^ name
 
 and write_var_decl v = 
 	match v with 
