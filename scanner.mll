@@ -54,10 +54,10 @@ rule token = parse
 |	"list"		{ LIST }
 |   '@'         { AT }
 |   '$'         { DOLLAR }
-|   ('s'|'e'|'q'|'h'|'w') as lxm { NOTE_TYPE(lxm) }
+|   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ')* as lxm) '"' { STRING_LIT(lxm) }
-|   (letter | digit | '_')* as lxm  { ID(lxm) }
+|   (letter | digit | '_')+ as lxm  { ID(lxm) }
     
 |   (letter)+ as lxm { INSTRUMENT(lxm) }
 |   eof       { EOF }
