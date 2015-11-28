@@ -1,0 +1,10 @@
+/* Testing Conditional Control Flow */
+
+int condition;
+condition = 1;
+
+if (condition == 1) {
+	(print()) [condition];
+} else {
+	(print()) ["error"];
+}
