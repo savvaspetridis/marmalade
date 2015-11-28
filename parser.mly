@@ -45,11 +45,14 @@ program:
 
 
 fdecl:
-   type_dec ID LPAREN arguments RPAREN LBRACE vdecl_list stmt_list RBRACE
+   type_dec ID LPAREN arguments RPAREN LBRACE /*vdecl_list*/ stmt_list RBRACE
      {{ ret_type = $1;
         fname = $2;
 	    args = $4;
-	    body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} } }
+	    body = {locals = []; statements = List.rev $7; block_id = inc_block_id ()} 
+	    (*body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} *)
+
+	    } }
 
 arguments: 
 	/* nothing */ { [] }
@@ -63,12 +66,12 @@ fvmod:
 	type_dec ID { ($2, $1) }
 
 
-vdecl_list: 
+/*vdecl_list: 
 					   { [] }
 	| vdecl_list vdecl { $2 :: $1 }
 
 vdecl: 
-	type_dec ID ASSIGN expr {($2, $1)}
+	type_dec ID ASSIGN expr {($2, $1)}*/
 
 stmt:
 	expr SEMI { Expr($1) }
