@@ -1,0 +1,8 @@
+/*
+Tests reference list item by index
+*/
+
+int_list swag = [0, 1, 2];
+int out = swag[1];
+
+int_list swagOut = (print()) [out];
