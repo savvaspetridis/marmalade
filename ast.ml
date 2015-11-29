@@ -86,10 +86,10 @@ and block = {
 type fdecl = {
     fname : string;
     ret_type : declare_type;
-    args : expr list;
+    args : var list;
 (*    formals : string list;
     locals : string list; *)
-    body : stmt list;
+    body : block;
 }
 
 type program = {stmts: stmt list; funcs: fdecl list}
