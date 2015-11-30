@@ -1,4 +1,4 @@
-OBJS = ast.cmo table.cmo parser.cmo scanner.cmo compile.cmo marmalade.cmo
+OBJS = ast.cmo table.cmo sast.cmo parser.cmo scanner.cmo compile.cmo marmalade.cmo
 
 TESTS = \
 
@@ -33,6 +33,9 @@ clean :
 
 ast.cmo: 
 ast.cmx: 
+
+sast.cmo: ast.cmo
+sast.cmx: ast.cmx
 
 compile.cmo: ast.cmo 
 compile.cmx: bytecode.cmx ast.cmx 

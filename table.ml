@@ -46,7 +46,7 @@ let rec get_decl name env =
 		if (snd env) = 0 then raise (Failure("symbol " ^ name ^ " not declared in current scope"))
         else get_decl name ((fst env), parent_scope.(snd env))
 
-let add_symbol (name:string) (decl:stmt) env =
+let add_symbol (name:string) (decl:decl) env =
 	let key = name_scope_str name env in
     if StrMap.mem key (env_table env)
     then raise(Failure("symbol " ^ name ^ " declared twice in same scope"))
@@ -55,17 +55,17 @@ let add_symbol (name:string) (decl:stmt) env =
 
 let add_var var exp env =
 	let (name, p_type) = var in
-	(*let is_implicit_array = 
+	let is_implicit_array = 
 		(match p_type with
-		  (Chord_Type | Track_Type | Composition_Type | Rhythm_Type) -> true
-		  | _ -> false) in*)
+		  (Int | Note | String ) -> false
+		  | _ -> true) in
 
-	add_symbol name (VarDecl(Assign( p_type, name, exp))) env
+	add_symbol name (Var_Decl(name, is_implicit_array, p_type, (env_scope env))) env
 
 let rec add_stmt stmt env =
 	match stmt with
 
-	(*Expr(exp) -> (match exp with 
+	Expr(exp) -> env(*(match exp with 
 	  Block(block) -> add_block block env
 	  | If(expr, block1, block2) -> 
 	  		let env = add_block block1 env in add_block block2 env
@@ -74,6 +74,7 @@ let rec add_stmt stmt env =
 	  | '_' -> env )*)
 	| If(e, bl_1, bl_2) -> let env_1 = add_block bl_1 env in add_block bl_2 env_1
 	| While(e, bl) -> add_block bl env
+	| Fdecl(fdec) -> add_func fdec env
 	| VarDecl(chan) -> (match chan with 
 		Assign(typ, id, blah) -> add_var (id, typ) blah env
 	 	| _ -> env )
@@ -86,19 +87,19 @@ and add_block block env =
 	let env = map_to_list_env add_stmt block.statements env in
 	parent_scope.(id) <- scope; 
 	((env_table env), scope)
-(*
+
 and add_func func env =
 	let (table, scope) = env in
-	let arg_names = List.map type_of_funct_args func.formals in
+	let arg_names = List.map type_of_funct_args func.args in
 	let env = add_symbol func.fname (Func_Decl(func.fname, func.ret_type, arg_names, scope)) env in
-	let env = map_to_list_env add_var func.formals ((env_table env), func.fblock.block_id) in
-	add_block func.fblock ((env_table env), scope)
-*)
+	(*let env = map_to_list_env add_var func.formals ((env_table env), func.fblock.block_id) in*)
+	add_block func.body ((env_table env), scope)
+
 
 let base_env = 
-	let table = StrMap.add "print" (*{fname = "print"; ret_type = Int; args = []; body = []}*) (Fdecl("print", Int, [], [])) StrMap.empty in
-	let table = StrMap.add "play" (*{fname = "play"; ret_type = Int; args = []; body = []}*) (Fdecl("play", Int, [], [])) table in
-	let table = StrMap.add "write" (*{fname = "write"; ret_type = Int; args = []; body = []}*) (Fdecl("write", Int, [], [])) table in
+	let table = StrMap.add "print" (*(Fdecl({fname = "print"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0 }}))*) (Func_Decl("print", Null_Type, [], 0)) StrMap.empty in
+	let table = StrMap.add "play" (*(Fdecl({fname = "play"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("play", Null_Type, [], 0)) table in
+	let table = StrMap.add "write" (*(Fdecl({fname = "write"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("write", Null_Type, [], 0)) table in
 	(table, 0)
 
 let build_table p = 

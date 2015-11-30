@@ -36,7 +36,7 @@ and write_scope_var_decl svd =
 	write_scope_var_decl_func svd ^ ";\n"
 
 and write_scope_var_decl_func svd = 
-	let (name, typ) = svd in 
+	let (name, arr, typ) = svd in 
 		write_type typ ^ " " ^ name
 
 and write_var_decl v = 

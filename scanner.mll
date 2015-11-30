@@ -57,7 +57,7 @@ rule token = parse
 |   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ')* as lxm) '"' { STRING_LIT(lxm) }
-|   (letter | digit | '_')+ as lxm  { ID(lxm) }
+|   (letter | digit | '_')+ (*('[' (digit)+ ']')**) as lxm  { ID(lxm) } (* not sure if this is what we're going for*)
     
 |   (letter)+ as lxm { INSTRUMENT(lxm) }
 |   eof       { EOF }

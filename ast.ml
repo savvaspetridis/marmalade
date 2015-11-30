@@ -12,7 +12,7 @@ type note_type =
 	| H of string
 	| W of string 
 *)
-type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist | Wild
+type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist | Wild | Null_Type
 (*
 type funk_expr = 
     IntLit of int
@@ -42,11 +42,10 @@ type prim_type =
 
 
 
-(* type var = string * declare_type *)
 
-type scope_var_decl = string * declare_type * int
+(*type scope_var_decl = string * declare_type * int*)
 
-type var = string * declare_type
+type var = string * bool * declare_type
 
 type expr = 
 	IntLit of int
@@ -72,10 +71,11 @@ type vmod =
 type stmt = 
 	Expr of expr
 	| VarDecl of vmod
-	(*| Fdecl of fdecl*)
-	| Fdecl of string * declare_type * expr list * stmt list
+	(*| Fdecl of string * declare_type * expr list * stmt list*)
 	| If of expr * block * block
 	| While of expr * block
+	| Fdecl of fdecl
+	| Null_Type
 
 and block = {
 	locals: var list;
@@ -83,13 +83,22 @@ and block = {
 	block_id: int
 }
 
-type fdecl = {
+and fdecl = {
     fname : string;
     ret_type : declare_type;
     args : var list;
-(*    formals : string list;
+(*  formals : string list;
     locals : string list; *)
     body : block;
 }
+
+
+type scope_var_decl = string * bool * declare_type * int
+
+type scope_func_decl = string * declare_type * declare_type list * int
+
+type decl = 
+    Func_Decl of scope_func_decl
+  | Var_Decl of scope_var_decl
 
 type program = {stmts: stmt list; funcs: fdecl list}

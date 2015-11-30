@@ -63,7 +63,14 @@ arg_list:
 	| arg_list COMMA fvmod { $3 :: $1 }
 
 fvmod:
-	type_dec ID { ($2, $1) }
+	INT ID { ($2, false, Int) }
+	| STRING ID {($2, false, String)}
+	| NOTE ID {($2, false, Note)}
+	| SONG ID {($2, true, Song)}
+	| MEASURE ID {($2, true, Measure)}
+	| INTLIST ID {($2, true, Intlist)}
+	| STRL ID {($2, true, Stringlist)}
+	| PHRASE ID {($2, true, Phrase)}
 
 
 /*vdecl_list: 
@@ -124,6 +131,7 @@ vmod:
 expr:
   | app_gen  {$1}
   | arith {$1}
+  /*| literal {$1}*/
 
 
 arith: 
@@ -134,20 +142,22 @@ primary_expr:
 |	literal 		{ $1 }
 |	LPAREN expr RPAREN { $2 }
 
+
+
 literal:
 	INT_LIT {IntLit($1)}
-|	note {$1}
-|   STRING_LIT {String_Lit($1)}  
+|	note 			{$1}
+|   STRING_LIT {String_Lit($1)} 
 
 multi_expr:
-	primary_expr		{ $1 }
-|	multi_expr TIMES lit { Binop($1, Times,$3) }
-|   multi_expr DIVIDE lit { Binop($1, Divide, $3) } 
+	primary_expr /*lit*/		{ $1 }
+|	multi_expr TIMES primary_expr { Binop($1, Times,$3) }
+|   multi_expr DIVIDE primary_expr { Binop($1, Divide, $3) } 
 
 add_expr:
 	multi_expr { $1 }
-|	lit PLUS multi_expr  { Binop($1, Plus, $3) }
-|   lit MINUS multi_expr { Binop($1, Minus, $3) }
+|	primary_expr PLUS multi_expr  { Binop($1, Plus, $3) }
+|   primary_expr MINUS multi_expr { Binop($1, Minus, $3) }
 
 relational_expr:
 	add_expr		{ $1 }
@@ -172,7 +182,7 @@ logical_OR_expr:
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 
-arithmetic:
+/*arithmetic:
     lit PLUS int_term {Binop($1, Plus, $3)}
 |	lit MINUS int_term {Binop($1, Minus, $3)}
 |	int_term {$1}
@@ -180,7 +190,7 @@ arithmetic:
 int_term:
 	int_term TIMES lit {Binop($1, Times, $3)}
 |	int_term DIVIDE lit {Binop($1, Divide, $3)}
-|	lit {$1}
+|	lit {$1}*/
 
 /*atom:
 	INT_LIT {IntLit($1)}
@@ -193,17 +203,11 @@ app_gen:
 |   reg_list  {BasicList($1)}
 
 
-
-
-
-
-
-
-lit:
+/*lit:
 	INT_LIT {IntLit($1)}
 |	note {$1}
 |	ID {Id($1)}
-|   STRING_LIT {String_Lit($1)}  /*why is this here? */
+|   STRING_LIT {String_Lit($1)}  why is this here? */ 
 
 funk:
 	LPAREN f_arithmetics RPAREN {$2}
@@ -243,7 +247,7 @@ reg_list:
 	LBRACK funk_args RBRACK {List.rev $2}
 
 note:
-	INT_LIT PERIOD NOTE_TYPE {Note($1, $3)}
+	INT_LIT NOTE_TYPE {Note($1, $2)}
 /*|   INT_LIT PERIOD S {Note($1, $3)}
 |	INT_LIT PERIOD E {Note($1, $3)}
 |	INT_LIT PERIOD Q {Note($1, $3)}
