@@ -45,11 +45,12 @@ program:
 
 
 fdecl:
-   type_dec ID LPAREN arguments RPAREN LBRACE /*vdecl_list*/ stmt_list RBRACE
+   type_dec type_dec ID LPAREN arguments RPAREN LBRACE /*vdecl_list*/ stmt_list RBRACE
      {{ ret_type = $1;
-        fname = $2;
-	    args = $4;
-	    body = {locals = []; statements = List.rev $7; block_id = inc_block_id ()} 
+     	f_type = $2; 
+        fname = $3;
+	    args = $5;
+	    body = {locals = []; statements = List.rev $8; block_id = inc_block_id ()} 
 	    (*body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} *)
 
 	    } }
@@ -84,6 +85,7 @@ stmt:
 	expr SEMI { Expr($1) }
 |	vmod SEMI	  { VarDecl($1) }
 |	conditional_stmt { $1 }
+| 	RETURN expr SEMI { Return($2)}
 
 type_dec:
 	INT 	{Int}

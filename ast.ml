@@ -74,6 +74,7 @@ type stmt =
 	(*| Fdecl of string * declare_type * expr list * stmt list*)
 	| If of expr * block * block
 	| While of expr * block
+	| Return of expr
 	| Fdecl of fdecl
 	| Null_Type
 
@@ -86,6 +87,7 @@ and block = {
 and fdecl = {
     fname : string;
     ret_type : declare_type;
+    f_type : declare_type;
     args : var list;
 (*  formals : string list;
     locals : string list; *)
@@ -95,7 +97,7 @@ and fdecl = {
 
 type scope_var_decl = string * bool * declare_type * int
 
-type scope_func_decl = string * declare_type * declare_type list * int
+type scope_func_decl = string * declare_type * declare_type * declare_type list * int
 
 type decl = 
     Func_Decl of scope_func_decl

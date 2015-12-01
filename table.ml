@@ -91,15 +91,15 @@ and add_block block env =
 and add_func func env =
 	let (table, scope) = env in
 	let arg_names = List.map type_of_funct_args func.args in
-	let env = add_symbol func.fname (Func_Decl(func.fname, func.ret_type, arg_names, scope)) env in
+	let env = add_symbol func.fname (Func_Decl(func.fname, func.ret_type, func.f_type, arg_names, scope)) env in
 	(*let env = map_to_list_env add_var func.formals ((env_table env), func.fblock.block_id) in*)
 	add_block func.body ((env_table env), scope)
 
 
 let base_env = 
-	let table = StrMap.add "print" (*(Fdecl({fname = "print"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0 }}))*) (Func_Decl("print", Null_Type, [], 0)) StrMap.empty in
-	let table = StrMap.add "play" (*(Fdecl({fname = "play"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("play", Null_Type, [], 0)) table in
-	let table = StrMap.add "write" (*(Fdecl({fname = "write"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("write", Null_Type, [], 0)) table in
+	let table = StrMap.add "print" (*(Fdecl({fname = "print"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0 }}))*) (Func_Decl("print", Null_Type, Wild, [], 0)) StrMap.empty in
+	let table = StrMap.add "play" (*(Fdecl({fname = "play"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("play", Null_Type, Wild, [], 0)) table in
+	let table = StrMap.add "write" (*(Fdecl({fname = "write"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("write", Null_Type, Wild, [], 0)) table in
 	(table, 0)
 
 let build_table p = 
