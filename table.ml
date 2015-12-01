@@ -85,7 +85,7 @@ and add_block block env =
 	let id = block.block_id in
 	(*let env = map_to_list_env add_var block.locals (table, id) in*)
 	let env = map_to_list_env add_stmt block.statements env in
-	parent_scope.(id) <- scope; 
+	parent_scope.(id) <- scope; (* insert scope value into idth element of parent array *)
 	((env_table env), scope)
 
 and add_func func env =
