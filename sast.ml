@@ -78,6 +78,7 @@ let type_of_expr = function
   | S_Call (_, _, _, _, t) -> t
   | S_Index (_, _, t) -> t
   | S_Noexpr -> Null_Type 
+  | _ -> raise(Failure("could not match type in type_of_expr"))
 
 
 let rec map_to_list_env func lst env =
@@ -103,6 +104,7 @@ let drop_funk li =
 		| _ ->						Null_Type
 
 let verify_var var env = 
+	let () = Printf.printf "## in verifying var ## \n" in 
 	let decl = Table.get_decl (fst_of_three var) env in
 	match decl with
 		Func_Decl(f) -> raise(Failure("symbol is not a variable"))
@@ -270,7 +272,7 @@ and check_call_and_type name vargs env =
 	let fdecl = match decl with
 		Func_Decl(f) -> f                     (* check if it is a function *)
 		| _ -> raise(Failure (name ^ " is not a function")) in
-	if name = "print" then Wild (* note returns wrong type *)
+	if name = "print" then Int (* note returns wrong type *)
 	else if name = "write" then Wild (* note returns wrong type *)
 	else if name = "play" then Wild (* note returns wrong type *)
 	else 
@@ -303,9 +305,10 @@ let rec verify_stmt stmt ret_type env =
 			Assign(typ, id, e) -> (* Verify that id is compatible type to e *)
 			let ve = verify_expr e env in
 			(*let vid_type = get_id_type id env in *)
+			let () = Printf.printf "right before \n" in
 			let eid_type = type_of_expr ve in
 			if typ = eid_type
-				then S_Assign(id, ve, typ)
+				then let () = Printf.printf "got vars \n" in S_Assign(id, ve, typ)
 			else raise(Failure("return type does not match"))
 			| Update(st, ex) -> 
 				let vid_type = get_id_type st env in
@@ -328,6 +331,7 @@ let rec verify_stmt stmt ret_type env =
 			let vb = verify_block block ret_type (fst env, block.block_id) in
 			S_While(vc, vb)
 		else raise(Failure("Condition in While statement must be boolean.")) 
+	| _ -> raise(Failure("match screw up, can't map to a statement"))
 
 and verify_stmt_list stmt_list ret_type env = 
 	match stmt_list with
@@ -336,13 +340,15 @@ and verify_stmt_list stmt_list ret_type env =
 
 and verify_block block ret_type env =
 	let verified_vars = map_to_list_env verify_var block.locals (fst env, block.block_id) in
+	let () = Printf.printf "verified vars \n" in 
 	let verified_stmts = verify_stmt_list block.statements ret_type env in 
+	let () = Printf.printf "verified stmts \n" in 
 	{ s_locals = verified_vars; s_statements = verified_stmts; s_block_id = block.block_id } 
 
 let verify_func func env =
-	(* let () = Printf.printf "verifying function \n" in *)
+	let () = Printf.printf "verifying function \n" in 
 	let verified_block = verify_block func.body func.ret_type (fst env, func.body.block_id) in
-	(* let () = Printf.printf "func.fname" in *) 
+	let () = Printf.printf "func.fname" in 
 	let verified_args = map_to_list_env verify_var func.args (fst env, func.body.block_id) in
 	let verified_func_decl = verify_is_func_decl func.fname env in 
 	{ s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
@@ -350,8 +356,14 @@ let verify_func func env =
 let verify_semantics program env = 
 	let main_stmts = traverse_main drop_funk program.stmts in 
 	let main_vars = traverse_main get_vars main_stmts in 
+	let () = Printf.printf "got vars \n" in
 	let verified_gvar_list = map_to_list_env verify_var main_vars env in 
+	let () = Printf.printf "got global variables \n" in 
 	let main_func = verify_func ({fname = "main"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) main_vars; statements = main_stmts; block_id = 0}}) env in 
-	let verified_func_list = main_func :: map_to_list_env verify_func program.funcs env in
+	let () = Printf.printf "created main \n" in 
+	let print = verify_func ({fname = "print"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
+	let play = verify_func ({fname = "play"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
+	let write = verify_func ({fname = "main"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
+	let verified_func_list = write :: play :: print ::  main_func :: map_to_list_env verify_func program.funcs env in
 	let () = prerr_endline "// Passed semantic checking \n" in
-		{ s_pfuncs = []; s_gvars = []} 
+		{ s_pfuncs = verified_func_list; s_gvars = verified_gvar_list} 

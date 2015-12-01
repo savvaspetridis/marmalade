@@ -78,7 +78,7 @@ let rec add_stmt stmt env =
 	| VarDecl(chan) -> (match chan with 
 		Assign(typ, id, blah) -> add_var (id, typ) blah env
 	 	| _ -> env )
-	(*| '_' -> env*)
+	| _ -> env
 
 and add_block block env =  
 	let (table, scope) = env in 
@@ -97,9 +97,10 @@ and add_func func env =
 
 
 let base_env = 
-	let table = StrMap.add "print" (*(Fdecl({fname = "print"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0 }}))*) (Func_Decl("print", Null_Type, Wild, [], 0)) StrMap.empty in
-	let table = StrMap.add "play" (*(Fdecl({fname = "play"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("play", Null_Type, Wild, [], 0)) table in
-	let table = StrMap.add "write" (*(Fdecl({fname = "write"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("write", Null_Type, Wild, [], 0)) table in
+	let table = StrMap.add "print_0" (*(Fdecl({fname = "print"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0 }}))*) (Func_Decl("print", Null_Type, Int, [], 0)) StrMap.empty in
+	let table = StrMap.add "play_0" (*(Fdecl({fname = "play"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("play", Null_Type, Wild, [], 0)) table in
+	let table = StrMap.add "write_0" (*(Fdecl({fname = "write"; ret_type = Wild; args = []; body = {locals = []; statements = []; block_id = 0}}))*) (Func_Decl("write", Null_Type, Wild, [], 0)) table in
+	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, Wild, [], 0)) table in
 	(table, 0)
 
 let build_table p = 
@@ -107,5 +108,6 @@ let build_table p =
 	let env = base_env in
 	let env =  map_to_list_env add_stmt p.stmts env in
 	(*let env = map_to_list_env add_func funcs env in *)
+	let () = Printf.printf "through table \n" in 
 	env
 

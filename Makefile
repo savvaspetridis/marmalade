@@ -1,4 +1,4 @@
-OBJS = ast.cmo table.cmo sast.cmo parser.cmo scanner.cmo compile.cmo marmalade.cmo
+OBJS = ast.cmo table.cmo sast.cmo parser.cmo scanner.cmo javagen.cmo marmalade.cmo
 
 TESTS = \
 
@@ -37,8 +37,8 @@ ast.cmx:
 sast.cmo: ast.cmo
 sast.cmx: ast.cmx
 
-compile.cmo: ast.cmo 
-compile.cmx: bytecode.cmx ast.cmx 
+javagen.cmo: ast.cmo 
+javagen.cmx: bytecode.cmx ast.cmx 
 marmalade.cmo: scanner.cmo parser.cmi compile.cmo 
 marmalade.cmx: scanner.cmx parser.cmx compile.cmx
 parser.cmo: ast.cmo parser.cmi 
