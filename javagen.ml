@@ -145,8 +145,8 @@ and write_global_scope_var_decl gsvd =
 
 and write_assign name dexpr t =
 	(match t with
-	  Int | String | Intlist  -> name ^ " = " ^ write_expr dexpr
-	| Note | Measure | Phrase | Song | Stringlist -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	  Int | String | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
+	| Note | Measure | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type")))
 
 

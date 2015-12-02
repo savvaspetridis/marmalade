@@ -45,15 +45,19 @@ program:
 
 
 fdecl:
-   type_dec type_dec ID LPAREN arguments RPAREN LBRACE /*vdecl_list*/ stmt_list RBRACE
-     {{ ret_type = $1;
-     	f_type = $2; 
-        fname = $3;
-	    args = $5;
-	    body = {locals = []; statements = List.rev $8; block_id = inc_block_id ()} 
+   t_dec_l ID LPAREN arguments RPAREN LBRACE /*vdecl_list*/ stmt_list RBRACE
+     {{ ret_type = List.hd (List.rev $1);
+     	f_type = List.tl (List.rev $1); 
+        fname = $2;
+	    args = $4;
+	    body = {locals = []; statements = List.rev $7; block_id = inc_block_id ()} 
 	    (*body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} *)
 
 	    } }
+
+t_dec_l:
+  		FUNK  { [] }
+    | t_dec_l type_dec { $2 :: $1 } 
 
 arguments: 
 	/* nothing */ { [] }

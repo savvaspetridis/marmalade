@@ -106,10 +106,10 @@ and add_func func env =
 
 
 let base_env = 
-	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, Int, [], 0)) StrMap.empty in
-	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, Wild, [], 0)) table in
-	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, Wild, [], 0)) table in
-	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, Wild, [], 0)) table in
+	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note; String; Song; Phrase; Measure; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
+	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
+	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
+	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, [], [], 0)) table in
 	(table, 0)
 
 let build_table p = 

@@ -17,7 +17,7 @@ type s_expr =
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
 	| S_Binop of s_expr * op * s_expr * declare_type
-	| S_Call of string * s_expr * s_expr list * declare_type * declare_type
+	| S_Call of string * s_expr * s_expr list * declare_type list * declare_type
 	| S_Index of string * int * declare_type
 	| S_Arr of s_expr list * declare_type
 	| S_Db_Arr of s_expr * s_expr
@@ -55,7 +55,7 @@ type s_program = {
 
 let get_dt fdc = match fdc with
 	| Func_Decl(_, dt, it, _, den) -> (dt, it, den)
-	| Var_Decl(_, _, dt, den) -> (dt, dt, den)
+	| Var_Decl(_, _, dt, den) -> (dt, [dt], den)
 
 let string_of_prim_type = function
   | Int -> "int"
@@ -217,11 +217,11 @@ let rec verify_expr ex env boo =
 			let ags = verify_type_and_vars ag in
 			let i_arg = verify_mod_expr arg in
 			(*let (lis, tp) = *)
-			if typ = it then
+			if List.mem typ it then
 			(match dt with 
 			Null_Type ->
 				i_arg
-			| _ ->	S_Call(nme, i_arg, ags, dt, it))
+			| _ ->	S_Call(nme, i_arg, ags, it, dt))
 			else  raise(Failure("Illigal function call " ^ nme ^ " on argument ")) in
 		let mapcall fu (arg:expr) = (* for void calls to be executed before*)
 			let (nme, ag) = 
@@ -247,10 +247,10 @@ let rec verify_expr ex env boo =
 			let ags = verify_type_and_vars ag in
 			let i_arg = verify_mod_expr arg in
 			(*let (lis, tp) = *)
-			if typ = it then
+			if List.mem typ it then
 			(match dt with 
 			Null_Type ->
-				S_Call(nme, i_arg, ags, dt, it)
+				S_Call(nme, i_arg, ags, it, dt)
 			| _ -> S_Noexpr)
 			else  raise(Failure("Illigal function call " ^ nme ^ " on an argument ")) in
 		let l_calls =  List.map2 mapval li fl in
@@ -382,7 +382,7 @@ let verify_semantics program env =
 	let () = Printf.printf "got vars \n" in
 	let verified_gvar_list = map_to_list_env verify_var g_var_val env in 
 	let () = Printf.printf "got global variables \n" in 
-	let main_func = verify_func ({fname = "main"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) (*List.rev main_vars*) []; statements = List.rev main_stmts; block_id = 0}}) env in 
+	let main_func = verify_func ({fname = "main"; ret_type = Null_Type; f_type = []; args = []; body = {locals = (*verified_gvar_list*) (*List.rev main_vars*) []; statements = List.rev main_stmts; block_id = 0}}) env in 
 	(*let () = Printf.printf "created main \n" in *)
 	(*let print = verify_func ({fname = "print"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
 	let play = verify_func ({fname = "play"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
