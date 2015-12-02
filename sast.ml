@@ -322,7 +322,7 @@ let rec verify_stmt stmt ret_type env =
 			if typ = eid_type
 				then (*let () = Printf.printf "got typ \n" in*) S_Assign(id, ve, typ)
 			else raise(Failure("return type does not match* " ^ string_of_prim_type eid_type ^ " " ^ string_of_prim_type typ))
-			| Update(st, ex) -> 
+			| Update(st, ex) -> let () = Printf.printf "in update \n" in
 				let vid_type = get_id_type st env in
 				let de = verify_expr ex env true in
 				let de_tp = type_of_expr de in
