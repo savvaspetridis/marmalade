@@ -1,10 +1,23 @@
 /*
 Tests a funktion definition & call
+
+	NOTE: works for now, needs to be changed
 */
 
-funk void marmOut( arg1 ) {
-	str_list print = (print()) [arg1];
+
+
+funk int int marmout() {
+	int_list foo = (print()) [42];	
+		/* this print isn't working!!! */
+	return 42;
 }
 
-int foo = 42;
-str_list fooey = (marmOut()) [foo];
+(marmout()) [42];
+(print()) [42];
+
+
+
+
+/* int_list swag = (marmout()) [42]; */
+
+/* (print()) [42]; */
