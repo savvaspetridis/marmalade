@@ -55,7 +55,7 @@ type expr =
 (*	| Note_E of int * note_type
 	| Note_Q of int * note_type
 	| Note_H of int * note_type
-	| Note_W of int * note_type *)
+	| Note_W of int * note_typemake *)
 	| Binop of expr * op * expr
 	| BasicList of expr list
 	| FuncList of expr list * expr list
@@ -77,6 +77,7 @@ type stmt =
 	| Return of expr
 	| Fdecl of fdecl
 	| Null_Type
+	| None
 
 and block = {
 	locals: var list;

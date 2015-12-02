@@ -95,6 +95,7 @@ let rec map_to_list_env func lst env =
 			let r = func head env in 
 				r :: map_to_list_env func tail env
 
+
 let rec traverse_main func lst =
 	match lst with
 		[] -> []
@@ -111,7 +112,7 @@ let drop_funk li =
 		| _ ->						Null_Type
 
 let verify_var var env = 
-	(*let () = Printf.printf "## in verifying var ## \n" in *)
+	(*let () = Printf.printf "## in verifying var ## \n" in *) let () = print_string ((fst_of_three var) ^ " Nulled??") in
 	let decl = Table.get_decl (fst_of_three var) env in
 	match decl with
 		Func_Decl(f) -> raise(Failure("symbol is not a variable"))
@@ -119,16 +120,23 @@ let verify_var var env =
 			(vname, varray, vtype, id)
 
 let verify_is_func_decl name env =
+	let () = print_string (name ^ " Nulled6??") in
 	let decl = Table.get_decl name env in
 	match decl with 
 		Func_Decl(f) -> name
 		| _ -> raise(Failure("id " ^ name ^ " not a function"))
 
 let verify_id_get_type id env = 
+	let () = print_string (id ^ " Nulled7??") in
 	let decl = Table.get_decl id env in
 	match decl with
 		Var_Decl(v) -> let (_, _, t, _) = v in t
 		| _ -> raise(Failure("id " ^ id ^ " not a variable.")) 
+
+(*let rm_one var l = 
+	let l = a :: (_ as t) -> if a = var then rm_one t 
+		else rm_one a :: rm_one t *)
+
 
 
 let get_vars li =
@@ -141,9 +149,9 @@ let get_vars li =
 						| Note -> (iden, false, dt)
 						| String -> (iden, false, dt)
 						| _ -> (iden, true, dt))
-				| Update(iden, v)	-> ("", false, Null_Type))
+				| Update(iden, v)	-> ("", false, Wild))
 
-		| _ ->						("", false, Null_Type)
+		| _ ->						("", false, Wild)
 
 let verify_binop l r op =
 	let tl = type_of_expr l in
@@ -197,7 +205,7 @@ let rec verify_expr ex env boo =
 				IntLit(i) -> Int
 				| Note(_, _) -> Note
 				| String_Lit(_) -> String
-				| Id(st) -> let v_decl = Table.get_decl st env in
+				| Id(st) -> let () = print_string (nme ^ " Nulled4??") in let v_decl = Table.get_decl st env in
 					let (t_st, _, _) = get_dt v_decl in
 					t_st
 				) in
@@ -221,12 +229,13 @@ let rec verify_expr ex env boo =
 				FunkCall(i, e) -> (i, e)
 				| _ -> raise(Failure("Specified string in FuncList is not a valid function."))) in
 			let fn_decl = Table.get_decl nme env in
+			let () = print_string (nme ^ " *Nulled??") in
 			let (dt, it, de) = get_dt fn_decl in
 			let typ = (match arg with
 				IntLit(i) -> Int
 				| Note(_, _) -> Note
 				| String_Lit(_) -> String
-				| Id(st) -> let v_decl = Table.get_decl st env in
+				| Id(st) -> let () = print_string (st ^ " Nulled??") in let v_decl = Table.get_decl st env in
 					let (t_st, _, _) = get_dt v_decl in
 					t_st
 				) in
@@ -281,7 +290,7 @@ and check_ex_list (lst: expr list) env =
 	| head :: tail -> verify_expr head env false :: check_ex_list tail env
 
 and check_call_and_type name vargs env =
-	let decl = Table.get_decl name env in (* function name in symbol table *)
+	let decl = let () = print_string (name ^ " Nulled3??") in Table.get_decl name env in (* function name in symbol table *)
 	let fdecl = match decl with
 		Func_Decl(f) -> f                     (* check if it is a function *)
 		| _ -> raise(Failure (name ^ " is not a function")) in
@@ -298,7 +307,7 @@ and check_call_and_type name vargs env =
 		else raise(Failure("Function " ^ name ^ " takes " ^ string_of_int (List.length params) ^ " arguments, called with " ^ string_of_int (List.length vargs))) 
 
 let get_id_type den env =
-	let mark = Table.get_decl den env in
+	let mark = let () = print_string (den ^ " Nulled2??") in Table.get_decl den env in
 	let var = match mark with
 	Var_Decl(sk) -> sk
 	| _ -> raise(Failure (den ^ " is not a variable")) in
@@ -306,6 +315,7 @@ let get_id_type den env =
 	tp 
 
 let rec verify_stmt stmt ret_type env =
+	let () = Printf.printf "in update \n" in
 	match stmt with
 	Return(e) ->
 		let verified_expr = verify_expr e env false in
@@ -366,11 +376,12 @@ let verify_func func env =
 	{ s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
 
 let verify_semantics program env = 
-	let main_stmts = traverse_main drop_funk program.stmts in 
+	let main_stmts = traverse_main drop_funk ((*List.rev*) program.stmts) in 
 	let main_vars = traverse_main get_vars main_stmts in 
-	(*let () = Printf.printf "got vars \n" in*)
-	let verified_gvar_list = map_to_list_env verify_var main_vars env in 
-	(*let () = Printf.printf "got global variables \n" in *)
+	let g_var_val = List.filter (fun x -> x <> ("", false, Wild)) main_vars in
+	let () = Printf.printf "got vars \n" in
+	let verified_gvar_list = map_to_list_env verify_var g_var_val env in 
+	let () = Printf.printf "got global variables \n" in 
 	let main_func = verify_func ({fname = "main"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) (*List.rev main_vars*) []; statements = List.rev main_stmts; block_id = 0}}) env in 
 	(*let () = Printf.printf "created main \n" in *)
 	(*let print = verify_func ({fname = "print"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
