@@ -79,12 +79,12 @@ let rec add_stmt stmt env =
 	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
 		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
 		add_var (id, typ) blah env
-	 	| Update(str, exr) ->let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
+	 	| Update(str, exr) -> env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
 	 	let () = Printf.printf "printing update \n" in
 	 		(match dec with 
-	 			Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
-	 			| _ -> raise(Failure("A function cannot be redefined as a variable"))
-	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))
+	 			(*Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
+	 			|*) _ -> raise(Failure("A function cannot be redefined as a variable"))
+	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*))
 	| _ ->	env
 
 and add_block block env =  
@@ -115,8 +115,8 @@ let base_env =
 let build_table p = 
 	(*let (vars, funcs) = p in*)
 	let env = base_env in
-	let env =  map_to_list_env add_stmt p.stmts env in
-	(*let env = map_to_list_env add_func funcs env in *)
+	let env =  map_to_list_env add_stmt (List.rev p.stmts) env in
+	let env = map_to_list_env add_func (List.rev p.funcs) env in 
 	let () = Printf.printf "through table \n" in 
 	env
 
