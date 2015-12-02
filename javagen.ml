@@ -90,18 +90,26 @@ let rec write_expr = function
 	| S_Call_lst(s) -> String.concat "" (List.map write_expr s)
 	| _ -> raise(Failure(" is not a valid expression"))
 
-and write_stmt (d:s_stmt) = match d with
-	  S_CodeBlock(dblock) -> write_block dblock 
+and write_stmt d vg = match d with
+	  S_CodeBlock(dblock) -> write_block dblock false
 	| S_expr(dexpr) -> write_expr dexpr ^ ";"
-	| S_Assign (name, dexpr, t) -> (
+	| S_Assign (name, dexpr, t) -> (match vg with
+		true -> (
 		match dexpr with
-		S_Db_Arr(a1, a2) -> write_expr (S_Db_Arr(a1, a2)) ^ write_assign name a2 t ^ ";\n"
-		| _ -> write_assign name dexpr t ^ ";\n" )
+		S_Db_Arr(a1, a2) -> write_expr (S_Db_Arr(a1, a2)) ^ write_assign name a2 t true ^ ";\n"
+		| _ -> write_assign name dexpr t true ^ ";\n" )
+		| false -> (match dexpr with
+		S_Db_Arr(a1, a2) -> write_expr (S_Db_Arr(a1, a2)) ^ write_assign name a2 t false ^ ";\n"
+		| _ -> write_assign name dexpr t false ^ ";\n" ) )
 	| S_Return(dexpr) -> "return " ^ write_expr dexpr ^ ";\n"
-    | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 ^ "else"  ^ write_stmt dstmt2
-    | S_While(dexpr, dblock) -> "while(" ^ write_expr dexpr ^ ")"  ^ write_block dblock
+    | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 false ^ "else"  ^ write_stmt dstmt2 false
+    | S_While(dexpr, dblock) -> "while(" ^ write_expr dexpr ^ ")"  ^ write_block dblock vg (* check true *)
     (*| S_Array_Assign(str,dexpr_value, dexpr_index, t) -> str ^ ".set(" ^ write_expr dexpr_index ^ "," ^ write_expr dexpr_value ^ ");"*)
     | _ -> raise(Failure(" is not a valid statement"))
+
+and write_stmt_true d = write_stmt d true 
+
+and write_stmt_false d = write_stmt d false
 
 and write_binop_expr expr1 op expr2 t =
 	let e1 = write_expr expr1 and e2 = write_expr expr2 in 
@@ -143,21 +151,29 @@ and write_global_scope_var_decl gsvd =
 	(*let () = Printf.printf "writing global \n" in*) 
 	"static " ^ write_scope_var_decl_func gsvd ^ ";\n"
 
-and write_assign name dexpr t =
-	(match t with
+and write_assign name dexpr t vg =
+	match vg with 
+
+	true -> (match t with
 	  Int | String | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
 	| Note | Measure | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type")))
+	| false -> (match t with
+	  Int | String | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
+	| Note | Measure | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type"))) 
 
 
 
-and write_block dblock =
-	"{\n" ^  String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt dblock.s_statements) ^ "\n}"
+and write_block dblock vg =
+	match vg with
+	true -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_true dblock.s_statements ) ^ "\n}"
+	| false -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_false dblock.s_statements ) ^ "\n}"
 
 let write_func dfunc =
 	match dfunc.s_fname with
-	"main" -> "public static void main(String[] args)" ^ write_block dfunc.s_fblock
-	| _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^ dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock
+	"main" -> "public static void main(String[] args)" ^ write_block dfunc.s_fblock true
+	| _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^ dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock false
 
 
 let gen_pgm pgm name = 
@@ -167,4 +183,4 @@ let gen_pgm pgm name =
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.*;\n" ^
-	"public class " ^ name ^ " implements JMC{\n" ^String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map write_func pgm.s_pfuncs) ^  "}"
+	"public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map write_func pgm.s_pfuncs) ^  "}"
