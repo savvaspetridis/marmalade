@@ -61,8 +61,51 @@ FUNK
 Working:
 > test_funk_decl
 
+Kinda Working:
+> test_funk_print       (.java and .class files generated)
+
+
+    ```````````````````````````````````````````````````````````````````````````````
+    [ua2144@uzo marmalade]$ ./marmac tests_new/test_funk_print.marm test_funk_print
+    // Passed semantic checking 
+    
+    adding stmt 
+    in vdec 
+    adding assignment 
+    trying to add a var 
+    adding symbol 
+    in symbol 
+    trying to add function
+    adding symbol 
+    in symbol 
+    adding blockadding stmt 
+    through table 
+    got vars 
+    swag Nulled??got global variables 
+    verifying function 
+    in update 
+    marmout Nulled3??marmout *Nulled??marmout Nulled3??main Nulled6??verifying function 
+    in update 
+    marmout Nulled6??test_funk_print.java:13: error: '}' expected
+    swag = new int [] {42.marmout();/n};
+                          ^
+    test_funk_print.java:13: error: -> expected
+    swag = new int [] {42.marmout();/n};
+                                   ^
+    test_funk_print.java:13: error: not a statement
+    swag = new int [] {42.marmout();/n};
+                                 ^
+    test_funk_print.java:13: error: ';' expected
+    swag = new int [] {42.marmout();/n};
+                                      ^
+    test_funk_print.java:15: error: class, interface, or enum expected
+    }}
+    `````````````````````````````````````````````````````````````````````````````````
+    
+    
 Not Working:
-> test_funk_print
+>
+>
 
 
 
