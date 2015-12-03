@@ -12,7 +12,8 @@ type note_type =
 	| H of string
 	| W of string 
 *)
-type declare_type = Int | Note | String | Song | Phrase | Measure | List | Intlist | Stringlist | Wild | Null_Type
+type declare_type = Int | Note | String | Song | Phrase | Measure | TimeSig |
+Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type
 (*
 type funk_expr = 
     IntLit of int
@@ -52,6 +53,9 @@ type expr =
 	| Id of string
 	| String_Lit of string
 	| Note of int * char
+    | TimeSig of int * int
+    | Instr of string
+    | Tempo of int
 (*	| Note_E of int * note_type
 	| Note_Q of int * note_type
 	| Note_H of int * note_type

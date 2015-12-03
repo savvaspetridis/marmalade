@@ -52,6 +52,9 @@ rule token = parse
 |	"phrase"	{ PHRASE }
 |	"song"		{ SONG }
 |	"list"		{ LIST }
+|   "timesig"   { TIMESIG }
+|   "instr"     { INSTR }
+|   "tempo"     { TEMPO }
 |   '@'         { AT }
 |   '$'         { DOLLAR }
 |   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }

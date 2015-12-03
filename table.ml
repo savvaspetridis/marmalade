@@ -59,7 +59,7 @@ let add_var var exp env =
 	let (name, p_type) = var in
 	let is_implicit_array = 
 		(match p_type with
-		  (Int | Note | String ) -> false
+		  (Int | Note | String | TimeSig | Instr | Tempo) -> false
 		  | _ -> true) in let () = Printf.printf "trying to add a var \n" in 
 	add_symbol name (Var_Decl(name, is_implicit_array, p_type, (env_scope env))) env
 
@@ -106,7 +106,8 @@ and add_func func env =
 
 
 let base_env = 
-	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note; String; Song; Phrase; Measure; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
+	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note;
+    String; Song; Phrase; Measure; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
 	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
 	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
 	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, [], [], 0)) table in

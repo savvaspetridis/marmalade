@@ -16,7 +16,10 @@ type s_expr =
 	| S_Id of string * declare_type
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
-	| S_Binop of s_expr * op * s_expr * declare_type
+    | S_TimeSig of int * int * declare_type
+    | S_Instr of string * declare_type
+    | S_Tempo of int * declare_type
+    | S_Binop of s_expr * op * s_expr * declare_type
 	| S_Call of string * s_expr * s_expr list * declare_type list * declare_type
 	| S_Index of string * int * declare_type
 	| S_Arr of s_expr list * declare_type
@@ -64,6 +67,9 @@ let string_of_prim_type = function
   | Measure -> "measure"
   | Phrase -> "phrase"
   | Song -> "song"
+  | TimeSig -> "timesig"
+  | Instr -> "instr"
+  | Tempo -> "tempo"
   | Intlist -> "int_list"
   | Stringlist -> "str_list"
   | Null_Type -> "null"
@@ -74,6 +80,9 @@ let rec type_of_expr here = match here with
   | S_String_Lit(_,t) -> t
   | S_Id(_,t) -> t
   | S_Note(_,_,t) -> t
+  | S_TimeSig(_,_,t) -> t
+  | S_Instr(_,t) -> t
+  | S_Tempo(_,t) -> t
   | S_Binop(_,_,_,t) -> t 
   | S_Arr (_, t) -> let tpe = (match t with 
   		Int -> Intlist
@@ -148,9 +157,11 @@ let get_vars li =
 						Int -> (iden, false, dt) 
 						| Note -> (iden, false, dt)
 						| String -> (iden, false, dt)
-						| _ -> (iden, true, dt))
+                        | TimeSig -> (iden, false, dt) 
+                        | Instr -> (iden, false, dt)
+                        | Tempo -> (iden, false, dt)
+                        | _ -> (iden, true, dt))
 				| Update(iden, v)	-> ("", false, Wild))
-
 		| _ ->						("", false, Wild)
 
 let verify_binop l r op =
@@ -180,6 +191,9 @@ let rec verify_expr ex env boo =
 	| Id(st)			-> S_Id(st, verify_id_get_type st env)
 	| String_Lit(st)	-> S_String_Lit(st, String)
 	| Note(ct, nt)		-> S_Note(ct, nt, Note)
+    | TimeSig(num, den) -> S_TimeSig(num, den, TimeSig)
+    | Instr(st)         -> S_Instr(st, Instr)
+    | Tempo(i)          -> S_Tempo(i, Tempo)
 	| Binop(lft, op, rgt) ->
 		let l = verify_expr lft env false in
 		let r = verify_expr rgt env false in

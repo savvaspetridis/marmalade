@@ -8,6 +8,9 @@ let write_type = function
 	| Measure -> "Note[]"
 	| Phrase -> "Note[][]"
 	| Song -> "Note[][][]"
+    | TimeSig -> "TimeSig"
+    | Instr -> "int"
+    | Tempo -> "int"
 	| Intlist -> "int[]"
 	| Stringlist -> "String[]"
 	| _ -> raise(Failure "Type string of PD_Tuple or Null_Type being generated")
@@ -81,7 +84,10 @@ let rec write_expr = function
 			S_Arr(l_one, l_two) ->   write_expr call (*^ write_expr mark*) 
 			| S_Noexpr -> write_expr call)
 	| S_Noexpr -> ""
-	| S_Note(i, ch, tp) -> string_of_int i ^ ", " ^ write_rhythm ch 
+	| S_Note(i, ch, tp) -> string_of_int i ^ ", " ^ write_rhythm ch
+    | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
+    | S_Instr(str, tp) -> str
+    | S_Tempo(i, tp) -> string_of_int i
 	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
 								  "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"
 								  | "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ");\n"
@@ -155,12 +161,12 @@ and write_assign name dexpr t vg =
 	match vg with 
 
 	true -> (match t with
-	  Int | String | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
-	| Note | Measure | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	  Int | String | Instr | Tempo | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
+	| Note | TimeSig | Measure | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type")))
 	| false -> (match t with
-	  Int | String | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
-	| Note | Measure | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	  Int | String | Instr | Tempo | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
+	| Note | TimeSig | Measure | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type"))) 
 
 
@@ -183,4 +189,5 @@ let gen_pgm pgm name =
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.*;\n" ^
+    "import jm.midi.event.TimeSig;\n" ^
 	"public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map write_func pgm.s_pfuncs) ^  "}"

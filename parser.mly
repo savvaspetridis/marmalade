@@ -9,7 +9,7 @@ let inc_block_id (u:unit) =
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
 %token SEMI COMMA PLUS MINUS TIMES
-%token INT NOTE STRING MEASURE PHRASE SONG LIST INTLIST STRL
+%token INT NOTE STRING MEASURE PHRASE SONG LIST TIMESIG INSTR TEMPO INTLIST STRL
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
 %token <char> NOTE_TYPE
@@ -68,7 +68,7 @@ arg_list:
 	| arg_list COMMA fvmod { $3 :: $1 }
 
 fvmod:
-	INT ID { ($2, false, Int) }
+	INT ID {($2, false, Int)}
 	| STRING ID {($2, false, String)}
 	| NOTE ID {($2, false, Note)}
 	| SONG ID {($2, true, Song)}
@@ -76,6 +76,9 @@ fvmod:
 	| INTLIST ID {($2, true, Intlist)}
 	| STRL ID {($2, true, Stringlist)}
 	| PHRASE ID {($2, true, Phrase)}
+    | TIMESIG ID {($2, false, TimeSig)}
+    | INSTR ID {($2, false, Instr)}
+    | TEMPO ID {($2, false, Tempo)}
 
 
 /*vdecl_list: 
@@ -101,6 +104,9 @@ type_dec:
 | 	LIST 	{List}
 |	INTLIST	{Intlist}
 |	STRL 	{Stringlist}
+|   TIMESIG {TimeSig}
+|   INSTR   {Instr}
+|   TEMPO   {Tempo}
 
 /*
 conditional_stmt:
@@ -135,10 +141,15 @@ vmod:
 |	ID ASSIGN expr {Update($1, $3)}
 
 expr:
-  | app_gen  {$1}
-  | arith {$1}
+    add_ons {$1}
+| app_gen  {$1}
+| arith {$1}
   /*| literal {$1}*/
 
+add_ons:
+    DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
+|   DOLLAR LPAREN INSTRUMENT RPAREN {Instr($3)}
+|   DOLLAR LPAREN INT_LIT RPAREN {Tempo($3)}
 
 arith: 
 	logical_OR_expr { $1 }
