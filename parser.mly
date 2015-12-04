@@ -139,6 +139,11 @@ stmt_list:
 vmod:
 	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
+|	ID APPEND ASSIGN append_list {Append($1, List.rev $4)} 
+
+append_list:
+	append_list APPEND expr {$3 :: $1}
+|	expr {[$1]}
 
 expr:
     add_ons {$1}
