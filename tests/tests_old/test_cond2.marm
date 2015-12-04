@@ -1,0 +1,18 @@
+/* Testing conditionals in marmalade */
+
+/*
+string x = "true";
+int z = 5;
+string y = "Fail";
+
+if (x != "true") {
+    y = "Fail";
+} 
+elif (z < 4){
+    y = "Fail";
+} 
+else {
+    y = "Success";
+}
+(print()) [y];
+*/
