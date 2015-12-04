@@ -157,7 +157,7 @@ app_gen  {$1}
 add_on:
 	DOLLAR LPAREN RPAREN { Default }
 |   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
-|   DOLLAR LPAREN INSTRUMENT RPAREN {Instr($3)}
+|   DOLLAR LPAREN ID RPAREN {Instr($3)}
 |   DOLLAR LPAREN INT_LIT RPAREN {Tempo($3)}
 
 arith: 
