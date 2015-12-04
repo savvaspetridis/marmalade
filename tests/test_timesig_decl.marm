@@ -1,0 +1,15 @@
+/* Testing time sig */
+
+timesig t_sig_0 = $(4:4);
+/* timesig t_sig_1 = $(6:8); */
+
+(print()) ["This works"];
+
+
+
+/* 
+TIME SIG --> MEASURE 
+*/
+
+/* measure m_1 = $(6:8) [36.q, 50.h]; */
+
