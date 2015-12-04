@@ -13,7 +13,7 @@ type note_type =
 	| W of string 
 *)
 type declare_type = Int | Note | String | Song | Phrase | Measure | TimeSig |
-Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type
+Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default
 (*
 type funk_expr = 
     IntLit of int
@@ -56,6 +56,7 @@ type expr =
     | TimeSig of int * int
     | Instr of string
     | Tempo of int
+    | Default
 (*	| Note_E of int * note_type
 	| Note_Q of int * note_type
 	| Note_H of int * note_type
@@ -68,11 +69,15 @@ type expr =
 (*type invocation = 
     FunkCall of string * expr list
 *)
+
+type appunit = expr * expr
+
 type vmod =
 	Assign of declare_type * string * expr 
-	| Append of string * expr list
-	| Append_Assign_ten_dollars_uzo_never_reads_this of declare_type * string * expr list
+	| Append of string * appunit list
+	| Append_Assign of declare_type * string * appunit list
 	| Update of string * expr
+
 
 type stmt = 
 	Expr of expr
