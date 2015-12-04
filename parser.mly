@@ -140,23 +140,23 @@ stmt_list:
 	
 vmod:
 
-	type_dec ID APPEND ASSIGN expr {Append_Assign($1, $2, $5)}
+	type_dec ID APPEND ASSIGN append_list {Append_Assign($1, $2, List.rev $5)}
 |	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
 |	ID APPEND ASSIGN append_list {Append($1, List.rev $4)} 
 
 append_list:
-	append_list APPEND add_ons expr {$3 :: $1}
-|	add_ons expr {[$1]}
+	append_list APPEND add_on expr {($3, $4) :: $1}
+|	add_on expr {[($1, $2)]}
 
 expr:
 app_gen  {$1}
 | arith {$1}
   /*| literal {$1}*/
 
-add_ons:
-	DOLLAR {0}
-|    DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
+add_on:
+	DOLLAR LPAREN RPAREN { Default }
+|   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
 |   DOLLAR LPAREN INSTRUMENT RPAREN {Instr($3)}
 |   DOLLAR LPAREN INT_LIT RPAREN {Tempo($3)}
 
@@ -171,7 +171,7 @@ primary_expr:
 
 
 literal:
-    add_ons {$1}
+    add_on {$1}
 | 	INT_LIT {IntLit($1)}
 |	note 			{$1}
 |   STRING_LIT {String_Lit($1)} 
