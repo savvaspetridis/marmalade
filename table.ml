@@ -55,7 +55,7 @@ let add_symbol (name:string) (decl:decl) env =
     ((StrMap.add key decl (env_table env)), (env_scope env))
 
 
-let add_var var exp env =
+let add_var var env =
 	let (name, p_type) = var in
 	let is_implicit_array = 
 		(match p_type with
@@ -78,13 +78,15 @@ let rec add_stmt stmt env =
 	| Fdecl(fdec) -> add_func fdec env
 	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
 		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
-		add_var (id, typ) blah env
+		add_var (id, typ) env
 	 	| Update(str, exr) -> env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
 	 	let () = Printf.printf "printing update \n" in
 	 		(match dec with 
 	 			(*Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
 	 			|*) _ -> raise(Failure("A function cannot be redefined as a variable"))
-	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*))
+	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*)
+		| Append(str, appL) -> env
+		| Append_Assign(typ, str, appL) -> add_var (str, typ) env)
 	| _ ->	env
 
 and add_block block env =  
