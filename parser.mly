@@ -94,6 +94,8 @@ stmt:
 |	conditional_stmt { $1 }
 | 	RETURN expr SEMI { Return($2)}
 
+
+
 type_dec:
 	INT 	{Int}
 |	NOTE 	{Note}
@@ -137,22 +139,24 @@ stmt_list:
     | stmt_list stmt { $2 :: $1 } 
 	
 vmod:
-	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
+
+	type_dec ID APPEND ASSIGN expr {Append_Assign($1, $2, $5)}
+|	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
 |	ID APPEND ASSIGN append_list {Append($1, List.rev $4)} 
 
 append_list:
-	append_list APPEND expr {$3 :: $1}
-|	expr {[$1]}
+	append_list APPEND add_ons expr {$3 :: $1}
+|	add_ons expr {[$1]}
 
 expr:
-    add_ons {$1}
-| app_gen  {$1}
+app_gen  {$1}
 | arith {$1}
   /*| literal {$1}*/
 
 add_ons:
-    DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
+	DOLLAR {0}
+|    DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
 |   DOLLAR LPAREN INSTRUMENT RPAREN {Instr($3)}
 |   DOLLAR LPAREN INT_LIT RPAREN {Tempo($3)}
 
@@ -167,7 +171,8 @@ primary_expr:
 
 
 literal:
-	INT_LIT {IntLit($1)}
+    add_ons {$1}
+| 	INT_LIT {IntLit($1)}
 |	note 			{$1}
 |   STRING_LIT {String_Lit($1)} 
 

@@ -70,6 +70,8 @@ type expr =
 *)
 type vmod =
 	Assign of declare_type * string * expr 
+	| Append of string * expr list
+	| Append_Assign_ten_dollars_uzo_never_reads_this of declare_type * string * expr list
 	| Update of string * expr
 
 type stmt = 
