@@ -1,9 +1,0 @@
-/* Testing while loop */
-
-int i = 0;
-
-while (i<10 ) {
-	i = i+1;
-}
-
-int_list out = (print()) [i];

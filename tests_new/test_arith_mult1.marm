@@ -1,7 +1,0 @@
-/*
-Tests the basic arithmetic operations: multiplication
-*/
-
-int c = 25 * 3;
-
-int_list gl = (print()) [c];

@@ -1,7 +1,0 @@
-/*
-Tests the basic arithmetic operations: addition
-*/
-
-int a = 10 + 35;
-
-int_list hello = (print()) [a];

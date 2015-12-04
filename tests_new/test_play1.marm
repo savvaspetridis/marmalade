@@ -1,3 +1,0 @@
-/* Playing 1 note in marmalade */
-
-measure meme = (play()) [55.q];

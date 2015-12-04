@@ -1,7 +1,0 @@
-/*
-Tests the basic arithmetic operations: subtraction
-*/
-
-int b = 30 - 25;
-
-int_list fall = (print()) [b];
