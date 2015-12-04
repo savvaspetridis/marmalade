@@ -1,0 +1,11 @@
+/* Testing Conditional Control Flow */
+
+int condition = 1;
+
+if (condition == 1) {
+	int_list good = (print()) [condition];
+} else {
+	str_list bad = (print()) ["bad"];
+}
+
+

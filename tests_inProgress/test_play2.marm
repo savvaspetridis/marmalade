@@ -1,0 +1,3 @@
+/* Playing 2 notes and write 1 */
+
+measure world = (play(), play(), write()) [55.q, 44.s, 76.h];

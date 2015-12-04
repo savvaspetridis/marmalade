@@ -1,0 +1,8 @@
+/*
+Tests the basic arithmetic operations: addition
+*/
+
+int a = 10;
+a = a + 32;
+
+int_list hello = (print()) [a];

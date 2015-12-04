@@ -130,7 +130,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests_new/fail_* tests_new/test_*"
+    files="tests/fail_* tests/test_*"
     # files="tests/fail_*.marm tests/test_*.marm"
 fi
 

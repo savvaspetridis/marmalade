@@ -1,0 +1,19 @@
+jMusic NOTE: [Pitch = 55][RhythmValue = 1.0][Dynamic = 85][Duration = 0.9][Pan = 0.5]
+jMusic NOTE: [Pitch = 44][RhythmValue = 0.25][Dynamic = 85][Duration = 0.225][Pan = 0.5]
+jMusic NOTE: [Pitch = 76][RhythmValue = 1.5][Dynamic = 85][Duration = 1.35][Pan = 0.5]
+----------------------------- Writing MIDI File ------------------------------
+Converting to SMF data structure...
+    Part 0 'Untitled Part' to SMF Track on Ch. 0:  Phrase 0:.
+MIDI file 'out.mid' written from score 'Score of a single note' in 0.062 seconds.
+------------------------------------------------------------------------------
+jMusic Play: Playing score One note score using JavaSound General MIDI soundbank.
+jMusic Play: Waiting for the end of One note score.
+jMusic MidiSynth: Stopped JavaSound MIDI playback
+jMusic Play: Playing score One note score using JavaSound General MIDI soundbank.
+jMusic Play: Waiting for the end of One note score.
+jMusic MidiSynth: Stopped JavaSound MIDI playback
+1
+5
+Hello
+World
+Hello World

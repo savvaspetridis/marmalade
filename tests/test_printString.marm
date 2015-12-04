@@ -1,0 +1,5 @@
+/* Testing print String */
+
+(print()) ["foo"];
+
+(print(), print(), print()) ["Hello", "World", "Hello World"];
