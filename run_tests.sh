@@ -83,6 +83,7 @@ Check() {
     mv "${basename}" "$2/${basename}" 
     mv "${basename}.java" "$2/${basename}.java" 
     mv "${basename}.class" "$2/${basename}.class"
+    mv *.class "$2/"
 
     Compare $2/${basename}.t.out ${reffile}.out $2/${basename}.t.diff
 
