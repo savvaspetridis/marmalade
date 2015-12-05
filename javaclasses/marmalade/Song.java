@@ -1,3 +1,5 @@
+package marmalade;
+
 import jm.music.data.Score;
 import jm.music.data.Part;
 import jm.music.data.Phrase;

@@ -1,3 +1,5 @@
+package marmalade;
+
 import jm.music.data.Note;
 import jm.util.*;
 import jm.JMC;
