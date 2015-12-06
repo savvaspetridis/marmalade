@@ -57,6 +57,14 @@ type expr =
     | Instr of string
     | Tempo of int
     | Default
+    (* PARSE THESE *)
+    | Measure of expr list * expr (* list of notes, TimeSig *)
+    | Phrase of expr list list * expr list * expr (* list of 'measures' (Notes in them), list of their Time-signatures, 
+													and an instrument *)
+    | Song of expr list list list * expr list list * expr list * expr (* list of phrases (Notes in them), 
+																	list of each measure in each phrase's
+																	 time-signature, list of all instruments for each
+																	 phrase, and a BPM *)
 (*	| Note_E of int * note_type
 	| Note_Q of int * note_type
 	| Note_H of int * note_type
