@@ -8,7 +8,8 @@ let inc_block_id (u:unit) =
 %}
 
 %token LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK
-%token SEMI COMMA PLUS MINUS TIMES
+%token SEMI COMMA PLUS MINUS TIMES 
+%token <char> BOUND
 %token INT NOTE STRING MEASURE PHRASE SONG LIST TIMESIG INSTR TEMPO INTLIST STRL
 %token DIVIDE ASSIGN EQ NEQ LT LEQ
 %token GT GEQ DASH APPEND NOT
@@ -152,6 +153,7 @@ append_list:
 expr:
 app_gen  {$1}
 | arith {$1}
+| AT LPAREN special_expression RPAREN /*{Regex({$3.ids; $3.bounds})}*/ {Regex($3)}
 | add_on expr {Msk_list($1, $2)}
   /*| literal {$1}*/
 
@@ -168,6 +170,17 @@ primary_expr:
     ID              { Id($1) }
 |	literal 		{ $1 }
 |	LPAREN expr RPAREN { $2 }
+
+special_expression:
+						{{ids = []; bounds = []}}
+|	special_expression ID {{ids = $2 :: $1.ids; bounds = $1.bounds}}
+|	special_expression LBRACE bound_list RBRACE {{ids = $1.ids; bounds = $3 }}
+
+bound_list:
+			{[]}
+|	bound_list BOUND DASH BOUND {Ranges($2, $4) :: $1}
+
+	 
 
 
 
@@ -229,6 +242,7 @@ int_term:
 app_gen: 
 |	funk reg_list {FuncList($1, $2)}
 |   reg_list  {BasicList($1)}
+
 
 
 /*lit:

@@ -61,7 +61,7 @@ rule token = parse
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ')* as lxm) '"' { STRING_LIT(lxm) }
 |   (letter | digit | '_')+ (*('[' (digit)+ ']')**) as lxm  { ID(lxm) } (* not sure if this is what we're going for*)
-    
+|	''' ((letter | digit | ' ') as lxm) ''' { BOUND(lxm) }
 |   (letter)+ as lxm { INSTRUMENT(lxm) }
 |   eof       { EOF }
 |   _ as char { raise (Failure("illegal character: " ^ Char.escaped char)) }

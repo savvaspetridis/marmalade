@@ -55,6 +55,15 @@ type s_program = {
 	s_pfuncs: s_func list;
 }
 
+let rec get_range l (a:char) b =
+	let lower = Char.code a in
+	let upper = Char.code b in
+	if lower = upper then
+		a :: l
+	else 
+		get_range (a :: l) (Char.chr (lower+1)) b 
+
+
 
 let get_dt fdc = match fdc with
 	| Func_Decl(_, dt, it, _, den) -> (dt, it, den)
