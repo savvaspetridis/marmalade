@@ -345,7 +345,7 @@ let compress_app_list typ app_list =
 						if t = Measure || t = Phrase then m_f
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) ->
-						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2]) in
+						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2], Default) in
 						if t = Phrase || t = Song then m_f 
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) -> 
@@ -385,8 +385,8 @@ let compress_app_list typ app_list =
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2), Phrase(ns_3, ts_3, instrum_3)) ->
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Phrase(ns_2, ts_2, instrum_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
-				| _ -> raise(Failure("Append pattern not among accepted music pairs"))
-			)
+				| _ -> raise(Failure("Append pattern not among accepted music pairs")) 
+			) in compress_append app_list typ
 
 *)
 
@@ -417,10 +417,10 @@ let rec verify_stmt stmt ret_type env =
 					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
 			(*| Append(iden, ap_l) -> 
 				let typ = get_id_typ iden env in
-				let  app_lis = verify_app_list_mod ap_l typ env in
+				let  app_lis = verify_app_list_mod ap_l typ in
 				app_lis
 			| Append_Assign(ty, stri, ap_l) ->
-				let app_lis = verify_app_list_def ap_l typ env in
+				let app_lis = verify_app_list_def ap_l typ in
 				let eval_typ = verify_expr app_lis env true in
 				let eid_typ = type_of_expr eval_typ in
 				if typ = eid_type
