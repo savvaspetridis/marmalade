@@ -152,6 +152,7 @@ append_list:
 expr:
 app_gen  {$1}
 | arith {$1}
+| add_on expr {Msk_list($1, $2)}
   /*| literal {$1}*/
 
 add_on:
@@ -259,7 +260,7 @@ arithmeticID_arg:
 	app_gen {$1}
    /*| arithmetic {$1}*/
     | arith {$1}
-
+    | add_on expr {Msk_list($1, $2)}
 
 /*
 funk_args:

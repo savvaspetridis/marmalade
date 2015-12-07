@@ -105,6 +105,7 @@ let rec map_to_list_env func lst env =
 				r :: map_to_list_env func tail env
 
 
+
 let rec traverse_main func lst =
 	match lst with
 		[] -> []
@@ -327,6 +328,67 @@ let get_id_type den env =
 	| _ -> raise(Failure (den ^ " is not a variable")) in
 	let  (_, _, tp, _)  = var in
 	tp 
+(*
+(* Savvas finish this function and write type_of_expr_ast function, model it on type_of_expr function except with ast objects*)
+let compress_app_list typ app_list = 
+	let rec compress_append lst t = 
+		let new_l = match lst with
+		[] -> []
+		| [fst; snd] -> let n_val = (fst,snd) in 
+				let f_val =(match n_val with
+				(Note(n_1, d_1), Note(n_2, d_2)) -> 
+						let m_f = Measure([fst; snd], Default) in
+						if t = Measure || t = Phrase then m_f
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Measure(ns, ts), Note(n_1, d_1)) -> 
+						let m_f = Measure(ns @ [n_1], ts) in
+						if t = Measure || t = Phrase then m_f
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) ->
+						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2]) in
+						if t = Phrase || t = Song then m_f 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) -> 
+						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
+						if t = Phrase || t = Song then m_f 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2)) -> 
+						let m_f = Song([ns_1; ns_2], [ts_1; ts_2], [instrum_1; instrum_2], Default ) in
+						if t = Song then m_f 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Song(ns_1, ts_1, instrum_1, bpm), Phrase(ns_2, ts_2, instrum_2)) -> 
+						let m_f = Song(ns_1 :: ns_2, ts_1 :: ts_2, instrum_1 :: instrum_2, bpm)
+						if t = Song then m_f 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2)) ->
+						let m_f = Song(ns_1 @ ns_2, ts_1 @ ts_2, instrum_1 @ instrum_2, bpm_1)
+						if t = Song then m_f 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 											
+					)
+						 in f_val
+		| fst :: (snd :: (thr :: _ as tl)) -> let n_val = let comp_triple = (fst, snd, thr) in 
+			let action = (match (fst, snd, thr) with
+				(Note(n_1, d_1), Note(n_2, d_2), Note(n_3, d_3)) -> (* combine first two notes and reccurse EXAMPLE do others the same way *)
+					let fusion = Measure([fst; snd], Default) in
+						let new_l = fusion :: (thr :: tl) in
+							compress_append new_l t
+				| (Measure(ns, ts), Note(n_2, d_2), Note(n_3, d_3)) -> (* combine measure with note and reccurse *)
+				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2), Note(n_3, d_3)) -> (* combine 2nd measure and note *)
+				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2), Measure(ns_2, ts_2)) -> (* combine first two measures ... you should get the point *)
+				| (Measure(ns_1, ts_1), Note(n_2, d_2), Measure(ns_2, ts_2)) -> 
+				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2), Note(n_3, d_3)) ->
+				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2), Measure(ns_2, ts_2)) ->
+				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2), Measure(ns, ts)) ->
+				| (Phrase(ns_1, ts_1, instrum_1), Measure(ns, ts), Phrase(ns_2, ts_2, instrum_2)) ->
+				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2), Phrase(ns_3, ts_3, instrum_3)) ->
+				| (Song(ns_1, ts_1, instrum_1, bpm), Phrase(ns_2, ts_2, instrum_2), Phrase(ns_3, ts_3, instrum_3)) ->
+				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2), Phrase(ns_3, ts_3, instrum_3)) ->
+				| (Song(ns_1, ts_1, instrum_1, bpm_1), Phrase(ns_2, ts_2, instrum_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
+				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
+				| _ -> raise(Failure("Append pattern not among accepted music pairs"))
+			)
+
+*)
 
 let rec verify_stmt stmt ret_type env =
 	let () = Printf.printf "in update \n" in
@@ -352,7 +414,19 @@ let rec verify_stmt stmt ret_type env =
 				let de_tp = type_of_expr de in
 				if de_tp = vid_type then S_Assign(st, de, de_tp)
 				else raise(Failure("Attempting to assign variable name " ^ st ^ " to value of type " ^ string_of_prim_type de_tp  ^ " 
-					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ ".")) )
+					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
+			(*| Append(iden, ap_l) -> 
+				let typ = get_id_typ iden env in
+				let  app_lis = verify_app_list_mod ap_l typ env in
+				app_lis
+			| Append_Assign(ty, stri, ap_l) ->
+				let app_lis = verify_app_list_def ap_l typ env in
+				let eval_typ = verify_expr app_lis env true in
+				let eid_typ = type_of_expr eval_typ in
+				if typ = eid_type
+				then (*let () = Printf.printf "got typ \n" in*) S_Assign(stri, app_lis, ty)
+			else raise(Failure("return type does not match* " ^ string_of_prim_type eid_type ^ " " ^ string_of_prim_type typ))*)
+				)
 	| If(e, b1, b2) ->
 		let verified_expr = verify_expr e env false in
 		if (type_of_expr verified_expr) = Int then

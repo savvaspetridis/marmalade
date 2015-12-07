@@ -57,6 +57,7 @@ type expr =
     | Instr of string
     | Tempo of int
     | Default
+    | Msk_list of expr * expr
     (* PARSE THESE *)
     | Measure of expr list * expr (* list of notes, TimeSig *)
     | Phrase of expr list list * expr list * expr (* list of 'measures' (Notes in them), list of their Time-signatures, 
