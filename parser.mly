@@ -174,11 +174,11 @@ primary_expr:
 special_expression:
 						{{ids = []; bounds = []}}
 |	special_expression ID {{ids = $2 :: $1.ids; bounds = $1.bounds}}
-|	special_expression LBRACE bound_list RBRACE {{ids = $1.ids; bounds = $3 }}
+|	special_expression LBRACE bound_list RBRACE {{ids = $1.ids; bounds = $3 :: $1.bounds}}
 
 bound_list:
 			{[]}
-|	bound_list BOUND DASH BOUND {Ranges($2, $4) :: $1}
+|	bound_list BOUND DASH BOUND {(Ranges($2, $4) :: $1)}
 
 	 
 

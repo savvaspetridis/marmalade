@@ -46,7 +46,11 @@ type prim_type =
 
 (*type scope_var_decl = string * declare_type * int*)
 
+type char_pair = Ranges of char * char
+
 type var = string * bool * declare_type
+
+type range = int * int
 
 type expr = 
 	IntLit of int
@@ -66,10 +70,7 @@ type expr =
 																	list of each measure in each phrase's
 																	 time-signature, list of all instruments for each
 																	 phrase, and a BPM *)
-(*	| Note_E of int * note_type
-	| Note_Q of int * note_type
-	| Note_H of int * note_type
-	| Note_W of int * note_typemake *)
+	| Regex of special_exp
 	| Binop of expr * op * expr
 	| BasicList of expr list
 	| FuncList of expr list * expr list
@@ -78,8 +79,12 @@ type expr =
 (*type invocation = 
     FunkCall of string * expr list
 *)
+and special_exp = {ids: string list; bounds: char_pair list list}
+
+
 
 type appunit = expr * expr
+
 
 type vmod =
 	Assign of declare_type * string * expr 
