@@ -25,6 +25,7 @@ type s_expr =
 	| S_Arr of s_expr list * declare_type
 	| S_Db_Arr of s_expr * s_expr
 	| S_Call_lst of s_expr list
+	| S_Append_block of expr list * string list
 	| S_Noexpr 
 
 type s_stmt =
@@ -338,49 +339,89 @@ let get_id_type den env =
 	let  (_, _, tp, _)  = var in
 	tp 
 (*
+	NOTE --> This function was originally written to parse note, phrase and song literals and for that it will work.
+				The issue is, this will have a problem with Ids.
+				The way we will deal with it is by parsing as follows:
+
+				When finds an id in the list of expressions, we'll append them to a list of ids which is the second value
+				in the tuple compress_append returns.
+
+				The goal of compress_append is to take an append_list and end up with a tupe of a list of Note, measure, phrase and song objects.
+				and a list of ids.
+
+				Somehow you'll have to figure out if an id or literal came first (possibly by putting some expr on the top of 
+				either list?)
+				
+
+
+
 (* Savvas finish this function and write type_of_expr_ast function, model it on type_of_expr function except with ast objects*)
-let compress_app_list typ app_list = 
-	let rec compress_append lst t = 
+let compress_app_list typ app_list env = 
+	let rec compress_append lst t =  (* might need to add return list argument *)
 		let new_l = match lst with
-		[] -> []
-		| [fst; snd] -> let n_val = (fst,snd) in 
+		([], []) -> ([], [])
+		| ([fst; snd], id_list) -> let n_val = (fst,snd) in
+
+
+
+				(* you're gonna have to figure out how to parse ids 
+
+					One way to do this. 
+
+					Take fst and add it to return list *) 
+
+
+
 				let f_val =(match n_val with
 				(Note(n_1, d_1), Note(n_2, d_2)) -> 
 						let m_f = Measure([fst; snd], Default) in
-						if t = Measure || t = Phrase then m_f
+						if t = Measure || t = Phrase then ([m_f], [])
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Measure(ns, ts), Note(n_1, d_1)) -> 
 						let m_f = Measure(ns @ [n_1], ts) in
-						if t = Measure || t = Phrase then m_f
+						if t = Measure || t = Phrase then ([m_f], [])
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) ->
 						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2], Default) in
-						if t = Phrase || t = Song then m_f 
+						if t = Phrase || t = Song then ([m_f], []) 
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) -> 
 						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
-						if t = Phrase || t = Song then m_f 
+						if t = Phrase || t = Song then ([m_f], []) 
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2)) -> 
 						let m_f = Song([ns_1; ns_2], [ts_1; ts_2], [instrum_1; instrum_2], Default ) in
-						if t = Song then m_f 
+						if t = Song then ([m_f], []) 
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Song(ns_1, ts_1, instrum_1, bpm), Phrase(ns_2, ts_2, instrum_2)) -> 
 						let m_f = Song(ns_1 :: ns_2, ts_1 :: ts_2, instrum_1 :: instrum_2, bpm)
-						if t = Song then m_f 
+						if t = Song then ([m_f], []) 
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2)) ->
 						let m_f = Song(ns_1 @ ns_2, ts_1 @ ts_2, instrum_1 @ instrum_2, bpm_1)
-						if t = Song then m_f 
+						if t = Song then ([m_f], [] )
 					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 											
 					)
 						 in f_val
 		| fst :: (snd :: (thr :: _ as tl)) -> let n_val = let comp_triple = (fst, snd, thr) in 
 			let action = (match (fst, snd, thr) with
+
+
+
+				| (Id(string_1), Id(string_2), Id(string_3)) -> let decl = Table.get_decl env in
+				| (Song(ns_1, ts_1, instrum_1, bpm_1),Id(string_1), Song(ns_1, ts_1, instrum_1, bpm_1)) ->
+
+
+				(* here you'll probably have to enumerate all the possiblities with ids and figure out how to put them in the
+					list, and then reccurse. Good luck *)
+
+
+
+
 				(Note(n_1, d_1), Note(n_2, d_2), Note(n_3, d_3)) -> (* combine first two notes and reccurse EXAMPLE do others the same way *)
 					let fusion = Measure([fst; snd], Default) in
 						let new_l = fusion :: (thr :: tl) in
-							compress_append new_l t
+							(compress_append new_l t, [])
 				| (Measure(ns, ts), Note(n_2, d_2), Note(n_3, d_3)) -> (* combine measure with note and reccurse *)
 				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2), Note(n_3, d_3)) -> (* combine 2nd measure and note *)
 				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2), Measure(ns_2, ts_2)) -> (* combine first two measures ... you should get the point *)
@@ -395,7 +436,7 @@ let compress_app_list typ app_list =
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Phrase(ns_2, ts_2, instrum_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
 				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2), Song(ns_3, ts_3, instrum_3, bpm_3)) ->
 				| _ -> raise(Failure("Append pattern not among accepted music pairs")) 
-			) in compress_append app_list typ
+			) in compress_append (app_list, [], typ)
 
 *)
 
@@ -426,10 +467,10 @@ let rec verify_stmt stmt ret_type env =
 					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
 			(*| Append(iden, ap_l) -> 
 				let typ = get_id_typ iden env in
-				let  app_lis = verify_app_list_mod ap_l typ in
+				let  app_lis = verify_app_list_mod ap_l typ env in
 				app_lis
 			| Append_Assign(ty, stri, ap_l) ->
-				let app_lis = verify_app_list_def ap_l typ in
+				let app_lis = verify_app_list_def ap_l typ env in
 				let eval_typ = verify_expr app_lis env true in
 				let eid_typ = type_of_expr eval_typ in
 				if typ = eid_type
