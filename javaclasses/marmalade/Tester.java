@@ -9,6 +9,17 @@ public class Tester implements JMC {
 	
 	public static void main (String[] args) {
 		
+		// test note
+		m_Note note = new m_Note(50, 1.0);
+		note.play();
+		note.print();
+		note.output_midi("measure file");
+		note.setLength(2.0);
+		System.out.println("Note length: " + note.getLength());
+		note.setPitch(70);
+		System.out.println("Note pitch: " + note.getPitch());
+		note.play();
+
 		// test measure
 		Note[] n = new Note[5];
 		n[0] = new Note(55, 1.0);

@@ -189,5 +189,20 @@ let gen_pgm pgm name =
 	"import jm.JMC;\n" ^
 	"import jm.music.data.*;\n" ^
 	"import jm.util.*;\n" ^
+    "import marmalade.*;\n" ^ 
     "import jm.midi.event.TimeSig;\n" ^
-	"public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map write_func pgm.s_pfuncs) ^  "}"
+    "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map
+    write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map
+    write_func pgm.s_pfuncs) ^  "\n\n" ^ 
+    "class j_note extends m_Note {\n" ^
+    "public j_note(int pitch, double length) {\n" ^
+    "super(pitch, length);\n}\n}\n\n" ^ 
+    "class j_measure extends Measure {\n" ^ 
+    "public j_measure(Note[] n) {\n" ^
+    "super(n);\n}\n}\n\n" ^ 
+    "class j_phrase extends m_Phrase {\n" ^
+    "public j_phrase(Note[][] n) {\n" ^
+    "super(n);\n}\n}\n\n" ^ 
+    "class j_song extends Song {\n" ^
+    "public j_song(Note[][][] n) {\n" ^
+    "super(n);\n}\n}\n}\n"
