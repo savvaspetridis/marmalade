@@ -4,10 +4,10 @@ open Sast
 let write_type = function 
 	| Int -> "int"
 	| String -> "String"
-	| Note -> "Note"
-	| Measure -> "Note[]"
-	| Phrase -> "Note[][]"
-	| Song -> "Note[][][]"
+	| Note -> "j_note"
+	| Measure -> "j_measure"
+	| Phrase -> "j_phrase"
+	| Song -> "j_song"
     | TimeSig -> "TimeSig"
     | Instr -> "int"
     | Tempo -> "int"
@@ -84,13 +84,17 @@ let rec write_expr = function
 			S_Arr(l_one, l_two) ->   write_expr call (*^ write_expr mark*) 
 			| S_Noexpr -> write_expr call)
 	| S_Noexpr -> ""
-	| S_Note(i, ch, tp) -> string_of_int i ^ ", " ^ write_rhythm ch
+	| S_Note(i, ch, tp) -> "(new j_note(" ^ string_of_int i ^ ", " ^
+    write_rhythm ch ^ "))"
     | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
     | S_Instr(str, tp) -> str
     | S_Tempo(i, tp) -> string_of_int i
 	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
 								  "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"
-								  | "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ");\n"
+								 (*| "play" -> "Play.midi(" ^ (*(String.concat
+                                  * "," (List.map write_expr args)*) write_expr
+                                  exp ^ ");\n"*)
+                                  | "play" -> write_expr exp ^ ".play();\n"
 								  | "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"						 
 								  | _ -> write_expr exp ^ "." ^ str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ");/n")
 	| S_Call_lst(s) -> String.concat "" (List.map write_expr s)
@@ -190,19 +194,19 @@ let gen_pgm pgm name =
 	"import jm.music.data.*;\n" ^
 	"import jm.util.*;\n" ^
     "import marmalade.*;\n" ^ 
-    "import jm.midi.event.TimeSig;\n" ^
+    "import jm.midi.event.TimeSig;\n\n" ^
     "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map
     write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map
     write_func pgm.s_pfuncs) ^  "\n\n" ^ 
-    "class j_note extends m_Note {\n" ^
+    "public static class j_note extends m_Note {\n" ^
     "public j_note(int pitch, double length) {\n" ^
     "super(pitch, length);\n}\n}\n\n" ^ 
-    "class j_measure extends Measure {\n" ^ 
-    "public j_measure(Note[] n) {\n" ^
+    "public static class j_measure extends Measure {\n" ^ 
+    "public j_measure(j_note[] n) {\n" ^
     "super(n);\n}\n}\n\n" ^ 
-    "class j_phrase extends m_Phrase {\n" ^
-    "public j_phrase(Note[][] n) {\n" ^
+    "public static class j_phrase extends m_Phrase {\n" ^
+    "public j_phrase(j_note[][] n) {\n" ^
     "super(n);\n}\n}\n\n" ^ 
-    "class j_song extends Song {\n" ^
-    "public j_song(Note[][][] n) {\n" ^
+    "public static class j_song extends Song {\n" ^
+    "public j_song(j_note[][][] n) {\n" ^
     "super(n);\n}\n}\n}\n"

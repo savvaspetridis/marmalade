@@ -11,10 +11,17 @@ public class m_Phrase implements JMC {
 	Part p;
 
 	// constructor
-	public m_Phrase(Note[][] array) {
-		Phrase[] phr = new Phrase[array.length];
-		for (int i = 0; i < array.length; i++) {
-			phr[i] = new Phrase(array[i]);
+	public m_Phrase(m_Note[][] array) {
+		
+		Note[][] a = new Note[array.length][array[0].length];
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[i].length; j++) {
+				a[i][j] = array[i][j].toNote();
+			}
+		}
+		Phrase[] phr = new Phrase[a.length];
+		for (int i = 0; i < a.length; i++) {
+			phr[i] = new Phrase(a[i]);
 		}
 		p = new Part(phr);
 	}

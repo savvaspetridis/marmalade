@@ -12,13 +12,22 @@ public class Song implements JMC {
 	Score s;
 
 	// constructor
-	public Song(Note[][][] array) {
-		Part[] p = new Part[array.length];
+	public Song(m_Note[][][] array) {
+		Note[][][] a = new Note[array.length][array[0].length][array[0][0].length];
+		for (int i = 0; i < a.length; i++) {
+			for (int j = 0; j < a[i].length; j++) {
+				for (int k = 0; k < a[i][i].length; k++) {
+					a[i][j][k] = array[i][j][k].toNote();
+				}
+			}
+		}
+		
+		Part[] p = new Part[a.length];
 
-		for (int i = 0; i < array.length; i++) {	
-			Phrase[] phr = new Phrase[array[i].length];
-			for (int j = 0; j < array[i].length; j++) {
-				phr[j] = new Phrase(array[i][j]);
+		for (int i = 0; i < a.length; i++) {	
+			Phrase[] phr = new Phrase[a[i].length];
+			for (int j = 0; j < a[i].length; j++) {
+				phr[j] = new Phrase(a[i][j]);
 			}
 			p[i] = new Part(phr, "PART", 0, i);
 		}

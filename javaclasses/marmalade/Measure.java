@@ -10,9 +10,13 @@ public class Measure implements JMC {
 	Phrase p;
 	
 	// constructor
-	public Measure(Note[] array) {
+	public Measure(m_Note[] array) {
 		p = new Phrase();
-		p.addNoteList(array);
+		Note[] a = new Note[array.length];
+		for (int i = 0; i < a.length; i++) {
+			a[i] = array[i].toNote();
+		}
+		p.addNoteList(a);
 	}
 
 	// set note

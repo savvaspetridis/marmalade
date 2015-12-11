@@ -1,3 +1,6 @@
 /* Playing 1 note in marmalade */
 
-measure meme = (play()) [55.q];
+/* measure meme = (play()) [55.q, 56.q]; */
+
+measure meme = [55.q, 56.q];
+(play()) [meme];
