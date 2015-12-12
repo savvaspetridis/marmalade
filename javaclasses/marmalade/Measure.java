@@ -20,7 +20,7 @@ public class Measure implements JMC {
 	}
 
 	// set note
-	
+
 	// get note
 	
 	// play measure
@@ -53,6 +53,14 @@ public class Measure implements JMC {
 		p.setTempo((double) tempo);
 	}
 	
+	public void setTempo(m_Int tempo) {
+		p.setTempo((double) tempo.get());
+	}
+	
+	public void setTempo(m_Tempo tempo) {
+		p.setTempo((double) tempo.getTempo());
+	}
+	
 	// get tempo
 	public int getTempo() {
 		return (int) p.getTempo();
@@ -64,6 +72,21 @@ public class Measure implements JMC {
 		p.setDenominator(den);
 	}
 	
+	public void setTimesig(int num, m_Int den) {
+		p.setNumerator(num);
+		p.setDenominator(den.get());
+	}
+	
+	public void setTimesig(m_Int num, int den) {
+		p.setNumerator(num.get());
+		p.setDenominator(den);
+	}
+	
+	public void setTimesig(m_Int num, m_Int den) {
+		p.setNumerator(num.get());
+		p.setDenominator(den.get());
+	}
+	
 	// get time sig - numerator
 	public int getTimesigNum() {
 		return p.getNumerator();
@@ -72,5 +95,10 @@ public class Measure implements JMC {
 	// get time sig - denominator
 	public int getTimesigDenom() {
 		return p.getDenominator();
+	}
+	
+	// tostring
+	public String toString() {
+		return p.toString();
 	}
 }

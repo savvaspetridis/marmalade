@@ -36,6 +36,11 @@ public class m_Phrase implements JMC {
 		System.out.println(p);
 	}
 
+	// toString
+	public String toString() {
+		return p.toString();
+	}
+	
 	// create midi file - name provided
 	public void output_midi(String filename) {
 		Write.midi(p, filename);
@@ -54,6 +59,14 @@ public class m_Phrase implements JMC {
 	// set tempo
 	public void setTempo(int tempo) {
 		p.setTempo((double) tempo);
+	}
+	
+	public void setTempo(m_Int tempo) {
+		p.setTempo((double) tempo.get());
+	}
+	
+	public void setTempo(m_Tempo tempo) {
+		p.setTempo((double) tempo.getTempo());
 	}
 	
 	// get tempo

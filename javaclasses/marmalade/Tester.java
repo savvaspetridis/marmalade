@@ -9,8 +9,19 @@ public class Tester implements JMC {
 	
 	public static void main (String[] args) {
 		
+		// test m_Tempo
+		m_Tempo temp = new m_Tempo(20);
+		System.out.println("Tempo: " + temp);
+		temp.setTempo(60);
+		System.out.println("New tempo: " + temp);
+		
+		// test m_int
+		m_Int x = new m_Int(4);
+		m_Int y = new m_Int(7);
+		//System.out.println(x + y);
+		
 		// test note
-		m_Note note = new m_Note(50, 1.0);
+		/*m_Note note = new m_Note(50, 1.0);
 		note.play();
 		note.print();
 		note.output_midi("measure file");
@@ -41,7 +52,7 @@ public class Tester implements JMC {
 		m.play();
 		
 		
-		/*// test phrase
+		// test phrase
 		Note[][] p = new Note[3][5];
 		p[0] = n;
 		p[1] = n;

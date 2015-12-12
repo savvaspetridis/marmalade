@@ -55,6 +55,10 @@ public class Song implements JMC {
 		System.out.println(s);
 	}
 
+	// toString
+	public String toString() {
+		return s.toString();
+	}
 	// create midi file - name provided
 	public void output_midi(String filename) {
 		Write.midi(s, filename);
