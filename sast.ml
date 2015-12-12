@@ -16,6 +16,9 @@ type s_expr =
 	| S_Id of string * declare_type
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
+	| S_Measure of expr list * expr * declare_type
+	| S_Phrase of expr list list * expr list * expr * declare_type
+	| S_Song of expr list list list * expr list list * expr list * expr * declare_type
     | S_TimeSig of int * int * declare_type
     | S_Instr of string * declare_type
     | S_Tempo of int * declare_type
@@ -25,8 +28,10 @@ type s_expr =
 	| S_Arr of s_expr list * declare_type
 	| S_Db_Arr of s_expr * s_expr
 	| S_Call_lst of s_expr list
-	| S_Append_block of expr list * string list
 	| S_Noexpr 
+	(*| S_Measure of s_expr list * s_expr
+	| S_Phrase of s_expr list list * s_expr list * s_expr
+	| S_Song of s_expr list list list * s_expr list list * s_expr list * s_expr*)
 
 type s_stmt =
 	S_CodeBlock of s_block
@@ -37,6 +42,7 @@ type s_stmt =
 	| S_If of s_expr * s_stmt * s_stmt (* stmts of type D_CodeBlock *)
 	| S_For of s_stmt * s_stmt * s_stmt * s_block (* stmts of type D_Assign | D_Noexpr * D_Expr of type bool * D_Assign | D_Noexpr *)
 	| S_While of s_expr * s_block
+	| S_Append_Assign of declare_type * string * s_expr list
 
 and s_block = {
 	s_locals : scope_var_decl list;
@@ -74,7 +80,7 @@ let string_of_prim_type = function
   | Int -> "int"
   | String -> "string"
   | Note -> "note"
-  | Measure -> "measure"
+  | Measurepoo -> "measure"
   | Phrase -> "phrase"
   | Song -> "song"
   | TimeSig -> "timesig"
@@ -97,8 +103,8 @@ let rec type_of_expr here = match here with
   | S_Arr (_, t) -> let tpe = (match t with 
   		Int -> Intlist
   		| String -> Stringlist
-  		| Note -> Measure
-  		| Measure -> Phrase
+  		| Note -> Measurepoo
+  		| Measurepoo -> Phrase
   		| Phrase -> Song) in tpe
   | S_Call (_, _, _, _, t) -> t
   | S_Index (_, _, t) -> t
@@ -162,17 +168,28 @@ let verify_id_get_type id env =
 let get_vars li =
 	match li with 
 		VarDecl(v) -> 	
+			let () = Printf.printf "HEY \n" in
 			(match v with
 				Assign(dt, iden, v) -> 
+					let () = Printf.printf "ASSIGN - SAST \n" in
 					(match dt with 
 						Int -> (iden, false, dt) 
 						| Note -> (iden, false, dt)
+						| Measurepoo -> (iden, false, dt)
 						| String -> (iden, false, dt)
                         | TimeSig -> (iden, false, dt) 
                         | Instr -> (iden, false, dt)
                         | Tempo -> (iden, false, dt)
                         | _ -> (iden, true, dt))
-				| Update(iden, v)	-> ("", false, Wild))
+				| Update(iden, v)	-> let () = Printf.printf "UPDATE - SAST \n" in
+					("", false, Wild)
+				| Append_Assign(dt, iden, aplist) ->
+					let () = Printf.printf "APPEND ASSIGN - SAST \n" in
+					(match dt with
+						Note -> (iden, false, dt)
+						| Measurepoo -> (iden, true, dt)
+
+					))
 		| _ ->						("", false, Wild)
 
 let verify_binop l r op =
@@ -353,10 +370,75 @@ let get_id_type den env =
 				either list?)
 				
 
-
+*)
 
 (* Savvas finish this function and write type_of_expr_ast function, model it on type_of_expr function except with ast objects*)
-let compress_app_list typ app_list env = 
+(*let compress_app_list typ app_list env = *)
+
+
+
+
+
+
+let rec compress_append t verified_list append_list env = 
+	(match append_list with 
+		[] -> verified_list (* empty append list *)
+		| [fst; snd] -> let last_two = (fst, snd) in (* match last two elements of append list *)
+			(match last_two with
+				(Note(n_1, d_1) , Note(n_2, d_2)) ->  							(* ~~~ NOTE, NOTE ~~~ *)
+						(match t with 
+							Measurepoo ->
+								let meas = S_Measure([Note(n_1, d_1); Note(n_2, d_2)], Default, Measurepoo) in
+								let updated_list = (verified_list@[meas]) in 
+								compress_append t updated_list [] env
+							| Phrase ->
+								let meas = Measure([Note(n_1, d_1); Note(n_2, d_2)], Default) in 
+								let updated_list = (verified_list@[S_Phrase([[meas]], [], Default, Phrase)]) in 
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))
+				| (Measure(ns, ts), Note(n_1, d_1)) -> 							(* ~~~ MEASURE, NOTE ~~~ *)
+					let new_note = Note(n_1, d_1) in 
+						(match t with
+							Measurepoo -> 
+								let meas = S_Measure(ns@[new_note], ts, Measurepoo) in 
+								let updated_list = (verified_list@[meas]) in 
+								compress_append t updated_list [] env
+							| Phrase ->
+								let meas = Measure(ns@[new_note], ts) in 
+								let updated_list = (verified_list@[S_Phrase([[meas]], [], Default, Phrase)]) in 
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))
+				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) -> 				(* ~~~ MEASURE, MEASURE ~~~ *)
+					let new_phrase = S_Phrase([ns_1; ns_2], [ts_1; ts_2], Default, Phrase) in 
+						(match t with
+							Phrase ->
+								let updated_list = (verified_list@[new_phrase]) in 
+								compress_append t updated_list [] env
+							| Song -> 
+								let new_song = S_Song([[ns_1; ns_2]], [[ts_1; ts_2]], [], Default, Song) in 
+								let updated_list = (verified_list@[new_song]) in
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))) 
+				(*| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) ->
+					let 
+
+						
+
+
+
+						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
+						if t = Phrase || t = Song then ([m_f], []) 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) *)
+				
+
+				)
+
+
+
+	(* OLD BELOW *)
+
+	(*
+
 	let rec compress_append lst t =  (* might need to add return list argument *)
 		let new_l = match lst with
 		([], []) -> ([], [])
@@ -468,9 +550,18 @@ let rec verify_stmt stmt ret_type env =
 			(*| Append(iden, ap_l) -> 
 				let typ = get_id_typ iden env in
 				let  app_lis = verify_app_list_mod ap_l typ env in
-				app_lis
-			| Append_Assign(ty, stri, ap_l) ->
-				let app_lis = verify_app_list_def ap_l typ env in
+				app_lis*)
+			| Append_Assign(ty, stri, ap_l) -> 
+
+				let verified_app_list = compress_append ty [] ap_l env in
+				S_Append_Assign(ty, stri, verified_app_list)
+
+				
+				(*let app_block = S_Append_block(verified_app_list) in*)
+
+
+
+				(*let app_lis = verify_app_list_def ap_l typ env in
 				let eval_typ = verify_expr app_lis env true in
 				let eid_typ = type_of_expr eval_typ in
 				if typ = eid_type

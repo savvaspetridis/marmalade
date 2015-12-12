@@ -53,7 +53,7 @@ and write_type ty =
 	Int -> "int"
 	| String -> "String"
 	| Note -> "Note"
-	| Measure -> "Note[]"
+	| Measurepoo -> "Note[]"
 	| Phrase -> "Note[][]"
 	| Song -> "Note[][][]"
     | List -> "ArrayList<Our_Object>"

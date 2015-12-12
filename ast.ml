@@ -12,7 +12,7 @@ type note_type =
 	| H of string
 	| W of string 
 *)
-type declare_type = Int | Note | String | Song | Phrase | Measure | TimeSig |
+type declare_type = Int | Note | String | Song | Phrase | Measurepoo | TimeSig |
 Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default
 (*
 type funk_expr = 
@@ -82,14 +82,10 @@ type expr =
 and special_exp = {ids: string list; bounds: char_pair list list}
 
 
-
-type appunit = expr * expr
-
-
 type vmod =
 	Assign of declare_type * string * expr 
-	| Append of string * appunit list
-	| Append_Assign of declare_type * string * appunit list
+	| Append of string * expr list
+	| Append_Assign of declare_type * string * expr list
 	| Update of string * expr
 
 

@@ -79,14 +79,16 @@ let rec add_stmt stmt env =
 	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
 		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
 		add_var (id, typ) env
-	 	| Update(str, exr) -> env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
+	 	| Update(str, exr) -> let () = Printf.printf "adding update \n" in
+	 		env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
 	 	let () = Printf.printf "printing update \n" in
 	 		(match dec with 
 	 			(*Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
 	 			|*) _ -> raise(Failure("A function cannot be redefined as a variable"))
 	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*)
 		| Append(str, appL) -> env
-		| Append_Assign(typ, str, appL) -> add_var (str, typ) env)
+		| Append_Assign(typ, str, appL) -> let () = Printf.printf "adding appendassign \n" in
+			add_var (str, typ) env)
 	| _ ->	env
 
 and add_block block env =  
@@ -109,9 +111,9 @@ and add_func func env =
 
 let base_env = 
 	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note;
-    String; Song; Phrase; Measure; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
-	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
-	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measure], [], 0)) table in
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
+	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
+	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
 	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, [], [], 0)) table in
 	(table, 0)
 

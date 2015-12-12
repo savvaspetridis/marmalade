@@ -73,7 +73,7 @@ fvmod:
 	| STRING ID {($2, false, String)}
 	| NOTE ID {($2, false, Note)}
 	| SONG ID {($2, true, Song)}
-	| MEASURE ID {($2, true, Measure)}
+	| MEASURE ID {($2, true, Measurepoo)}
 	| INTLIST ID {($2, true, Intlist)}
 	| STRL ID {($2, true, Stringlist)}
 	| PHRASE ID {($2, true, Phrase)}
@@ -100,7 +100,7 @@ stmt:
 type_dec:
 	INT 	{Int}
 |	NOTE 	{Note}
-|	MEASURE	{Measure}
+|	MEASURE	{Measurepoo}
 |	PHRASE	{Phrase}
 |	SONG	{Song}
 |	STRING 	{String}
@@ -147,8 +147,8 @@ vmod:
 |	ID APPEND ASSIGN append_list {Append($1, List.rev $4)} 
 
 append_list:
-	append_list APPEND add_on expr {($3, $4) :: $1}
-|	add_on expr {[($1, $2)]}
+	append_list APPEND expr {$3 :: $1}
+|	expr {[$1]}
 
 expr:
 app_gen  {$1}
