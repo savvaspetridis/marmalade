@@ -1,6 +1,26 @@
 TEST SUITE PROGRESS TRACKER 
 
-    (last update: 12/2/15, 2:10pm)
+    (last update: 12/7/15, 2:10pm)
+
+
+
+----------------------
+TODO
+----------------------
+
+> conditional (more)
+> while (more)
+> measure/phrase/song decl
+> timesig/instr/tempo decl
+> append (good/error)
+> list of list of notes
+
+
+
+test_note_play
+test_measure_play
+test_phrase_play
+test_song_play
 
 
 ----------------------
@@ -9,25 +29,8 @@ PRINT
 
 Working:
 > int_list foo = (print()) [42]; 
-
-Not Working:
 > str_list foo = (print()) ["foo"];
 
-
-Output from "str_list print":
-
-adding stmt 
-in vdec 
-adding assignment 
-trying to add a var 
-adding symbol 
-in symbol 
-through table 
-got vars 
-foo Nulled??got global variables 
-verifying function 
-in update 
-print Nulled3??Fatal error: exception Failure("Illigal function call print on argument ")
 
 
 ---------------------
@@ -36,12 +39,13 @@ ARITHMETIC
 
 Working:
 > test_arith_add1
+> test_arith_add2
 > test_arith_sub1
 > test_arith_mult1
 > test_arith_div1
 
 Not Working:
-> test_arith_add2
+>
 
 
 
@@ -124,3 +128,86 @@ CONDITIONAL
 To do.
 
 
+
+------------------
+DATA STRUCTURES
+------------------
+
+
+song hey <<= (P_0) << (P_1 << m_0 ) << (p_1 << n_0) << ()
+
+song s_1 = <<= $()p_0 << $()m_0;
+
+
+
+time sig → measure
+bpm → song
+instrument → phrase
+
+
+
+
+----------------
+FUNKY
+----------------
+
+
+TEST FUNK 
+
+
+/*int_list out = (print()) [21];*/
+
+
+
+/*
+int_list int_list marmout() {
+    return [42];
+}
+
+int_list swag = (marmout()) [42];
+*/
+
+/*
+int_list foo = (marmout()) [42];
+*/
+
+
+/*
+int_list string marmout() {
+    return [42];
+}
+
+int_list foo = (print()) [42];
+*/
+
+
+/*
+NOTE: funk <implicit type or blank> <return type>
+*/
+
+
+
+/*
+funk int_list marmout() {
+    int_list out = (print()) [42];
+}
+
+int_list fooey = (marmout()) [1];
+*/
+
+
+/*
+int i = 5;
+*/
+
+
+/*
+int_list int_list foo() {
+    return [42];
+}
+*/
+
+
+/*
+int_list fooey = (marmout()) [42];
+*/
