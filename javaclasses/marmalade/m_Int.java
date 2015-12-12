@@ -220,5 +220,7 @@ public class m_Int implements JMC {
 		return Integer.toString(t);
 	}
 	
-
+	public void print() {
+		System.out.println(t);
+	}
 }

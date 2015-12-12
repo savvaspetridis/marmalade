@@ -116,8 +116,8 @@ and write_binop_expr expr1 op expr2 t =
 					(Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | Geq | And | Or) ->  
 					write_op_primitive op e1 e2)
 			  | String -> (match op with 
-					 Plus -> " + "
-					| (Equal | Less | Leq | Greater | Geq) -> write_op_compares e1 op e2
+					 Plus -> "new j_string(j_string.add(" ^ e1 ^ ", " ^ e2 ^ "))"
+              | (Equal | Less | Leq | Greater | Geq) -> write_op_compares e1 op e2
 					| _ -> raise(Failure(write_op_primitive op e1 e2 ^ " is not a supported operation for String_Type")))
 			  | _ -> raise(Failure(write_op_primitive op e1 e2 ^ " is not a supported operation for" ^ write_type t))
 		in write_binop_expr_help e1 op e2 
