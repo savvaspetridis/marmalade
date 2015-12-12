@@ -419,6 +419,7 @@ let rec compress_append t verified_list append_list env =
 								let updated_list = (verified_list@[new_song]) in
 								compress_append t updated_list [] env
 							| _ -> raise(Failure("Bad")))) 
+				
 				(*| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) ->
 					let 
 
