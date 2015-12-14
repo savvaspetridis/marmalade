@@ -1,0 +1,13 @@
+/*
+Testing new declaration style for music structures
+
+NOTE: This is to be split into 6 different tests
+*/
+
+
+note j = 44.q;
+measure q = $() [j];
+phrase d = $() [q];
+song s = $() [d];
+song g = $() [d, $() [q], $() [[$() q]]];
+
