@@ -1,0 +1,20 @@
+/*
+Testing Conditional Control Flow (v2)
+*/
+
+int i = 5;
+
+if (i > 5) {
+	/*i = 6;*/
+	int r = 4; 
+	int k = 9;
+	i = r + k;
+	(print()) [i];
+}
+
+else {
+	i = 8;
+	(print()) [i];
+}
+
+(print()) ["Main Branch"];
