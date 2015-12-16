@@ -1,0 +1,17 @@
+/*
+Test: appending note to measure
+*/
+
+note n_1 = 44.q;
+measure m_1 <<= (n_1);
+
+(play()) [m_1];
+
+
+/* From syntax-changing session: */
+
+/*
+song hey <<= (P_0) << (P_1 << m_0 ) << (p_1 << n_0) << ();
+song s_1 = <<= $()p_0 << $()m_0;
+*/
+
