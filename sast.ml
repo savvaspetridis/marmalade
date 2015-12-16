@@ -463,7 +463,7 @@ let rec compress_append t verified_list append_list env =
 		| [fst; snd] -> let last_two = (fst, snd) in (* match last two elements of append list *)
 			(match last_two with
 				(Note(pitch, length) , Note(pitch2, length2)) ->  							(* ~~~ NOTE, NOTE ~~~ *)
-					let note_1 = Note(pitch, length) and note_2 = Note(pitch, length2) in
+					let note_1 = Note(pitch, length) and note_2 = Note(pitch2, length2) in
 					let v_note1 = verify_expr note_1 env true and v_note2 = verify_expr note_2 env true in
 					(match t with 
 						Measurepoo ->
@@ -537,7 +537,46 @@ let rec compress_append t verified_list append_list env =
 								let updated_list = (verified_list@[song]) in 
 								compress_append t updated_list [] env
 							| _ -> raise(Failure("Bad")))
-				(*| (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2)) ->
+				| _ -> raise(Failure("Incorrect Append List")))
+		| fst :: (snd :: (thr :: _ as tl)) -> let first_three = (fst, snd, thr) in
+			let () = Printf.printf "FIRST THREE \n" in
+			(match first_three with 
+				(Note(pitch, length), Note(pitch2, length2), Note(pitch3, length3)) -> 
+					let () = Printf.printf "NOTE NOTE NOTE \n" in
+					let note_1 = Note(pitch, length) and note_2 = Note(pitch2, length2) and note_3 = Note(pitch3, length3) in 
+					let v_note_1 = verify_expr note_1 env true and v_note_2 = verify_expr note_2 env true in
+					(match t with 
+						Measurepoo -> 
+							let meas = S_Measure([v_note_1; v_note_2], S_Noexpr, Measurepoo) in 
+							let updated_list = (verified_list@[meas]) in 
+							compress_append t updated_list (thr :: tl) env
+						| _ -> raise(Failure("Bad")))
+
+
+
+		
+
+
+
+
+
+
+
+
+
+			)
+		)
+				
+
+	
+
+
+
+
+
+(*
+
+	 | (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2)) ->
 					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and song_2 = Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2) in
 					let v_song_1 = verify_expr song_1 env true and v_song_2 = verify_expr song_2 env true in
 					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l_l2, v_t_l_l2, v_in_l2, v_tempo2, _) = song_info v_song_2 in
@@ -546,12 +585,7 @@ let rec compress_append t verified_list append_list env =
 								let song = S_Song((List.concat v_nt_l_l_l v_nt_l_l_l2), (List.concat v_t_l_l v_t_l_l2), (List.concat v_in_l v_in_l2), (List.concat v_tempo v_tempo2), Song) in 
 								let updated_list = (verified_list@[song]) in 
 								compress_append t updated_list [] env
-							| _ -> raise(Failure("Bad")))*)
-
-			) 
-			)
-				
-
+							| _ -> raise(Failure("Bad")))   *)
 
 
 	(* OLD BELOW *)
