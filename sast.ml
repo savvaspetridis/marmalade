@@ -16,9 +16,9 @@ type s_expr =
 	| S_Id of string * declare_type
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
-	| S_Measure of expr list * expr * declare_type
-	| S_Phrase of expr list list * expr list * expr * declare_type
-	| S_Song of expr list list list * expr list list * expr list * expr * declare_type
+	| S_Measure of s_expr list * s_expr * declare_type
+	| S_Phrase of s_expr list list * s_expr list * s_expr * declare_type
+	| S_Song of s_expr list list list * s_expr list list * s_expr list * s_expr * declare_type
     | S_TimeSig of int * int * declare_type
     | S_Instr of string * declare_type
     | S_Tempo of int * declare_type
@@ -212,6 +212,53 @@ let verify_binop l r op =
 			| _, _ -> raise(Failure("Cannot apply && ||  op to types " ^ string_of_prim_type tl ^ " + " ^ string_of_prim_type tr)))
 
 
+let verify_music_obj music_obj = 
+	match music_obj with
+	| Note(ct, nt) -> S_Note(ct, nt, Note)
+	| _ -> raise(Failure("Not a music object!"))
+
+(*
+let rec map2 func lst =
+	match lst with
+		  [] -> []
+		| head :: tail ->
+			let ret = map1 func head in
+				ret :: map2 func tail
+
+let rec map1 func lst = 
+	match lst with 
+		[] -> []
+		| head :: tail -> 
+			let ret = func head in 
+				ret :: map1 func tail*)
+let rec map1 lst func env boo = 
+	match lst with 
+		[] -> []
+		| head :: tail -> 
+			let ret = func head env boo in 
+				ret :: map1 tail func env boo
+
+let rec map2 lst func env boo =
+	match lst with
+		[] -> []
+		| head :: tail ->
+			let ret = map1 head func env boo in
+				ret :: map2 tail func env boo
+
+let rec map3 lst func env boo = 
+	match lst with 
+		[] -> []
+		| head :: tail ->
+			let ret = map2 head func env boo in
+				ret :: map3 tail func env boo
+
+
+
+
+			(*let r = func head in 
+				r :: map2 func tail*)
+
+
 
 let rec verify_expr ex env boo =
 	match ex with
@@ -219,6 +266,22 @@ let rec verify_expr ex env boo =
 	| Id(st)			-> S_Id(st, verify_id_get_type st env)
 	| String_Lit(st)	-> S_String_Lit(st, String)
 	| Note(ct, nt)		-> S_Note(ct, nt, Note)
+	| Measure(nt_list, time) -> match time with
+								| TimeSig(num, den) -> let (n, d) = (num, den) in
+									let s_note_list = (List.map verify_music_obj nt_list); in 
+									S_Measure(s_note_list, S_TimeSig(n, d, TimeSig), Measurepoo)
+								| _ -> raise(Failure("Not a TimeSig!"))
+	| Phrase(nt_l_l, t_l, inst) -> let v_ts_list = map1 t_l verify_expr env boo in 
+								   let v_inst = verify_expr inst env boo in 
+								   let v_nt_l_l = map2 nt_l_l verify_expr env boo in
+								   S_Phrase(v_nt_l_l, v_ts_list, v_inst, Phrase)
+	| Song(nt_l_l_l, t_l_l, inst_l, tempo) -> 
+								let v_ts_l_l = map2 t_l_l verify_expr env boo in
+								let v_inst_l = map1 inst_l verify_expr env boo in 
+								let v_temp = verify_expr tempo env boo in
+								let v_nt_l_l_l = map3 nt_l_l_l verify_expr env boo in 
+								S_Song(v_nt_l_l_l, v_ts_l_l, v_inst_l, v_temp, Song) 
+
     | TimeSig(num, den) -> S_TimeSig(num, den, TimeSig)
     | Instr(st)         -> S_Instr(st, Instr)
     | Tempo(i)          -> S_Tempo(i, Tempo)
@@ -376,6 +439,20 @@ let get_id_type den env =
 (*let compress_app_list typ app_list env = *)
 
 
+let meas_info me = 
+	(match me with 
+	| S_Measure(v_nt_list, v_time, typ) -> (v_nt_list, v_time, typ)
+	| _ -> raise(Failure("Not S_Measure!")))
+
+let phras_info ph = 
+	(match ph with
+	| S_Phrase(v_nt_list_list, v_time_list, v_instr, typ) -> (v_nt_list_list, v_time_list, v_instr, typ)
+	| _ -> raise(Failure("Not S_Phrase!")))
+
+let song_info so = 
+	(match so with
+	| S_Song(v_nt_list_list_list, v_time_list_list, v_instr_list, v_bpm, typ) -> (v_nt_list_list_list, v_time_list_list, v_instr_list, v_bpm, typ)
+	| _ -> raise(Failure("Not S_Song!")))
 
 
 
@@ -385,54 +462,95 @@ let rec compress_append t verified_list append_list env =
 		[] -> verified_list (* empty append list *)
 		| [fst; snd] -> let last_two = (fst, snd) in (* match last two elements of append list *)
 			(match last_two with
-				(Note(n_1, d_1) , Note(n_2, d_2)) ->  							(* ~~~ NOTE, NOTE ~~~ *)
-						(match t with 
-							Measurepoo ->
-								let meas = S_Measure([Note(n_1, d_1); Note(n_2, d_2)], Default, Measurepoo) in
-								let updated_list = (verified_list@[meas]) in 
-								compress_append t updated_list [] env
-							| Phrase ->
-								let meas = Measure([Note(n_1, d_1); Note(n_2, d_2)], Default) in 
-								let updated_list = (verified_list@[S_Phrase([[meas]], [], Default, Phrase)]) in 
-								compress_append t updated_list [] env
-							| _ -> raise(Failure("Bad")))
-				| (Measure(ns, ts), Note(n_1, d_1)) -> 							(* ~~~ MEASURE, NOTE ~~~ *)
-					let new_note = Note(n_1, d_1) in 
+				(Note(pitch, length) , Note(pitch2, length2)) ->  							(* ~~~ NOTE, NOTE ~~~ *)
+					let note_1 = Note(pitch, length) and note_2 = Note(pitch, length2) in
+					let v_note1 = verify_expr note_1 env true and v_note2 = verify_expr note_2 env true in
+					(match t with 
+						Measurepoo ->
+							let meas = S_Measure([v_note1; v_note2], S_Noexpr, Measurepoo) in
+							let updated_list = (verified_list@[meas]) in 
+							compress_append t updated_list [] env
+						| Phrase ->
+							let phras = S_Phrase([[v_note1; v_note2]], [S_Noexpr; S_Noexpr], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phras]) in 
+							compress_append t updated_list [] env
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Note(pitch, length)) -> 							(* ~~~ MEASURE, NOTE ~~~ *)
+					let note_1 = Note(pitch, length) and meas_1 = Measure(note_list, time_sig) in
+					let v_note1 = verify_expr note_1 env true and v_meas_1 = verify_expr meas_1 env true in
+					let (v_nt_l, v_t, _) = meas_info v_meas_1 in
 						(match t with
-							Measurepoo -> 
-								let meas = S_Measure(ns@[new_note], ts, Measurepoo) in 
-								let updated_list = (verified_list@[meas]) in 
-								compress_append t updated_list [] env
-							| Phrase ->
-								let meas = Measure(ns@[new_note], ts) in 
-								let updated_list = (verified_list@[S_Phrase([[meas]], [], Default, Phrase)]) in 
-								compress_append t updated_list [] env
-							| _ -> raise(Failure("Bad")))
-				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) -> 				(* ~~~ MEASURE, MEASURE ~~~ *)
-					let new_phrase = S_Phrase([ns_1; ns_2], [ts_1; ts_2], Default, Phrase) in 
+						Measurepoo -> 
+							let meas = S_Measure(v_nt_l@[v_note1], v_t, Measurepoo) in 
+							let updated_list = (verified_list@[meas]) in 
+							compress_append t updated_list [] env
+						| Phrase ->
+							let phras = S_Phrase([(v_nt_l@[v_note1])], [v_t], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phras]) in 
+							compress_append t updated_list [] env
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Measure(note_list2, time_sig2)) -> 				(* ~~~ MEASURE, MEASURE ~~~ *)
+					let meas_1 = Measure(note_list, time_sig) and meas_2 = Measure(note_list2, time_sig2) in
+					let v_meas_1 = verify_expr meas_1 env true and v_meas_2 = verify_expr meas_2 env true in
+					let (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_2, v_t_2, _) = meas_info v_meas_2 in
 						(match t with
 							Phrase ->
-								let updated_list = (verified_list@[new_phrase]) in 
+								let phras = S_Phrase([v_nt_l_1; v_nt_l_2], [v_t_1; v_t_2], S_Noexpr, Phrase) in
+								let updated_list = (verified_list@[phras]) in 
 								compress_append t updated_list [] env
 							| Song -> 
-								let new_song = S_Song([[ns_1; ns_2]], [[ts_1; ts_2]], [], Default, Song) in 
-								let updated_list = (verified_list@[new_song]) in
+								let song = S_Song([[v_nt_l_1; v_nt_l_2]], [[v_t_1; v_t_2]], [S_Noexpr], S_Noexpr, Song) in 
+								let updated_list = (verified_list@[song]) in
 								compress_append t updated_list [] env
-							| _ -> raise(Failure("Bad")))) 
+							| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Measure(note_list, time_sig)) ->
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and meas_1 = Measure(note_list, time_sig) in
+					let v_phr_1 = verify_expr phr_1 env true and v_meas_1 = verify_expr meas_1 env true in
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 in
+						(match t with
+							Phrase ->
+								let phras = S_Phrase(v_nt_l_l@[v_nt_l_1], v_t_l@[v_t_1], v_in, Phrase) in
+								let updated_list = (verified_list@[phras]) in 
+								compress_append t updated_list [] env
+							| Song ->
+								let song = S_Song([v_nt_l_l@[v_nt_l_1]], [v_t_l@[v_t_1]], [v_in], S_Noexpr, Song) in
+								let updated_list = (verified_list@[song]) in
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Phrase(note_list_list2, time_sig_list2, instr2)) ->
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and phr_2 = Phrase(note_list_list2, time_sig_list2, instr2) in
+					let v_phr_1 = verify_expr phr_1 env true and v_phr_2 = verify_expr phr_2 env true in 
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_l2, v_t_l2, v_in2, _) = phras_info v_phr_2 in 
+						(match t with
+							Song -> 
+								let song = S_Song([v_nt_l_l; v_nt_l_l2], [v_t_l; v_t_l2], [v_in; v_in2], S_Noexpr, Song) in 
+								let updated_list = (verified_list@[song]) in 
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))
+				| (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Phrase(note_list_list, time_sig_list, instr)) ->
+					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and phr_1 = Phrase(note_list_list, time_sig_list, instr) in
+					let v_song_1 = verify_expr song_1 env true and v_phr_1 = verify_expr phr_1 env true in 
+					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 in
+						(match t with
+							Song ->
+								let song = S_Song(v_nt_l_l_l@[v_nt_l_l], v_t_l_l@[v_t_l], v_in_l@[v_in], v_tempo, Song) in 
+								let updated_list = (verified_list@[song]) in 
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))
+				(*| (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2)) ->
+					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and song_2 = Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2) in
+					let v_song_1 = verify_expr song_1 env true and v_song_2 = verify_expr song_2 env true in
+					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l_l2, v_t_l_l2, v_in_l2, v_tempo2, _) = song_info v_song_2 in
+						(match t with
+							Song -> 
+								let song = S_Song((List.concat v_nt_l_l_l v_nt_l_l_l2), (List.concat v_t_l_l v_t_l_l2), (List.concat v_in_l v_in_l2), (List.concat v_tempo v_tempo2), Song) in 
+								let updated_list = (verified_list@[song]) in 
+								compress_append t updated_list [] env
+							| _ -> raise(Failure("Bad")))*)
+
+			) 
+			)
 				
-				(*| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) ->
-					let 
-
-						
-
-
-
-						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
-						if t = Phrase || t = Song then ([m_f], []) 
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) *)
-				
-
-				)
 
 
 
