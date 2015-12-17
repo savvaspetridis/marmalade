@@ -1,4 +1,3 @@
-
 /* TEST CASES IN PSEUDOCODE */
 
 /*
@@ -65,11 +64,37 @@ measure m3 	<<= 	n_1 << n_2 << n_3;
 
 measure m4 	<<= 	n_1 << n_2 << n_3 << n_4;
 
-measure m4 	<<= 	n_1 << n_2 << n_3 << n_4 << n_5;
+measure m5 	<<= 	n_1 << n_2 << n_3 << n_4 << n_5;
 
 
 
 /* PHRASE TESTS */
 
+phrase p1 	<<=		$()
+phrase p2 	<<=
+phrase p3 	<<=
+phrase p4 	<<=
+phrase p5 	<<=
+phrase p6 	<<=
+phrase p7 	<<=
+phrase p8 	<<=
+phrase p9 	<<=
+
+
 
 /* SONG TESTS */
+
+song s1		<<=
+song s2		<<=
+song s3		<<=
+song s4		<<=
+song s5		<<=
+song s6		<<=
+song s7		<<=
+song s8		<<=
+song s9		<<=
+song s10	<<=
+song s11	<<=
+song s12	<<=
+song s13	<<=
+song s14	<<=
