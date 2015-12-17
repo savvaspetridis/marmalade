@@ -460,6 +460,28 @@ let song_info so =
 let rec compress_append t verified_list append_list env = 
 	(match append_list with 
 		[] -> verified_list (* empty append list *)
+		| [last] -> 
+			(match last with
+				Note(pitch, length) -> 
+					let note_1 = Note(pitch, length) in 
+					let v_note_1 = verify_expr note_1 env true in 
+					let updated_list = (verified_list@[v_note_1]) in
+					compress_append t updated_list [] env
+				| Measure(note_list, time_sig) -> 
+					let meas_1 = Measure(note_list, time_sig) in
+					let v_meas_1 = verify_expr meas_1 env true in 
+					let updated_list = (verified_list@[v_meas_1]) in
+					compress_append t updated_list [] env
+				| Phrase(note_list_list, time_sig_list, instr) ->
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) in
+					let v_phr_1 = verify_expr phr_1 env true in 
+					let updated_list = (verified_list@[v_phr_1]) in
+					compress_append t updated_list [] env
+				| Song(note_list_list_list, time_sig_list_list, instr_list, tempo) ->
+					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) in
+					let v_song_1 = verify_expr song_1 env true in
+					let updated_list = (verified_list@[v_song_1]) in
+					compress_append t updated_list [] env)
 		| [fst; snd] -> let last_two = (fst, snd) in (* match last two elements of append list *)
 			(match last_two with
 				(Note(pitch, length) , Note(pitch2, length2)) ->  							(* ~~~ NOTE, NOTE ~~~ *)
@@ -544,104 +566,151 @@ let rec compress_append t verified_list append_list env =
 				(Note(pitch, length), Note(pitch2, length2), Note(pitch3, length3)) -> 
 					let () = Printf.printf "NOTE NOTE NOTE \n" in
 					let note_1 = Note(pitch, length) and note_2 = Note(pitch2, length2) and note_3 = Note(pitch3, length3) in 
-					let v_note_1 = verify_expr note_1 env true and v_note_2 = verify_expr note_2 env true in
+					let v_note_1 = verify_expr note_1 env true and v_note_2 = verify_expr note_2 env true and v_note_3 = verify_expr note_3 env true in
 					(match t with 
 						Measurepoo -> 
-							let meas = S_Measure([v_note_1; v_note_2], S_Noexpr, Measurepoo) in 
+							let meas = S_Measure([v_note_1; v_note_2; v_note_3], S_Noexpr, Measurepoo) in 
 							let updated_list = (verified_list@[meas]) in 
-							compress_append t updated_list (thr :: tl) env
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Note(pitch, length), Note(pitch2, length2)) ->
+					let meas_1 = Measure(note_list, time_sig) and note_1 = Note(pitch, length) and note_2 = Note(pitch2, length2) in
+					let v_meas_1 = verify_expr meas_1 env true and v_note_1 = verify_expr note_1 env true and v_note_2 = verify_expr note_2 env true in
+					let (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 in 
+					(match t with 
+						Measurepoo ->
+							let meas = S_Measure((v_nt_l_1@[v_note_1])@[v_note_2], S_Noexpr, Measurepoo) in
+							let updated_list = (verified_list@[meas]) in
+							compress_append t updated_list tl env
+						| Phrase ->
+							let phr = S_Phrase([(v_nt_l_1@[v_note_1])@[v_note_2]], [S_Noexpr], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phr]) in
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Measure(note_list2, time_sig2), Note(pitch, length)) ->
+					let meas_1 = Measure(note_list, time_sig) and meas_2 = Measure(note_list2, time_sig2) and note_1 = Note(pitch, length) in 
+					let v_meas_1 = verify_expr meas_1 env true and v_meas_2 = verify_expr meas_2 env true and v_note_1 = verify_expr note_1 env true in
+					let (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_2, v_t_2, _) = meas_info v_meas_2 in 
+					(match t with 
+						Phrase -> 
+							let phr = S_Phrase([v_nt_l_1; (v_nt_l_2@[v_note_1])], [v_t_1; v_t_2], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phr]) in 
+							compress_append t updated_list tl env 
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Note(pitch, length), Measure(note_list2, time_sig2)) -> 
+					let meas_1 = Measure(note_list, time_sig) and note_1 = Note(pitch, length) and meas_2 = Measure(note_list2, time_sig2) in
+					let v_meas_1 = verify_expr meas_1 env true and v_meas_2 = verify_expr meas_2 env true and v_note_1 = verify_expr note_1 env true in
+					let (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_2, v_t_2, _) = meas_info v_meas_2 in
+					(match t with
+						Phrase ->
+							let phr = S_Phrase([(v_nt_l_1@[v_note_1]); v_nt_l_2], [v_t_1; v_t_2], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phr]) in 
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Measure(note_list, time_sig), Measure(note_list2, time_sig2), Measure(note_list3, time_sig3)) -> 
+					let meas_1 = Measure(note_list, time_sig) and meas_2 = Measure(note_list2, time_sig2) and meas_3 = Measure(note_list3, time_sig3) in 
+					let v_meas_1 = verify_expr meas_1 env true and v_meas_2 = verify_expr meas_2 env true and v_meas_3 = verify_expr meas_3 env true in
+					let (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_2, v_t_2, _) = meas_info v_meas_2 and (v_nt_l_3, v_t_3, _) = meas_info v_meas_3 in 
+					(match t with 
+						Phrase -> 
+							let phr = S_Phrase([v_nt_l_1; v_nt_l_2; v_nt_l_3], [v_t_1; v_t_2; v_t_3], S_Noexpr, Phrase) in
+							let updated_list = (verified_list@[phr]) in 
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Measure(note_list, time_sig), Note(pitch, length)) -> 
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and meas_1 = Measure(note_list, time_sig) and note_1 = Note(pitch, length) in 
+					let v_phr_1 = verify_expr phr_1 env true and v_meas_1 = verify_expr meas_1 env true and v_note_1 = verify_expr note_1 env true in
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 in 
+					(match t with 
+						Phrase ->
+							let phr = S_Phrase(v_nt_l_l@[(v_nt_l_1@[v_note_1])], v_t_l@[v_t_1], S_Noexpr, Phrase) in
+							let updated_list = (verified_list@[phr]) in 
+							compress_append t updated_list tl env
+						| Song -> 
+							let song = S_Song([v_nt_l_l@[(v_nt_l_1@[v_note_1])]], [v_t_l@[v_t_1]], [S_Noexpr], S_Noexpr, Song) in
+							let updated_list = (verified_list@[song]) in 
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Measure(note_list, time_sig), Measure(note_list2, time_sig2)) -> 
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and meas_1 = Measure(note_list, time_sig) and meas_2 = Measure(note_list2, time_sig2) in
+					let v_phr_1 = verify_expr phr_1 env true and v_meas_1 = verify_expr meas_1 env true and v_meas_2 = verify_expr meas_2 env true in
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_2, v_t_2, _) = meas_info v_meas_2 in 
+					(match t with 
+						Phrase -> 
+							let phr = S_Phrase(((v_nt_l_l@[v_nt_l_1])@[v_nt_l_2]), (v_t_l@[v_t_1])@[v_t_2], S_Noexpr, Phrase) in 
+							let updated_list = (verified_list@[phr]) in
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Phrase(note_list_list2, time_sig_list2, instr2), Measure(note_list, time_sig)) -> 
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and phr_2 = Phrase(note_list_list2, time_sig_list2, instr2) and meas_1 = Measure(note_list, time_sig) in
+					let v_phr_1 = verify_expr phr_1 env true and v_phr_2 = verify_expr phr_2 env true and v_meas_1 = verify_expr meas_1 env true in 
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_l2, v_t_l2, v_in2, _) = phras_info v_phr_2 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 in
+					(match t with 
+						Song -> 
+							let song = S_Song([v_nt_l_l; v_nt_l_l2@[v_nt_l_1]], [v_t_l; (v_t_l2@[v_t_1])], [v_in; v_in2], S_Noexpr, Song) in
+							let updated_list = (verified_list@[song]) in
+							compress_append t updated_list tl env
+						| _ -> raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Measure(note_list, time_sig), Phrase(note_list_list2, time_sig_list2, instr2)) -> 
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and meas_1 = Measure(note_list, time_sig) and phr_2 = Phrase(note_list_list2, time_sig_list2, instr2) in 
+					let v_phr_1 = verify_expr phr_1 env true and v_meas_1 = verify_expr meas_1 env true and v_phr_2 = verify_expr phr_2 env true in 
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 and (v_nt_l_l2, v_t_l2, v_in2, _) = phras_info v_phr_2 in
+					(match t with
+						Song -> 
+							let song = S_Song([v_nt_l_l@[v_nt_l_1]; v_nt_l_l2], [v_t_l@[v_t_1]; v_t_l2], [v_in; v_in2], S_Noexpr, Song) in 
+							let updated_list = (verified_list@[song]) in
+							compress_append t updated_list tl env
+						| _ ->  raise(Failure("Bad")))
+				| (Phrase(note_list_list, time_sig_list, instr), Phrase(note_list_list2, time_sig_list2, instr2), Phrase(note_list_list3, time_sig_list3, instr3)) -> 
+					let phr_1 = Phrase(note_list_list, time_sig_list, instr) and phr_2 = Phrase(note_list_list2, time_sig_list2, instr2) and phr_3 = Phrase(note_list_list3, time_sig_list3, instr3) in
+					let v_phr_1 = verify_expr phr_1 env true and v_phr_2 = verify_expr phr_2 env true and v_phr_3 = verify_expr phr_3 env true in
+					let (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_l2, v_t_l2, v_in2, _) = phras_info v_phr_2 and (v_nt_l_l3, v_t_l3, v_in3, _) = phras_info v_phr_3 in 
+					(match t with
+						Song -> 
+							let song = S_Song([v_nt_l_l; v_nt_l_l2; v_nt_l_l3], [v_t_l; v_t_l2; v_t_l3], [v_in; v_in2; v_in3], S_Noexpr, Song) in
+							let updated_list = (verified_list@[song]) in
+							compress_append t updated_list tl env 
+						| _ -> raise(Failure("Bad")))
+				| (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Phrase(note_list_list, time_sig_list, instr), Measure(note_list, time_sig)) -> 
+					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and phr_1 = Phrase(note_list_list, time_sig_list, instr) and meas_1 = Measure(note_list, time_sig) in 
+					let v_song_1 = verify_expr song_1 env true and v_phr_1 = verify_expr phr_1 env true and v_meas_1 = verify_expr meas_1 env true in
+					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_1, v_t_1, _) = meas_info v_meas_1 in 
+					(match t with
+						Song ->
+							let song = S_Song(v_nt_l_l_l@[(v_nt_l_l@[v_nt_l_1])], v_t_l_l@[(v_t_l@[v_t_1])], v_in_l@[v_in], S_Noexpr, Song) in 
+							let updated_list = (verified_list@[song]) in
+							compress_append t updated_list tl env 
+						| _ -> raise(Failure("Bad")))
+				| (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Phrase(note_list_list, time_sig_list, instr), Phrase(note_list_list2, time_sig_list2, instr2)) -> 
+					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and phr_1 = Phrase(note_list_list, time_sig_list, instr) and phr_2 = Phrase(note_list_list2, time_sig_list2, instr2) in 
+					let v_song_1 = verify_expr song_1 env true and v_phr_1 = verify_expr phr_1 env true and v_phr_2 = verify_expr phr_2 env true in
+					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l, v_t_l, v_in, _) = phras_info v_phr_1 and (v_nt_l_l2, v_t_l2, v_in2, _) = phras_info v_phr_2 in 
+					(match t with
+						Song ->
+							let song = S_Song((v_nt_l_l_l@[v_nt_l_l])@[v_nt_l_l2], (v_t_l_l@[v_t_l])@[v_t_l2], (v_in_l@[v_in])@[v_in2], S_Noexpr, Song) in 
+							let updated_list = (verified_list@[song]) in
+							compress_append t updated_list tl env 
 						| _ -> raise(Failure("Bad")))
 
 
 
-		
 
 
-
-
-
-
-
-
-
-			)
-		)
 				
 
-	
 
 
 
 
-
-(*
-
-	 | (Song(note_list_list_list, time_sig_list_list, instr_list, tempo), Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2)) ->
-					let song_1 = Song(note_list_list_list, time_sig_list_list, instr_list, tempo) and song_2 = Song(note_list_list_list2, time_sig_list_list2, instr_list2, tempo2) in
-					let v_song_1 = verify_expr song_1 env true and v_song_2 = verify_expr song_2 env true in
-					let (v_nt_l_l_l, v_t_l_l, v_in_l, v_tempo, _) = song_info v_song_1 and (v_nt_l_l_l2, v_t_l_l2, v_in_l2, v_tempo2, _) = song_info v_song_2 in
-						(match t with
-							Song -> 
-								let song = S_Song((List.concat v_nt_l_l_l v_nt_l_l_l2), (List.concat v_t_l_l v_t_l_l2), (List.concat v_in_l v_in_l2), (List.concat v_tempo v_tempo2), Song) in 
-								let updated_list = (verified_list@[song]) in 
-								compress_append t updated_list [] env
-							| _ -> raise(Failure("Bad")))   *)
-
-
-	(* OLD BELOW *)
-
-	(*
-
-	let rec compress_append lst t =  (* might need to add return list argument *)
-		let new_l = match lst with
-		([], []) -> ([], [])
-		| ([fst; snd], id_list) -> let n_val = (fst,snd) in
-
-
-
-				(* you're gonna have to figure out how to parse ids 
-
-					One way to do this. 
-
-					Take fst and add it to return list *) 
-
-
-
-				let f_val =(match n_val with
-				(Note(n_1, d_1), Note(n_2, d_2)) -> 
-						let m_f = Measure([fst; snd], Default) in
-						if t = Measure || t = Phrase then ([m_f], [])
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Measure(ns, ts), Note(n_1, d_1)) -> 
-						let m_f = Measure(ns @ [n_1], ts) in
-						if t = Measure || t = Phrase then ([m_f], [])
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) ->
-						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2], Default) in
-						if t = Phrase || t = Song then ([m_f], []) 
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) -> 
-						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
-						if t = Phrase || t = Song then ([m_f], []) 
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2)) -> 
-						let m_f = Song([ns_1; ns_2], [ts_1; ts_2], [instrum_1; instrum_2], Default ) in
-						if t = Song then ([m_f], []) 
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Song(ns_1, ts_1, instrum_1, bpm), Phrase(ns_2, ts_2, instrum_2)) -> 
-						let m_f = Song(ns_1 :: ns_2, ts_1 :: ts_2, instrum_1 :: instrum_2, bpm)
-						if t = Song then ([m_f], []) 
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
-				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2)) ->
-						let m_f = Song(ns_1 @ ns_2, ts_1 @ ts_2, instrum_1 @ instrum_2, bpm_1)
-						if t = Song then ([m_f], [] )
-					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 											
 					)
-						 in f_val
-		| fst :: (snd :: (thr :: _ as tl)) -> let n_val = let comp_triple = (fst, snd, thr) in 
-			let action = (match (fst, snd, thr) with
+
+					
+
+			)
+				
 
 
+ (*
 
 				| (Id(string_1), Id(string_2), Id(string_3)) -> let decl = Table.get_decl env in
 				| (Song(ns_1, ts_1, instrum_1, bpm_1),Id(string_1), Song(ns_1, ts_1, instrum_1, bpm_1)) ->
@@ -772,3 +841,57 @@ let verify_semantics program env =
 	let verified_func_list = (*write :: play :: print ::*)  main_func :: map_to_list_env verify_func program.funcs env in
 	let () = prerr_endline "// Passed semantic checking \n" in
 		{ s_pfuncs = List.rev verified_func_list; s_gvars = List.rev verified_gvar_list} 
+
+
+(*
+
+	let rec compress_append lst t =  (* might need to add return list argument *)
+		let new_l = match lst with
+		([], []) -> ([], [])
+		| ([fst; snd], id_list) -> let n_val = (fst,snd) in
+
+
+
+				(* you're gonna have to figure out how to parse ids 
+
+					One way to do this. 
+
+					Take fst and add it to return list *) 
+
+
+
+				let f_val =(match n_val with
+				(Note(n_1, d_1), Note(n_2, d_2)) -> 
+						let m_f = Measure([fst; snd], Default) in
+						if t = Measure || t = Phrase then ([m_f], [])
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Measure(ns, ts), Note(n_1, d_1)) -> 
+						let m_f = Measure(ns @ [n_1], ts) in
+						if t = Measure || t = Phrase then ([m_f], [])
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Measure(ns_1, ts_1), Measure(ns_2, ts_2)) ->
+						let m_f = Phrase([ns_1; ns_2], [ts_1; ts_2], Default) in
+						if t = Phrase || t = Song then ([m_f], []) 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Phrase(ns_1, ts_1, instrum), Measure(ns_2, ts_2)) -> 
+						let m_f = Phrase(ns_1 @ [ns_2], ts_1 @ [ts_2], instrum) in
+						if t = Phrase || t = Song then ([m_f], []) 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Phrase(ns_1, ts_1, instrum_1), Phrase(ns_2, ts_2, instrum_2)) -> 
+						let m_f = Song([ns_1; ns_2], [ts_1; ts_2], [instrum_1; instrum_2], Default ) in
+						if t = Song then ([m_f], []) 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Song(ns_1, ts_1, instrum_1, bpm), Phrase(ns_2, ts_2, instrum_2)) -> 
+						let m_f = Song(ns_1 :: ns_2, ts_1 :: ts_2, instrum_1 :: instrum_2, bpm)
+						if t = Song then ([m_f], []) 
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 
+				| (Song(ns_1, ts_1, instrum_1, bpm_1), Song(ns_2, ts_2, instrum_2, bpm_2)) ->
+						let m_f = Song(ns_1 @ ns_2, ts_1 @ ts_2, instrum_1 @ instrum_2, bpm_1)
+						if t = Song then ([m_f], [] )
+					else raise(Failure("A measure cannot be appended to a " string_of_prim_type t )) 											
+					)
+						 in f_val
+		| fst :: (snd :: (thr :: _ as tl)) -> let n_val = let comp_triple = (fst, snd, thr) in 
+			let action = (match (fst, snd, thr) with
+
+*)
