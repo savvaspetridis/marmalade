@@ -171,6 +171,15 @@ and write_block dblock vg =
 	true -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_true dblock.s_statements ) ^ "\n}"
 	| false -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_false dblock.s_statements ) ^ "\n}"
 
+let write_func dfunc =
+        match dfunc.s_fname with
+            "main" -> "public static void main(String[] args)" ^ write_block
+            dfunc.s_fblock true
+                | _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^
+                dfunc.s_fname ^ "("  ^ String.concat "," (List.map
+                write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block
+                dfunc.s_fblock false
+    (*
 let write_func dfunc arg =
 	match dfunc.s_fname with
 	"main" -> "public static void main(String[] args)" ^ write_block dfunc.s_fblock true
@@ -181,7 +190,7 @@ let write_func dfunc arg =
                 write_scope_var_decl_func dfunc.s_formals) ^ ")" ^
                 write_block dfunc.s_fblock false)
             | _ -> "")
-    (*
+  *)  (*
     String.concat "\n" (List.map write_func_def dfunc arg)
     
     "static " ^ write_type dfunc.s_ret_type ^ " " ^ dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock false
@@ -206,15 +215,15 @@ let gen_pgm pgm name =
     "import marmalade.*;\n" ^
     "import jm.midi.event.TimeSig;\n" ^
     "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ 
-    String.concat "\n" (List.map write_func pgm.s_pfuncs "int") ^  "\n\n" ^
+    String.concat "\n" (List.map write_func pgm.s_pfuncs) ^  "\n\n" ^
     "public static class j_int extends m_Int {\n" ^
     "public j_int(int n) {\n" ^
     "super(n);\n}\n" ^
      "public j_int(j_int n) {\n" ^
      "super(n);\n}" ^
-     (let greg = List.map write_func pgm.s_pfuncs in  
+   (*  (let greg = List.map write_func pgm.s_pfuncs in  
      String.concat "\n" greg) 
-     "\n}\n\n" ^ 
+   *)  "\n}\n\n" ^ 
      "public static class j_note extends m_Note {\n" ^
      "public j_note(int pitch, double length) {\n" ^
      "super(pitch, length);\n}\n}\n\n" ^ 
