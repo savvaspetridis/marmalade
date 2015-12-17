@@ -211,11 +211,11 @@ let verify_binop l r op =
 			Int, Int-> Int
 			| _, _ -> raise(Failure("Cannot apply && ||  op to types " ^ string_of_prim_type tl ^ " + " ^ string_of_prim_type tr)))
 
-
+(*
 let verify_music_obj music_obj = 
 	match music_obj with
 	| Note(ct, nt) -> S_Note(ct, nt, Note)
-	| _ -> raise(Failure("Not a music object!"))
+	| _ -> raise(Failure("Not a music object!")) *)
 
 (*
 let rec map2 func lst =
@@ -231,6 +231,8 @@ let rec map1 func lst =
 		| head :: tail -> 
 			let ret = func head in 
 				ret :: map1 func tail*)
+
+
 let rec map1 lst func env boo = 
 	match lst with 
 		[] -> []
@@ -266,11 +268,21 @@ let rec verify_expr ex env boo =
 	| Id(st)			-> S_Id(st, verify_id_get_type st env)
 	| String_Lit(st)	-> S_String_Lit(st, String)
 	| Note(ct, nt)		-> S_Note(ct, nt, Note)
-	| Measure(nt_list, time) -> match time with
+	| Measure(nt_list, time) -> let new_time = verify_expr time env true in
+								let s_note_list = map1 nt_list verify_expr env true in
+								S_Measure(s_note_list, new_time, Measurepoo)
+
+
+
+
+								(*(match time with
 								| TimeSig(num, den) -> let (n, d) = (num, den) in
 									let s_note_list = (List.map verify_music_obj nt_list); in 
 									S_Measure(s_note_list, S_TimeSig(n, d, TimeSig), Measurepoo)
-								| _ -> raise(Failure("Not a TimeSig!"))
+								| _ -> raise(Failure("Not a TimeSig!")))
+								let new_time = verify_expr time env true in
+								let s_note_list = List.map verify_expr nt_list in*)
+
 	| Phrase(nt_l_l, t_l, inst) -> let v_ts_list = map1 t_l verify_expr env boo in 
 								   let v_inst = verify_expr inst env boo in 
 								   let v_nt_l_l = map2 nt_l_l verify_expr env boo in
@@ -280,7 +292,7 @@ let rec verify_expr ex env boo =
 								let v_inst_l = map1 inst_l verify_expr env boo in 
 								let v_temp = verify_expr tempo env boo in
 								let v_nt_l_l_l = map3 nt_l_l_l verify_expr env boo in 
-								S_Song(v_nt_l_l_l, v_ts_l_l, v_inst_l, v_temp, Song) 
+								S_Song(v_nt_l_l_l, v_ts_l_l, v_inst_l, v_temp, Song)
 
     | TimeSig(num, den) -> S_TimeSig(num, den, TimeSig)
     | Instr(st)         -> S_Instr(st, Instr)
@@ -746,7 +758,7 @@ let rec compress_append t verified_list append_list env =
 
 let rec verify_stmt stmt ret_type env =
 	let () = Printf.printf "in update \n" in
-	match stmt with
+	(match stmt with
 	Return(e) ->
 		let verified_expr = verify_expr e env false in
 		if ret_type = type_of_expr verified_expr then S_Return(verified_expr) 
@@ -804,7 +816,7 @@ let rec verify_stmt stmt ret_type env =
 			let vb = verify_block block ret_type (fst env, block.block_id) in
 			S_While(vc, vb)
 		else raise(Failure("Condition in While statement must be boolean.")) 
-	| _ -> raise(Failure("match screw up, can't map to a statement"))
+	| _ -> raise(Failure("match screw up, can't map to a statement")))
 
 and verify_stmt_list stmt_list ret_type env = 
 	match stmt_list with
