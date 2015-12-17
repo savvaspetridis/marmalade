@@ -1,6 +1,6 @@
 TEST SUITE PROGRESS TRACKER 
 
-    (last update: 12/7/15, 2:10pm)
+    (last update: 12/17/15, 12:14am)
 
 
 
@@ -12,15 +12,38 @@ TODO
 > while (more)
 > measure/phrase/song decl
 > timesig/instr/tempo decl
-> append (good/error)
+> append (error)
 > list of list of notes
 
 
+test_note_play      DONE
+test_measure_play   DONE
+test_phrase_play    PEND
+test_song_play      PEND
 
-test_note_play
-test_measure_play
-test_phrase_play
-test_song_play
+
+
+---------------------------
+PLAY() called on PHRASE
+---------------------------
+
+Test
+> test_phrase_play  (without phrase addon)
+
+Progress
+> Java file generated
+> No Class files generated
+
+
+OUTPUT FROM JAVA COMPILE:
+
+    test_phrase_play.java:11: error: incompatible types: j_note[] cannot be converted to j_measure
+    p_1 = new j_phrase(new j_measure [] {new j_note [] {(new j_note(44, 2.0)),(new j_note(47, 2.0))}});
+                                         ^
+    test_phrase_play.java:11: error: incompatible types: j_measure[] cannot be converted to j_note[][]
+    p_1 = new j_phrase(new j_measure [] {new j_note [] {(new j_note(44, 2.0)),(new j_note(47, 2.0))}});
+
+
 
 
 ----------------------
@@ -125,7 +148,13 @@ To be split into multiple tests.
 CONDITIONAL
 ------------------
 
-To do.
+Working:
+> test_cond_ifelse
+> test_cond_ifelse2
+> test_cond_ifelse3
+
+Not working:
+> 
 
 
 
@@ -143,6 +172,12 @@ song s_1 = <<= $()p_0 << $()m_0;
 time sig → measure
 bpm → song
 instrument → phrase
+
+
+
+--------------------
+APPEND
+--------------------
 
 
 
