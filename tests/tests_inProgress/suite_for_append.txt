@@ -1,0 +1,121 @@
+/* TEST CASES IN PSEUDOCODE */
+
+/*
+measure 	<<=	note
+measure 	<<=	note 	<<	note
+measure 	<<=	note 	<<	note	<<	note
+measure 	<<=	note 	<<	note	<<	note	<<	note
+
+phrase	<<=	measure
+phrase	<<=	measure	<<	measure	
+phrase	<<=	measure	<<	measure	<<	measure
+phrase	<<=	measure	<<	measure	<<	measure	<<	measure
+phrase	<<=	measure	<<	measure	<<	measure	<<	note
+phrase	<<=	measure	<<	measure	<<	note
+phrase	<<=	measure	<<	measure	<<	note	<< 	note
+phrase	<<=	measure	<<	note
+phrase	<<=	measure	<<	note	<<	note
+phrase	<<=	measure	<<	note	<<	note	<<	note
+
+song 	<<= 	phrase
+song 	<<= 	phrase	<<	phrase
+song 	<<= 	phrase	<<	phrase	<< 	phrase
+song 	<<= 	phrase	<<	phrase	<< 	phrase	<<	phrase
+song 	<<= 	phrase	<<	phrase	<< 	phrase	<<	measure
+song 	<<= 	phrase	<<	phrase	<< 	measure
+song 	<<= 	phrase	<<	phrase	<< 	measure	<<	measure
+song 	<<= 	phrase	<<	phrase	<<	measure	<<	note
+song 	<<= 	phrase	<<	measure
+song 	<<= 	phrase	<<	measure	<<	measure
+song 	<<= 	phrase	<<	measure	<<	measure	<<	measure
+song 	<<= 	phrase	<<	measure	<<	measure	<<	note
+song 	<<= 	phrase	<<	measure	<<	note	
+song 	<<= 	phrase	<<	measure	<<	note	<<	note
+*/
+
+
+
+/* CONSTANTS FOR TESTS */
+
+note n_1 = 44.w;
+note n_2 = 45.h;
+note n_3 = 46.q;
+note n_4 = 47.e;
+
+measure m_1 = $() [44.w, 44.w];
+measure m_2 = $() [45.h, 45.h];
+measure m_3 = $() [46.q, 46.q];
+measure m_4 = $() [47.e, 47.e];
+
+phrase p_1 = $() [[44.w, 44.w]];
+phrase p_2 = $() [[45.h, 45.h]];
+phrase p_3 = $() [[46.q, 46.q]];
+phrase p_4 = $() [[47.e, 47.e]];
+
+
+
+/* MEASURE TESTS */
+
+measure m1 	<<= 	n_1;
+
+measure m2 	<<= 	n_1 << n_2;
+
+measure m3 	<<= 	n_1 << n_2 << n_3;
+
+measure m4 	<<= 	n_1 << n_2 << n_3 << n_4;
+
+
+
+/* PHRASE TESTS */
+
+phrase p1 	<<=		$() [m_1];
+
+phrase p2 	<<=		$() [m_1] << $() [m_2];
+
+phrase p3 	<<=		$() [m_1] << $() [m_2] << $() [m_3];
+
+phrase p4 	<<=		$() [m_1] << $() [m_2] << $() [m_3] << $() [m_4];
+
+phrase p5 	<<=		$() [m_1] << $() [m_2] << $() [m_3] << n_1;
+
+phrase p6 	<<=		$() [m_1] << $() [m_2] << n_1;
+
+phrase p7 	<<=		$() [m_1] << $() [m_2] << n_1 << n_2;
+
+phrase p8 	<<=		$() [m_1] << n_1;
+
+phrase p9 	<<=		$() [m_1] << n_1 << n_2;
+
+phrase p10	<<=		$() [m_1] << n_1 << n_2 << n_3;
+
+
+
+/* SONG TESTS */
+
+song s1		<<=		$() [p_1];
+
+song s2		<<=		$() [p_1] << $() [p_2];
+
+song s3		<<=		$() [p_1] << $() [p_2] << $() [p_3];
+
+song s4		<<=		$() [p_1] << $() [p_2] << $() [p_3] << $() [p_4];
+
+song s5		<<=		$() [p_1] << $() [p_2] << $() [p_3] << $() [m_1];
+
+song s6		<<=		$() [p_1] << $() [p_2] << $() [m_1];
+
+song s7		<<=		$() [p_1] << $() [p_2] << $() [m_1] << $() [m_2];
+
+song s8		<<=		$() [p_1] << $() [p_2] << $() [m_1] << $() [n_1];
+
+song s9		<<=		$() [p_1] << $() [m_1];
+
+song s10	<<=		$() [p_1] << $() [m_1] << $() [m_2];
+
+song s11	<<=		$() [p_1] << $() [m_1] << $() [m_2] << $() [m_3];
+
+song s12	<<=		$() [p_1] << $() [m_1] << $() [m_2] << $() [n_1];
+
+song s13	<<=		$() [p_1] << $() [m_1] << $() [n_1];
+
+song s14	<<=		$() [p_1] << $() [m_1] << $() [n_1] << $() [n_2];
