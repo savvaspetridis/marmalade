@@ -64,9 +64,9 @@ type expr =
     | Msk_list of expr * expr
     (* PARSE THESE *)
     | Measure of expr list * expr (* list of notes, TimeSig *)
-    | Phrase of expr list list * expr list * expr (* list of 'measures' (Notes in them), list of their Time-signatures, 
+    | Phrase of expr list * expr (* list of 'measures' (Notes in them), list of their Time-signatures, 
 													and an instrument *)
-    | Song of expr list list list * expr list list * expr list * expr (* list of phrases (Notes in them), 
+    | Song of expr list * expr (* list of phrases (Notes in them), 
 																	list of each measure in each phrase's
 																	 time-signature, list of all instruments for each
 																	 phrase, and a BPM *)

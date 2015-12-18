@@ -158,12 +158,12 @@ app_gen  {$1}
   /*| literal {$1}*/
 
 add_on_expr:
-  DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(0, 0))}
-|	DOLLAR DOLLAR LPAREN RPAREN reg_list_list_wrapper reg_list { Phrase( $5, $6, Instr("")) }
-|	DOLLAR DOLLAR DOLLAR LPAREN RPAREN reg_list_list_list_wrapper reg_list_list_wrapper reg_list { Song($6, $7, $8, Tempo(1))}
+  DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(4, 4))}
+|	DOLLAR DOLLAR LPAREN RPAREN reg_list  { Phrase( $5, Instr("PIANO")) }
+|	DOLLAR DOLLAR DOLLAR LPAREN RPAREN reg_list { Song($6, Tempo(1))}
 |   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN reg_list { Measure($7, TimeSig($3, $5)) }  
-|   DOLLAR LPAREN ID RPAREN reg_list_list_wrapper reg_list { Phrase( $5, $6, Instr($3))  }
-|   DOLLAR LPAREN INT_LIT RPAREN reg_list_list_list_wrapper reg_list_list_wrapper reg_list { Song( $5, $6, $7, Tempo($3)) }
+|   DOLLAR LPAREN ID RPAREN reg_list { Phrase( $5, Instr($3))  }
+|   DOLLAR LPAREN INT_LIT RPAREN reg_list { Song( $5, Tempo($3)) }
 
 arith: 
 	logical_OR_expr { $1 }
@@ -284,8 +284,7 @@ funk_args:
 |	expr {[$1]}
 
 */
-
-reg_list_list_wrapper:
+/*reg_list_list_wrapper:
 	LBRACK reg_list_list RBRACK {List.rev $2} 
 
 reg_list_list:
@@ -299,7 +298,7 @@ reg_list_list_list_wrapper:
 reg_list_list_list:
 	reg_list_list_list COMMA reg_list_list_wrapper {$3 :: $1}
 |	reg_list_list_list COMMA ID {[[Id($3)]] :: $1}
-| 	reg_list_list_wrapper {[$1]}
+| 	reg_list_list_wrapper {[$1]}*/
 
 
 
