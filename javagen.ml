@@ -70,7 +70,7 @@ let rec write_expr = function
 			match mark with
 			S_Arr(l_one, l_two) ->   write_expr call (*^ write_expr mark*) 
 			| S_Noexpr -> write_expr call)
-	| S_Measure(n, n2, n3) -> "MEASURE"
+	| S_Measure(s_note_list, s_time, typ) -> "new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ ")"
 	| S_Phrase(n,n2,n3,n4) -> "PHRASE"
 	| S_Song(n, n2, n3, n4, n5) -> "SONG"
 	| S_Noexpr -> ""
