@@ -20,6 +20,15 @@ public class m_Phrase implements JMC {
 		setInstrument(instrument);
 	}
 	
+	public m_Phrase(Measure[] array, m_Int instrument) {
+		Phrase[] phr = new Phrase[array.length];
+		for (int i = 0; i < phr.length; i++) {
+			phr[i] = array[i].getPhrase();
+		}
+		p = new Part(phr);
+		setInstrument(instrument.get());
+	}
+	
 	// return part
 	public Part getPart() {
 		return p;

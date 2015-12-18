@@ -21,6 +21,15 @@ public class Song implements JMC {
 		setTempo(tempo);
 	}
 	
+	public Song(m_Phrase[] array, m_Int tempo) {
+		Part[] p = new Part[array.length];
+		for (int i = 0; i < p.length; i++) {
+			p[i] = array[i].getPart();
+		}
+		s = new Score(p);
+		setTempo(tempo.get());
+	}
+	
 	/*
 	// constructor
 	public Song(m_Note[][][] array) {
