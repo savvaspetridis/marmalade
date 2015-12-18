@@ -70,12 +70,14 @@ let rec write_expr = function
 			match mark with
 			S_Arr(l_one, l_two) ->   write_expr call (*^ write_expr mark*) 
 			| S_Noexpr -> write_expr call)
-	| S_Measure(s_note_list, s_time, typ) -> "new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ ")"
-	| S_Phrase(n,n2,n3) -> "PHRASE"
-	| S_Song(n, n2, n3) -> "SONG"
+	(*| S_Measure(s_note_list, s_time, typ) -> "new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ ")"
+	| S_Phrase(s_measure_list, s_instr, typ) -> "new j_measure[] {" ^ (String.concat ", " (List.map write_expr s_measure_list)) ^ "}, " ^ write_expr s_instr*)
+	| S_Measure(s_note_list, s_time, typ) -> "new j_measure(new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ "))"
+	| S_Phrase(s_measure_list, s_instr, typ) -> "new j_phrase(new j_measure[] {" ^ (String.concat ", " (List.map write_expr s_measure_list)) ^ "}, " ^ write_expr s_instr ^ ")"
+	| S_Song(s_phrase_list, s_tempo, typ) -> "new j_song(new j_phrase[] {" ^ (String.concat ", " (List.map write_expr s_phrase_list)) ^ "}, " ^ write_expr s_tempo ^ ")"
 	| S_Noexpr -> ""
-	| S_Note(i, ch, tp) -> "(new j_note(" ^ string_of_int i ^ ", " ^
-        write_rhythm ch ^ "))"
+	| S_Note(i, ch, tp) -> "new j_note(" ^ string_of_int i ^ ", " ^
+        write_rhythm ch ^ ")"
     | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
     | S_Instr(str, tp) -> str
     | S_Tempo(i, tp) -> string_of_int i
@@ -157,11 +159,12 @@ and write_assign name dexpr t vg =
 
 	true -> (match t with
 	  String | Instr | Tempo | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
-	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	(*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
+	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = " ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type")))
 	| false -> (match t with
 	  String | Instr | Tempo | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
-	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	(*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type"))) 
 
 
