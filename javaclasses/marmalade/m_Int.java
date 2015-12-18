@@ -39,6 +39,22 @@ public class m_Int implements JMC {
 		return x.get() + y.get();
 	}
 	
+	public static int add(m_Note x, m_Int y) {
+		return x.getPitch() + y.get();
+	}
+	
+	public static int add(m_Note x, int y) {
+		return x.getPitch() + y;
+	}
+	
+	public static int add(m_Int x, m_Note y) {
+		return x.get() + y.getPitch();
+	}
+	
+	public static int add(int x, m_Note y) {
+		return x + y.getPitch();
+	}
+	
 	// subtract
 	public static int sub(int x, int y) {
 		return x - y;
