@@ -125,6 +125,8 @@ and write_binop_expr expr1 op expr2 t =
                      "))"
 					| (Equal | Less | Leq | Greater | Geq) -> write_op_compares e1 op e2
 					| _ -> raise(Failure(write_op_primitive op e1 e2 ^ " is not a supported operation for String_Type")))
+			  | Note -> (match op with (Plus | Minus | Divide | Times) -> "new j_note( " ^ write_op_primitive op e1 e2 ^ ", " ^ e1 ^ ".getLength() )"
+			  			| _ -> raise(Failure("note add issue")) ) 
 			  | _ -> raise(Failure(write_op_primitive op e1 e2 ^ " is not a supported operation for" ^ write_type t))
 		in write_binop_expr_help e1 op e2 
 
@@ -227,6 +229,8 @@ let gen_pgm pgm name =
      "\n}\n\n" ^ 
      "public static class j_note extends m_Note {\n" ^
      "public j_note(int pitch, double length) {\n" ^
+     "super(pitch, length);\n}" ^
+     "public j_note(j_int pitch, double length) {\n" ^
      "super(pitch, length);\n}" ^ 
      (write_func_wrapper pgm.s_pfuncs Note) ^
      "\n}\n\n" ^ 
