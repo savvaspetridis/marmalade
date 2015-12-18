@@ -154,14 +154,16 @@ expr:
 app_gen  {$1}
 | arith {$1}
 | AT LPAREN special_expression RPAREN /*{Regex({$3.ids; $3.bounds})}*/ {Regex($3)}
-| add_on expr {Msk_list($1, $2)}
+| add_on_expr {$1}
   /*| literal {$1}*/
 
-add_on:
-	DOLLAR LPAREN RPAREN { Default }
-|   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN {TimeSig($3, $5)}  
-|   DOLLAR LPAREN ID RPAREN {Instr($3)}
-|   DOLLAR LPAREN INT_LIT RPAREN {Tempo($3)}
+add_on_expr:
+  DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(0, 0))}
+|	DOLLAR DOLLAR LPAREN RPAREN reg_list_list_wrapper reg_list { Phrase( $5, $6, Instr("")) }
+|	DOLLAR DOLLAR DOLLAR LPAREN RPAREN reg_list_list_list_wrapper reg_list_list_wrapper reg_list { Song($6, $7, $8, Tempo(1))}
+|   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN reg_list { Measure($7, TimeSig($3, $5)) }  
+|   DOLLAR LPAREN ID RPAREN reg_list_list_wrapper reg_list { Phrase( $5, $6, Instr($3))  }
+|   DOLLAR LPAREN INT_LIT RPAREN reg_list_list_list_wrapper reg_list_list_wrapper reg_list { Song( $5, $6, $7, Tempo($3)) }
 
 arith: 
 	logical_OR_expr { $1 }
@@ -185,8 +187,8 @@ bound_list:
 
 
 literal:
-    add_on {$1}
-| 	INT_LIT {IntLit($1)}
+ /*   add_on_expr {$1}
+| */	INT_LIT {IntLit($1)}
 |	note 			{$1}
 |   STRING_LIT {String_Lit($1)} 
 
@@ -274,7 +276,7 @@ arithmeticID_arg:
 	app_gen {$1}
    /*| arithmetic {$1}*/
     | arith {$1}
-    | add_on expr {Msk_list($1, $2)}
+    | add_on_expr { $1 }
 
 /*
 funk_args:
@@ -282,6 +284,22 @@ funk_args:
 |	expr {[$1]}
 
 */
+
+reg_list_list_wrapper:
+	LBRACK reg_list_list RBRACK {List.rev $2} 
+
+reg_list_list:
+	reg_list_list COMMA reg_list {$3 :: $1}
+|	reg_list_list COMMA ID {[Id($3)] :: $1}
+| reg_list {[$1]} 
+
+reg_list_list_list_wrapper:
+	LBRACK reg_list_list_list RBRACK {List.rev $2}
+
+reg_list_list_list:
+	reg_list_list_list COMMA reg_list_list_wrapper {$3 :: $1}
+|	reg_list_list_list COMMA ID {[[Id($3)]] :: $1}
+| 	reg_list_list_wrapper {[$1]}
 
 
 
