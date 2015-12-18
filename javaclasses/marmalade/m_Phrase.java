@@ -11,6 +11,21 @@ public class m_Phrase implements JMC {
 	Part p;
 
 	// constructor
+	public m_Phrase(Measure[] array, int instrument) {
+		Phrase[] phr = new Phrase[array.length];
+		for (int i = 0; i < phr.length; i++) {
+			phr[i] = array[i].getPhrase();
+		}
+		p = new Part(phr);
+		setInstrument(instrument);
+	}
+	
+	// return part
+	public Part getPart() {
+		return p;
+	}
+	
+	/*// constructor
 	public m_Phrase(m_Note[][] array) {
 		
 		Note[][] a = new Note[array.length][array[0].length];
@@ -42,6 +57,7 @@ public class m_Phrase implements JMC {
 		p = new Part(phr);
 		setInstrument(instrument);
 	}
+	*/
 	
 	// play measure
 	public void play() {

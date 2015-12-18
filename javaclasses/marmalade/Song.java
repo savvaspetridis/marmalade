@@ -12,6 +12,17 @@ public class Song implements JMC {
 	Score s;
 
 	// constructor
+	public Song(m_Phrase[] array, int tempo) {
+		Part[] p = new Part[array.length];
+		for (int i = 0; i < p.length; i++) {
+			p[i] = array[i].getPart();
+		}
+		s = new Score(p);
+		setTempo(tempo);
+	}
+	
+	/*
+	// constructor
 	public Song(m_Note[][][] array) {
 		Note[][][] a = new Note[array.length][array[0].length][array[0][0].length];
 		for (int i = 0; i < a.length; i++) {
@@ -80,6 +91,7 @@ public class Song implements JMC {
 		s = new Score(p);
 		setTempo(tempo);
 	}
+	*/
 
 	// set part
 	public void setPart(Part p, int i) {
