@@ -31,9 +31,11 @@ public class Measure implements JMC {
 		setTimesig(t.getNumerator(), t.getDenominator());
 	}
 
-	// set note
-
-	// get note
+	
+	// return phrase
+	public Phrase getPhrase() {
+		return p;
+	}
 	
 	// play measure
 	public void play() {
