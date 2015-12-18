@@ -70,12 +70,14 @@ let rec write_expr = function
 			match mark with
 			S_Arr(l_one, l_two) ->   write_expr call (*^ write_expr mark*) 
 			| S_Noexpr -> write_expr call)
-	| S_Measure(n, n2, n3) -> "MEASURE"
-	| S_Phrase(n,n2,n3,n4) -> "PHRASE"
-	| S_Song(n, n2, n3, n4, n5) -> "SONG"
+	(*| S_Measure(s_note_list, s_time, typ) -> "new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ ")"
+	| S_Phrase(s_measure_list, s_instr, typ) -> "new j_measure[] {" ^ (String.concat ", " (List.map write_expr s_measure_list)) ^ "}, " ^ write_expr s_instr*)
+	| S_Measure(s_note_list, s_time, typ) -> "new j_measure(new j_note[] {" ^ (String.concat ", " (List.map write_expr s_note_list)) ^ "}, new TimeSig (" ^ write_expr s_time ^ "))"
+	| S_Phrase(s_measure_list, s_instr, typ) -> "new j_phrase(new j_measure[] {" ^ (String.concat ", " (List.map write_expr s_measure_list)) ^ "}, " ^ write_expr s_instr ^ ")"
+	| S_Song(s_phrase_list, s_tempo, typ) -> "new j_song(new j_phrase[] {" ^ (String.concat ", " (List.map write_expr s_phrase_list)) ^ "}, " ^ write_expr s_tempo ^ ")"
 	| S_Noexpr -> ""
-	| S_Note(i, ch, tp) -> "(new j_note(" ^ string_of_int i ^ ", " ^
-        write_rhythm ch ^ "))"
+	| S_Note(i, ch, tp) -> "new j_note(" ^ string_of_int i ^ ", " ^
+        write_rhythm ch ^ ")"
     | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
     | S_Instr(str, tp) -> str
     | S_Tempo(i, tp) -> string_of_int i
@@ -157,11 +159,12 @@ and write_assign name dexpr t vg =
 
 	true -> (match t with
 	  String | Instr | Tempo | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
-	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	(*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
+	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = " ^ "(" ^ write_expr dexpr ^ ")"
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type")))
 	| false -> (match t with
 	  String | Instr | Tempo | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
-	| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"
+	(*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
 	| _ -> raise(Failure(write_type t ^ " is not a valid assign_type"))) 
 
 
@@ -171,11 +174,36 @@ and write_block dblock vg =
 	true -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_true dblock.s_statements ) ^ "\n}"
 	| false -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_false dblock.s_statements ) ^ "\n}"
 
-let write_func dfunc =
-	match dfunc.s_fname with
-	"main" -> "public static void main(String[] args)" ^ write_block dfunc.s_fblock true
-	| _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^ dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock false
+               
 
+
+let write_func_wrapper x str =
+    String.concat "\n"
+    (let write_func dfunc = 
+        match (dfunc.s_fname, str) with
+        ("main", String) -> "public static void main(String[] args)" ^ write_block dfunc.s_fblock true
+    | (_, _) -> (String.concat "\n" (let match_type ftype = 
+        match ftype with
+        str -> "static " ^ write_type dfunc.s_ret_type ^ " " ^
+        dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func
+        dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock false
+        | _ -> "" in
+        List.map match_type dfunc.s_f_type)) in
+    List.map write_func x)
+                            
+
+
+
+(*
+let write_func dfunc =
+        match dfunc.s_fname with
+            "main" -> "public static void main(String[] args)" ^ write_block
+            dfunc.s_fblock true
+                | _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^
+                dfunc.s_fname ^ "("  ^ String.concat "," (List.map
+                write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block
+                dfunc.s_fblock false
+*)
 
 let gen_pgm pgm name = 
 	(*let () = Printf.printf "got through table and sast \n" in *)
@@ -186,28 +214,42 @@ let gen_pgm pgm name =
 	"import jm.util.*;\n" ^
     "import marmalade.*;\n" ^
     "import jm.midi.event.TimeSig;\n" ^
-    "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map
-     write_global_scope_var_decl pgm.s_gvars) ^ String.concat "\n" (List.map
-     write_func pgm.s_pfuncs) ^  "\n\n" ^
+    "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ 
+     (write_func_wrapper pgm.s_pfuncs String)
+(*    String.concat "\n" (List.map
+         write_func pgm.s_pfuncs)*) ^  "\n\n" ^
     "public static class j_int extends m_Int {\n" ^
     "public j_int(int n) {\n" ^
     "super(n);\n}\n" ^
      "public j_int(j_int n) {\n" ^
-     "super(n);\n}\n}\n\n" ^ 
+     "super(n);\n}" ^
+     (write_func_wrapper pgm.s_pfuncs Int) ^ 
+     "\n}\n\n" ^ 
      "public static class j_note extends m_Note {\n" ^
      "public j_note(int pitch, double length) {\n" ^
-     "super(pitch, length);\n}\n}\n\n" ^ 
+     "super(pitch, length);\n}" ^ 
+     (write_func_wrapper pgm.s_pfuncs Note) ^
+     "\n}\n\n" ^ 
      "public static class j_measure extends Measure {\n" ^ 
-     "public j_measure(j_note[] n) {\n" ^
-     "super(n);\n}\n}\n\n" ^ 
+     "public j_measure(j_note[] m, TimeSig n) {\n" ^
+     "super(m, n);\n}" ^
+     (write_func_wrapper pgm.s_pfuncs Measurepoo) ^ 
+     "\n}\n" ^ 
      "public static class j_phrase extends
      m_Phrase {\n" ^
-     "public j_phrase(j_note[][] n) {\n" ^
-     "super(n);\n}\n}\n\n" ^ 
+     "public j_phrase(j_measure[] m, int n) {\n" ^
+     "super(m, n);\n}" ^
+     "public j_phrase(j_measure[] m, j_int n) {\n" ^
+     "super(m, n);\n}\n" ^
+     (write_func_wrapper pgm.s_pfuncs Phrase) ^
+     "\n}\n" ^ 
      "public static class j_song
      extends Song {\n" ^
-     "public j_song(j_note[][][]
-     n) {\n" ^
-     "super(n);\n}\n}\n}\n"
+     "public j_song(j_phrase[] m, int n) {\n" ^
+     "super(m, n);\n}" ^
+     "public j_song(j_phrase[] m, j_int n) {\n" ^
+     "super(m, n);\n}\n" ^
+     (write_func_wrapper pgm.s_pfuncs Song) ^
+     "\n}\n}\n"
 
 

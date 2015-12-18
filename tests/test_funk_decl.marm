@@ -3,7 +3,7 @@ Tests a funktion declaration
 */
 
 
-funk int_list int_list marmOut() {
+funk int_list int marmOut() {
 	return [42];
 }
 

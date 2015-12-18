@@ -3,6 +3,7 @@ package marmalade;
 import jm.music.data.Note;
 import jm.util.*;
 import jm.JMC;
+import jm.midi.event.TimeSig;
 
 
 public class Tester implements JMC {
@@ -21,7 +22,7 @@ public class Tester implements JMC {
 		//System.out.println(x + y);
 		
 		// test note
-		/*m_Note note = new m_Note(50, 1.0);
+		m_Note note = new m_Note(50, 1.0);
 		note.play();
 		note.print();
 		note.output_midi("measure file");
@@ -30,7 +31,7 @@ public class Tester implements JMC {
 		note.setPitch(70);
 		System.out.println("Note pitch: " + note.getPitch());
 		note.play();
-
+		
 		// test measure
 		m_Note[] n = new m_Note[5];
 		n[0] = new m_Note(55, 1.0);
@@ -39,7 +40,7 @@ public class Tester implements JMC {
 		n[3] = new m_Note(58, 1.0);
 		n[4] = new m_Note(59, 1.0);
 		
-		Measure m = new Measure(n);
+		Measure m = new Measure(n, new TimeSig(3, 4));
 		m.play();
 		m.print();
 		m.output_midi("measure file");
@@ -51,7 +52,7 @@ public class Tester implements JMC {
 		System.out.println("Measure time sig num/denom: " + m.getTimesigNum() + " / " + m.getTimesigDenom());
 		m.play();
 		
-		
+		/*
 		// test phrase
 		Note[][] p = new Note[3][5];
 		p[0] = n;

@@ -17,8 +17,8 @@ type s_expr =
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
 	| S_Measure of s_expr list * s_expr * declare_type
-	| S_Phrase of s_expr list list * s_expr list * s_expr * declare_type
-	| S_Song of s_expr list list list * s_expr list list * s_expr list * s_expr * declare_type
+	| S_Phrase of s_expr list * s_expr * declare_type
+	| S_Song of s_expr list  * s_expr * declare_type
     | S_TimeSig of int * int * declare_type
     | S_Instr of string * declare_type
     | S_Tempo of int * declare_type
@@ -53,7 +53,8 @@ and s_block = {
 type s_func = {
 	s_fname : string;
 	s_ret_type : declare_type; (* Changed from types for comparison error in verify_stmt *)
-	s_formals : scope_var_decl list;
+    s_f_type : declare_type list;
+    s_formals : scope_var_decl list;
 	s_fblock : s_block;
 }
 
@@ -99,6 +100,9 @@ let rec type_of_expr here = match here with
   | S_TimeSig(_,_,t) -> t
   | S_Instr(_,t) -> t
   | S_Tempo(_,t) -> t
+  | S_Measure(_, _, t) -> t
+  | S_Phrase(_, _, t) -> t
+  | S_Song( _, _, t) -> t
   | S_Binop(_,_,_,t) -> t 
   | S_Arr (_, t) -> let tpe = (match t with 
   		Int -> Intlist
@@ -270,11 +274,8 @@ let rec verify_expr ex env boo =
 	| Note(ct, nt)		-> S_Note(ct, nt, Note)
 	| Measure(nt_list, time) -> let new_time = verify_expr time env true in
 								let s_note_list = map1 nt_list verify_expr env true in
+								let () = Printf.printf "measure \n" in
 								S_Measure(s_note_list, new_time, Measurepoo)
-
-
-
-
 								(*(match time with
 								| TimeSig(num, den) -> let (n, d) = (num, den) in
 									let s_note_list = (List.map verify_music_obj nt_list); in 
@@ -283,17 +284,17 @@ let rec verify_expr ex env boo =
 								let new_time = verify_expr time env true in
 								let s_note_list = List.map verify_expr nt_list in*)
 
-	| Phrase(nt_l_l, t_l, inst) -> let v_ts_list = map1 t_l verify_expr env boo in 
+	| Phrase(m_l, inst) -> let verified_list = map1 m_l verify_expr env boo in 
+						S_Phrase( verified_list, verify_expr inst env boo, Phrase) (*) let v_ts_list = map1 t_l verify_expr env boo in 
 								   let v_inst = verify_expr inst env boo in 
 								   let v_nt_l_l = map2 nt_l_l verify_expr env boo in
-								   S_Phrase(v_nt_l_l, v_ts_list, v_inst, Phrase)
-	| Song(nt_l_l_l, t_l_l, inst_l, tempo) -> 
+								   S_Phrase(v_nt_l_l, v_ts_list, v_inst, Phrase)*)
+	| Song(s_l, tempo) -> S_Song(map1 s_l verify_expr env boo, verify_expr tempo env boo, Song) (*)
 								let v_ts_l_l = map2 t_l_l verify_expr env boo in
 								let v_inst_l = map1 inst_l verify_expr env boo in 
 								let v_temp = verify_expr tempo env boo in
 								let v_nt_l_l_l = map3 nt_l_l_l verify_expr env boo in 
-								S_Song(v_nt_l_l_l, v_ts_l_l, v_inst_l, v_temp, Song)
-
+								S_Song(v_nt_l_l_l, v_ts_l_l, v_inst_l, v_temp, Song)*)
     | TimeSig(num, den) -> S_TimeSig(num, den, TimeSig)
     | Instr(st)         -> S_Instr(st, Instr)
     | Tempo(i)          -> S_Tempo(i, Tempo)
@@ -450,7 +451,7 @@ let get_id_type den env =
 (* Savvas finish this function and write type_of_expr_ast function, model it on type_of_expr function except with ast objects*)
 (*let compress_app_list typ app_list env = *)
 
-
+(*)
 let meas_info me = 
 	(match me with 
 	| S_Measure(v_nt_list, v_time, typ) -> (v_nt_list, v_time, typ)
@@ -718,7 +719,7 @@ let rec compress_append t verified_list append_list env =
 
 					
 
-			)
+			)*)
 				
 
 
@@ -785,16 +786,11 @@ let rec verify_stmt stmt ret_type env =
 				let typ = get_id_typ iden env in
 				let  app_lis = verify_app_list_mod ap_l typ env in
 				app_lis*)
-			| Append_Assign(ty, stri, ap_l) -> 
+			(*| Append_Assign(ty, stri, ap_l) -> 
 
 				let verified_app_list = compress_append ty [] ap_l env in
-				S_Append_Assign(ty, stri, verified_app_list)
-
-				
+				S_Append_Assign(ty, stri, verified_app_list)*)
 				(*let app_block = S_Append_block(verified_app_list) in*)
-
-
-
 				(*let app_lis = verify_app_list_def ap_l typ env in
 				let eval_typ = verify_expr app_lis env true in
 				let eid_typ = type_of_expr eval_typ in
@@ -836,7 +832,7 @@ let verify_func func env =
 	(*let () = Printf.printf "func.fname" in *)
 	let verified_args = map_to_list_env verify_var func.args (fst env, func.body.block_id) in
 	let verified_func_decl = verify_is_func_decl func.fname env in 
-	{ s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
+    { s_f_type = func.f_type; s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
 
 let verify_semantics program env = 
 	let main_stmts = traverse_main drop_funk ((*List.rev*) program.stmts) in 
