@@ -298,6 +298,10 @@ let rec verify_expr ex env boo =
     | TimeSig(num, den) -> S_TimeSig(num, den, TimeSig)
     | Instr(st)         -> S_Instr(st, Instr)
     | Tempo(i)          -> S_Tempo(i, Tempo)
+    | Index(str, i)     ->
+            let st = verify_id_get_type str env in
+            let rl_int = (match i with IntLit(v) -> v) in
+            S_Index(str, rl_int, st)
 	| Binop(lft, op, rgt) ->
 		let l = verify_expr lft env false in
 		let r = verify_expr rgt env false in

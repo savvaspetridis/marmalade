@@ -56,6 +56,7 @@ rule token = parse
 |   "instr"     { INSTR }
 |   "tempo"     { TEMPO }
 |   '@'         { AT }
+|   '&'         { INDEX }
 |   '$'         { DOLLAR }
 |   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }
 |   (digit)+ as lxm { INT_LIT(int_of_string lxm) }
