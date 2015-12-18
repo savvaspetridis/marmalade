@@ -1,0 +1,22 @@
+/*
+Test for append to phrase: 8
+*/
+
+
+/* CONSTANTS FOR TESTS */
+
+note n_1 = 44.w;
+note n_2 = 45.h;
+note n_3 = 46.q;
+note n_4 = 47.e;
+measure m_1 = $() [44.w, 44.w];
+measure m_2 = $() [45.h, 45.h];
+measure m_3 = $() [46.q, 46.q];
+measure m_4 = $() [47.e, 47.e];
+
+
+/* PHRASE TEST */
+
+phrase p8 	<<=		$() [m_1] << n_1;
+
+(play()) [p8];

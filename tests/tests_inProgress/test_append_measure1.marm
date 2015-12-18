@@ -1,0 +1,14 @@
+/*
+Test for append to measure: 1
+*/
+
+/* CONSTANTS FOR TESTS */
+note n_1 = 44.w;
+note n_2 = 45.h;
+note n_3 = 46.q;
+note n_4 = 47.e;
+
+
+measure m1 	<<= 	n_1;
+
+(play()) [m1];
