@@ -10,6 +10,12 @@ public class Tester implements JMC {
 	
 	public static void main (String[] args) {
 		
+		m_Note j = new m_Note(50, 1.0);
+		m_Note k;
+		
+		k = (new m_Note( new m_Int(m_Int.add(j, (new m_Int(5)))), j.getLength() ));
+		System.out.println("success");
+		/*
 		// test m_Tempo
 		m_Tempo temp = new m_Tempo(20);
 		System.out.println("Tempo: " + temp);
@@ -52,7 +58,7 @@ public class Tester implements JMC {
 		System.out.println("Measure time sig num/denom: " + m.getTimesigNum() + " / " + m.getTimesigDenom());
 		m.play();
 		
-		/*
+		
 		// test phrase
 		Note[][] p = new Note[3][5];
 		p[0] = n;
