@@ -1,6 +1,7 @@
 package marmalade;
 
 import jm.music.data.Phrase;
+import jm.midi.event.TimeSig;
 import jm.music.data.Note;
 import jm.util.*;
 import jm.JMC;
@@ -17,6 +18,17 @@ public class Measure implements JMC {
 			a[i] = array[i].toNote();
 		}
 		p.addNoteList(a);
+	}
+	
+	// constructor with time sig
+	public Measure(m_Note[] array, TimeSig t) {
+		p = new Phrase();
+		Note[] a = new Note[array.length];
+		for (int i = 0; i < a.length; i++) {
+			a[i] = array[i].toNote();
+		}
+		p.addNoteList(a);
+		setTimesig(t.getNumerator(), t.getDenominator());
 	}
 
 	// set note
