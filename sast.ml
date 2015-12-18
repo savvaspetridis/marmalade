@@ -53,7 +53,8 @@ and s_block = {
 type s_func = {
 	s_fname : string;
 	s_ret_type : declare_type; (* Changed from types for comparison error in verify_stmt *)
-	s_formals : scope_var_decl list;
+    s_f_type : declare_type list;
+    s_formals : scope_var_decl list;
 	s_fblock : s_block;
 }
 
@@ -831,7 +832,7 @@ let verify_func func env =
 	(*let () = Printf.printf "func.fname" in *)
 	let verified_args = map_to_list_env verify_var func.args (fst env, func.body.block_id) in
 	let verified_func_decl = verify_is_func_decl func.fname env in 
-	{ s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
+    { s_f_type = func.f_type; s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
 
 let verify_semantics program env = 
 	let main_stmts = traverse_main drop_funk ((*List.rev*) program.stmts) in 
