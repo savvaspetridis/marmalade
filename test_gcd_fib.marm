@@ -9,18 +9,20 @@ fibinacci number algorithm
 */
 
 /* recursive algorithm for calulating nth fibinacci number */
-funk int int fib(int n, int val)
+funk int int fib(int n, int val_1, int val_2)
 {
 
-	if(n == 1){
+	if(n <= 2){
 		return 1;
 	}
 
 	else{
 
-		val = $fib(n-1, 0);
+		val_1 = $fib(n-1, 0, 0);
 
-		n = val * n;
+		val_2 = $fib(n-2, 0, 0);
+
+		n = val_1 + val_2;
 
 		return n; 
 	}
@@ -47,7 +49,7 @@ funk int int gcd(int a, int b){
 
 /* prints the gcd and factorial */
 
-(print(), print()) [gcd(30, 90), fib(2, 0)]; 
+(print(), print()) [gcd(30, 90), fib(10, 0, 0)]; 
 
 
 
