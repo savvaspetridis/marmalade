@@ -86,7 +86,8 @@ let rec write_expr = function
         (*| "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr
          * args)*) write_expr exp ^ ");\n"*)
     | "play" -> write_expr exp ^ ".play();\n"
-								  | "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"						 
+								  (*| "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"*)
+								  | "write" -> write_expr exp ^ ".output_midi(\"hi.mid\");"				 
 								  | _ -> write_expr exp ^ "." ^ str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ");/n")
 	| S_Call_lst(s) -> String.concat "" (List.map write_expr s)
 	| _ -> raise(Failure(" is not a valid expression"))
