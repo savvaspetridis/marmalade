@@ -60,6 +60,7 @@ type expr =
     | TimeSig of int * int
     | Instr of string
     | Tempo of int
+    | Index of string * expr
     | Default
     | Msk_list of expr * expr
     (* PARSE THESE *)

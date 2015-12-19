@@ -17,7 +17,7 @@ let inc_block_id (u:unit) =
 %token IF ELSE ELIF AND OR
 %token PERIOD COLON
 %token RETURN WHILE
-%token FUNK AT DOLLAR
+%token FUNK AT DOLLAR INDEX
 %token <int> INT_LIT
 %token <string> STRING_LIT ID INSTRUMENT
 %token EOF
@@ -152,6 +152,7 @@ append_list:
 
 expr:
 app_gen  {$1}
+| ID INDEX INT_LIT { Index($1, IntLit($3)) }
 | arith {$1}
 | AT LPAREN special_expression RPAREN /*{Regex({$3.ids; $3.bounds})}*/ {Regex($3)}
 | add_on_expr {$1}
