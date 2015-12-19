@@ -11,7 +11,7 @@ let write_type = function
     | TimeSig -> "TimeSig"
     | Instr -> "int"
     | Tempo -> "int"
-	| Intlist -> "j_int[]"
+	| Intlist -> "j_intlist"
 	| Stringlist -> "String[]"
 	| _ -> raise(Failure "Type string of PD_Tuple or Null_Type being generated")
 
@@ -138,7 +138,9 @@ and write_binop_expr expr1 op expr2 t =
 and write_array_expr dexpr_list t =
 	  match t with
 	 (* Int -> "[" ^ String.concat "," (List.map write_expr dexpr_list) ^ "]"
-	 |*) _ -> "new " ^ write_type t ^ " []"  ^ " {" ^ String.concat "," (List.map write_expr dexpr_list) ^ "}"
+              |*) Int -> "new j_intlist (new j_int[] {" ^ String.concat ","
+              (List.map write_expr dexpr_list) ^ "})" 
+     | _ -> "new " ^ write_type t ^ " []"  ^ " {" ^ String.concat "," (List.map write_expr dexpr_list) ^ "}"
 
 
 and tostring_str dexpr =
@@ -222,16 +224,22 @@ let gen_pgm pgm name =
     "import marmalade.*;\n" ^
     "import jm.midi.event.TimeSig;\n" ^
     "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ 
-     (write_func_wrapper pgm.s_pfuncs String)
-(*    String.concat "\n" (List.map
-         write_func pgm.s_pfuncs)*) ^  "\n\n" ^
+     (write_func_wrapper pgm.s_pfuncs String) ^ 
+    "\n\n" ^
     "public static class j_int extends m_Int {\n" ^
     "public j_int(int n) {\n" ^
     "super(n);\n}\n" ^
      "public j_int(j_int n) {\n" ^
      "super(n);\n}" ^
      (write_func_wrapper pgm.s_pfuncs Int) ^ 
-     "\n}\n\n" ^ 
+     "\n}\n\n" ^
+     "public static class j_intlist extends m_Int_List {\n" ^
+     "public j_intlist(j_int[] j) {\n" ^
+     "super(j);\n}" ^
+     "public j_int get(int i) {\n" ^
+     "return new j_int(getList()[i]);\n}" ^
+     (write_func_wrapper pgm.s_pfuncs Intlist) ^
+     "\n}\n\n" ^
      "public static class j_note extends m_Note {\n" ^
      "public j_note(Note n) {\n" ^
      "super(n);\n}" ^
@@ -247,7 +255,7 @@ let gen_pgm pgm name =
      "public j_measure(Phrase p) {\n" ^
      "super(p);\n}" ^
      "public j_note get(int i) {\n" ^
-     "Note n= getPhrase().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
+     "Note n = getPhrase().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
      (write_func_wrapper pgm.s_pfuncs Measurepoo) ^ 
      "\n}\n" ^ 
      "public static class j_phrase extends

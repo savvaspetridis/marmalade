@@ -111,7 +111,14 @@ let rec type_of_expr here = match here with
   		| Measurepoo -> Phrase
   		| Phrase -> Song) in tpe
   | S_Call (_, _, _, _, t) -> t
-  | S_Index (_, _, t) -> t
+  | S_Index (_, _, t) -> let tpe = (match t with
+        Intlist -> Int
+        | Stringlist -> String
+        | Measurepoo -> let hack = S_Note(5, 'a', Note) in
+            let bs = (match hack with S_Note(i, d, k) -> k) in
+                bs
+        | Phrase -> Measurepoo
+        | Song -> Phrase) in tpe
   | S_Db_Arr(_, ar) -> let b = type_of_expr ar in b
   | S_Noexpr -> Null_Type 
   | _ -> raise(Failure("could not match type in type_of_expr "))
