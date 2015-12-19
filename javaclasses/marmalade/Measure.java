@@ -42,7 +42,7 @@ public class Measure implements JMC {
 	}
 	
 	public m_Note get(int i) {
-		Note n = getNote(i);
+		Note n = p.getNote(i);
 		m_Note m = new m_Note(n);
 		return m;
 	}
