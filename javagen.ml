@@ -281,6 +281,9 @@ let gen_pgm pgm name =
      "super(m, n);\n}" ^
      "public j_phrase(j_measure[] m, j_int n) {\n" ^
      "super(m, n);\n}\n" ^
+     "public j_measure get(int i) {\n" ^
+     "Phrase p = getPart().getPhrase(i);\n" ^
+     "return (new j_measure(p));\n}" ^
      (write_func_wrapper pgm.s_pfuncs Phrase) ^
      "\n}\n" ^ 
      "public static class j_song

@@ -117,7 +117,9 @@ let rec type_of_expr here = match here with
         | Measurepoo -> let hack = S_Note(5, 'a', Note) in
             let bs = (match hack with S_Note(i, d, k) -> k) in
                 bs
-        | Phrase -> Measurepoo
+        | Phrase -> Measurepoo(*let hack = S_Measure(_, 1, Measurepoo) in
+            let bs = (match hack with S_Measure(i, d, k) -> k) in
+                bs*)
         | Song -> Phrase) in tpe
   | S_Db_Arr(_, ar) -> let b = type_of_expr ar in b
   | S_Noexpr -> Null_Type 
