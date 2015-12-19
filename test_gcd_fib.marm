@@ -8,7 +8,7 @@ fibinacci number algorithm
 
 */
 
-/* reccursive algorithm for calulating nth fibinacci number */
+/* recursive algorithm for calulating nth fibinacci number */
 funk int int fib(int n, int val)
 {
 
