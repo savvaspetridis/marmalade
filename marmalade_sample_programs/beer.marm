@@ -1,0 +1,30 @@
+/* 99 bottles of beer in marmalade */
+
+/* notes of each type */
+note sixteenth = 0.s;
+note eighth =  0.e;
+note quarter = 0.q;
+note half = 0.h;
+note whole = 0.w;
+
+
+int offset = 0;
+int current_bottle = 99;
+int next_bottle = 98;
+
+
+
+while(offset < 98)
+{
+	current_bottle = current_bottle - 1;
+	next_bottle = next_bottle - 1;
+
+	/*(play(), play(), play()) [sixteenth, eighth, quarter];*/
+
+	/*(print(), print()) [ current_bottle, "yo" ];*/
+
+	(print(), print(), print(), print(), print(), print() )	[ current_bottle, " bottles of beer on the wall ", current_bottle, " bottles of beer. Take one down, pass it around ", next_bottle, " bottles of beer on the wall."];
+	offset = offset + 1;
+
+}
+
