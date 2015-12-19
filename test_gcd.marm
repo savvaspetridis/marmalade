@@ -1,0 +1,53 @@
+/* gcd algorithm working */
+
+/* 
+
+factorial algorithm, not quite working causes a stack overflow error 
+
+(Cathy, or Savvas maybe take a look at the java and see if you can figure it out)
+
+*/
+int val = 0;
+
+funk int int factorial(int n)
+{
+
+
+	if(n == 1){
+		return 1;
+	}
+
+	else{
+
+		val = $factorial(n-1);
+
+		/*(print()) [val];*/
+		val = val * n;
+
+		return val; 
+	}
+
+}
+
+/* this is a working gcd algorthim */
+
+funk int int gcd(int a, int b){
+
+	while(a != b){
+		if (a > b) {
+			a = a- b;
+			}
+		else
+		{
+			b = b - a;
+		}
+	}
+
+	return a;
+}
+
+
+/* prints the gcd and factorial */
+
+(print(), print()) [gcd(30, 90), factorial(2)];
+

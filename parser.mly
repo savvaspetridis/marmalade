@@ -51,7 +51,7 @@ fdecl:
      	f_type = List.tl (List.rev $1); 
         fname = $2;
 	    args = $4;
-	    body = {locals = []; statements = List.rev $7; block_id = inc_block_id ()} 
+	    body = {locals = $4; statements = List.rev $7; block_id = inc_block_id ()} 
 	    (*body = {locals = List.rev $7; statements = List.rev $8; block_id = inc_block_id ()} *)
 
 	    } }
@@ -192,6 +192,7 @@ literal:
 | */	INT_LIT {IntLit($1)}
 |	note 			{$1}
 |   STRING_LIT {String_Lit($1)} 
+|	DOLLAR function_invocation { $2 }
 
 
 multi_expr:
@@ -279,6 +280,7 @@ arithmeticID_arg:
    /*| arithmetic {$1}*/
     | arith {$1}
     | add_on_expr { $1 }
+    | function_invocation { $1 }
 
 /*
 funk_args:

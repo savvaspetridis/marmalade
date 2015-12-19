@@ -63,6 +63,10 @@ let add_var var env =
 		  | _ -> true) in let () = Printf.printf "trying to add a var \n" in 
 	add_symbol name (Var_Decl(name, is_implicit_array, p_type, (env_scope env))) env
 
+let add_ast_var var env =
+	let (name, arr_b, typ) = var in
+	add_var (name, typ) env
+
 let rec add_stmt stmt env = 
 	let () = Printf.printf "adding stmt \n" in 
 	match stmt with
@@ -73,8 +77,8 @@ let rec add_stmt stmt env =
 	  (*| For(expr1, expr2, expr3, block) -> add_block block env*)
 	  | While(expr, block) -> add_block block env
 	  | '_' -> env )*)
-	| If(e, bl_1, bl_2) -> let () = Printf.printf "in expr \n" in let env_1 = add_block bl_1 env in add_block bl_2 env_1
-	| While(e, bl) -> let () = Printf.printf "in expr \n" in add_block bl env
+	| If(e, bl_1, bl_2) -> let () = Printf.printf "in expr \n" in let env_1 = add_block bl_1 Wild env in add_block bl_2 Wild env_1
+	| While(e, bl) -> let () = Printf.printf "in expr \n" in add_block bl Wild env
 	| Fdecl(fdec) -> add_func fdec env
 	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
 		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
@@ -91,12 +95,13 @@ let rec add_stmt stmt env =
 			add_var (str, typ) env)
 	| _ ->	env
 
-and add_block block env =  
+and add_block block return_tp env =  
 	let (table, scope) = env in 
 	let id = block.block_id in
 	let () = Printf.printf "adding block" in
-	(*let env = map_to_list_env add_var block.locals (table, id) in*)
+	let env = map_to_list_env add_ast_var block.locals (table, id) in
 	let env = map_to_list_env add_stmt block.statements env in
+	(*let env = add_var ("this", return_tp) env in*)
 	parent_scope.(id) <- scope; (* insert scope value into idth element of parent array *)
 	((env_table env), scope)
 
@@ -106,12 +111,14 @@ and add_func func env =
 	let () = Printf.printf "trying to add function\n" in 
 	let env = add_symbol func.fname (Func_Decl(func.fname, func.ret_type, func.f_type, arg_names, scope)) env in
 	(*let env = map_to_list_env add_var func.formals ((env_table env), func.fblock.block_id) in*)
-	add_block func.body ((env_table env), scope)
+	add_block func.body (func.ret_type) ((env_table env), scope)
 
 
 let base_env = 
 	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note;
-    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist], [], 0)) StrMap.empty in
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [], 0)) StrMap.empty in
+    let table = StrMap.add "evaluate_0" (Func_Decl("evaluate", Int, [Int; Note;
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [], 0)) table in
 	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
 	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
 	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, [], [], 0)) table in
@@ -122,6 +129,6 @@ let build_table p =
 	let env = base_env in
 	let env =  map_to_list_env add_stmt (List.rev p.stmts) env in
 	let env = map_to_list_env add_func (List.rev p.funcs) env in 
-	let () = Printf.printf "through table \n" in 
+	let () = Printf.printf "-----------through table------------ \n" in 
 	env
 

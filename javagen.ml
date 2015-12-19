@@ -84,19 +84,20 @@ let rec write_expr = function
     | S_Index(str, i, tp) -> (* "(" ^ (match tp with
         String | Int | Note | Measurepoo | Phrase -> write_type tp)
     ^ ") " ^ *) str ^ ".get(" ^ string_of_int i ^ ")"
-    | S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
-        "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
-        (*| "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr
-         * args)*) write_expr exp ^ ");\n"*)
-    | "play" -> write_expr exp ^ ".play();\n"
-								  (*| "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"*)
-								  | "write" -> write_expr exp ^ ".output_midi(\"hi.mid\");"				 
+	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
+       					 "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
+    					| "play" -> write_expr exp ^ ".play();\n"
+						| "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"
+						| "evaluate" -> (*let () = Printf.printf "waz good" in str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"	*) write_expr exp				 
+						| _ -> ( match exp with 
+								  	S_Noexpr -> str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"
 								  | _ -> write_expr exp ^ "." ^ str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ");/n")
+								)
 	| S_Call_lst(s) -> String.concat "" (List.map write_expr s)
 	| _ -> raise(Failure(" is not a valid expression"))
 
 and write_stmt d vg = match d with
-	  S_CodeBlock(dblock) -> write_block dblock false
+	  S_CodeBlock(dblock) -> write_block dblock vg
 	| S_expr(dexpr) -> write_expr dexpr ^ ";"
 	| S_Assign (name, dexpr, t) -> (match vg with
 		true -> (
@@ -107,7 +108,7 @@ and write_stmt d vg = match d with
 		S_Db_Arr(a1, a2) -> write_expr (S_Db_Arr(a1, a2)) ^ write_assign name a2 t false ^ ";\n"
 		| _ -> write_assign name dexpr t false ^ ";\n" ) )
 	| S_Return(dexpr) -> "return " ^ write_expr dexpr ^ ";\n"
-    | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 false ^ "else"  ^ write_stmt dstmt2 false
+    | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 vg ^ "else"  ^ write_stmt dstmt2 vg
     | S_While(dexpr, dblock) -> "while(" ^ write_expr dexpr ^ ")"  ^ write_block dblock vg (* check true *)
     (*| S_Array_Assign(str,dexpr_value, dexpr_index, t) -> str ^ ".set(" ^ write_expr dexpr_index ^ "," ^ write_expr dexpr_value ^ ");"*)
     | S_Append_Assign(ty, st, ap_list) -> String.concat "GOD" (List.map write_expr ap_list) ^ "IS DEAD"
@@ -177,7 +178,7 @@ and write_assign name dexpr t vg =
 
 and write_block dblock vg =
 	match vg with
-	true -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_true dblock.s_statements ) ^ "\n}"
+	true -> "{\n" ^ (*String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^*) String.concat "\n" (List.map write_stmt_true dblock.s_statements ) ^ "\n}"
 	| false -> "{\n" ^ String.concat "\n" (List.map write_scope_var_decl dblock.s_locals) ^ String.concat "\n" (List.map write_stmt_false dblock.s_statements ) ^ "\n}"
 
                
@@ -192,7 +193,7 @@ let write_func_wrapper x str =
         match ftype with
         str -> "static " ^ write_type dfunc.s_ret_type ^ " " ^
         dfunc.s_fname ^ "("  ^ String.concat "," (List.map write_scope_var_decl_func
-        dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock false
+        dfunc.s_formals) ^ ")" ^ write_block dfunc.s_fblock true
         | _ -> "" in
         List.map match_type dfunc.s_f_type)) in
     List.map write_func x)

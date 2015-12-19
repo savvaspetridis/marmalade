@@ -142,7 +142,7 @@ let drop_funk li =
 		| _ ->						Null_Type
 
 let verify_var var env = 
-	(*let () = Printf.printf "## in verifying var ## \n" in *) let () = print_string ((fst_of_three var) ^ " Nulled??") in
+	(*let () = Printf.printf "## in verifying var ## \n" in *) let () = print_string ((fst_of_three var) ^ " 8989fNulled??") in
 	let decl = Table.get_decl (fst_of_three var) env in
 	match decl with
 		Func_Decl(f) -> raise(Failure("symbol is not a variable"))
@@ -330,6 +330,8 @@ let rec verify_expr ex env boo =
 				| Id(st) -> let () = print_string (nme ^ " Nulled4??") in let v_decl = Table.get_decl st env in
 					let (t_st, _, _) = get_dt v_decl in
 					t_st
+				| FunkCall(id, args) -> let f_decl = Table.get_decl id env in
+					let (ty_funk, _, _ ) = get_dt f_decl in ty_funk
 				) in
 			let verify_type_and_vars tok = 
 				let nwvar =  check_ex_list tok env in
@@ -360,6 +362,9 @@ let rec verify_expr ex env boo =
 				| Id(st) -> let () = print_string (st ^ " Nulled??") in let v_decl = Table.get_decl st env in
 					let (t_st, _, _) = get_dt v_decl in
 					t_st
+				| Default -> Wild
+				| FunkCall(nme, arg_vals) -> Wild
+				| _ -> raise(Failure("no match"))
 				) in
 			let verify_type_and_vars tok = 
 				let nwvar =  check_ex_list tok env in
@@ -375,6 +380,7 @@ let rec verify_expr ex env boo =
 				S_Call(nme, i_arg, ags, it, dt)
 			| _ -> S_Noexpr)
 			else  raise(Failure("Illigal function call " ^ nme ^ " on an argument ")) in
+		let () = Printf.printf "before l_calls" in 
 		let l_calls =  List.map2 mapval li fl in
 		(*S_Noexpr in
 		if boo = true then l_calls = List.map2 mapval li fl else l_calls = S_Noexpr in *)
@@ -385,10 +391,15 @@ let rec verify_expr ex env boo =
 			 | false -> S_Db_Arr(S_Call_lst(r_calls), S_Noexpr)
 			) in ret
 		(*S_Db_Arr(S_Call_lst(r_calls), S_Arr(l_calls, ty))*)
-	(*| FunkCall(i, lis) -> 
+	| FunkCall(i, lis) -> 
 		let arg_var = check_ex_list lis env in
+		let () = Printf.printf "got here?!?!?" in
 		let rt_typ = check_call_and_type i arg_var env in
-		S_Call(i, arg_var, rt_typ)*)
+		let () = Printf.printf "nice out" in 
+		let decl_f = Table.get_decl i env in
+		let (implicit_parm_type, explicit_param_types, arg_types) = get_dt decl_f in
+		S_Call(i, (verify_expr Default env false), arg_var, explicit_param_types, rt_typ)
+	| Default -> S_Noexpr
 
 and check_arr arr env = 
 	match arr with
@@ -424,6 +435,7 @@ and check_call_and_type name vargs env =
 		if (List.length params) = (List.length vargs) then
 			(*let s_params = check_ex_list vargs in*)
 			let arg_types = List.map type_of_expr vargs in
+			let () = Printf.printf "woah got here!" in
 			if params = arg_types then rtype
 			else raise(Failure("Argument types in " ^ name ^ " call do not match formal parameters."))
 		else raise(Failure("Function " ^ name ^ " takes " ^ string_of_int (List.length params) ^ " arguments, called with " ^ string_of_int (List.length vargs))) 
@@ -766,8 +778,8 @@ let rec verify_stmt stmt ret_type env =
 	(match stmt with
 	Return(e) ->
 		let verified_expr = verify_expr e env false in
-		if ret_type = type_of_expr verified_expr then S_Return(verified_expr) 
-		else raise(Failure "return type does not match**") 
+		(*if ret_type = type_of_expr verified_expr then*) S_Return(verified_expr) 
+		(*else raise(Failure "return type does not match**") *)
 	| Expr(e) -> 
 		let verified_expr = verify_expr e env false in
 		S_expr(verified_expr)
@@ -779,11 +791,14 @@ let rec verify_stmt stmt ret_type env =
 			if typ = eid_type
 				then (*let () = Printf.printf "got typ \n" in*) S_Assign(id, ve, typ)
 			else raise(Failure("return type does not match* " ^ string_of_prim_type eid_type ^ " " ^ string_of_prim_type typ))
-			| Update(st, ex) -> let () = Printf.printf "in update \n" in
+			| Update(st, ex) -> let () = Printf.printf "in update $\n" in
 				let vid_type = get_id_type st env in
+				let () = Printf.printf "yo sub 1" in
 				let de = verify_expr ex env true in
+				let () = Printf.printf "yo sub 2" in
 				let de_tp = type_of_expr de in
-				if de_tp = vid_type then S_Assign(st, de, de_tp)
+				let () = Printf.printf "yo sub 3" in
+				if de_tp = vid_type then let () = Printf.printf " sub 4" in S_Assign(st, de, de_tp)
 				else raise(Failure("Attempting to assign variable name " ^ st ^ " to value of type " ^ string_of_prim_type de_tp  ^ " 
 					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
 			(*| Append(iden, ap_l) -> 
@@ -805,7 +820,9 @@ let rec verify_stmt stmt ret_type env =
 	| If(e, b1, b2) ->
 		let verified_expr = verify_expr e env false in
 		if (type_of_expr verified_expr) = Int then
+			let () = Printf.printf "****here1***" in
 			let vb1 = verify_block b1 ret_type (fst env, b1.block_id) in
+			let () = Printf.printf "****here2***" in
 			let vb2 = verify_block b2 ret_type (fst env, b2.block_id) in
 			S_If(verified_expr, S_CodeBlock(vb1), S_CodeBlock(vb2))
 		else raise(Failure("Condition in if statement must be a boolean expression."))
