@@ -152,11 +152,15 @@ append_list:
 
 expr:
 app_gen  {$1}
-| ID INDEX INT_LIT { Index($1, IntLit($3)) }
+| list_index {$1}
 | arith {$1}
 | AT LPAREN special_expression RPAREN /*{Regex({$3.ids; $3.bounds})}*/ {Regex($3)}
 | add_on_expr {$1}
   /*| literal {$1}*/
+
+
+list_index:
+    ID INDEX INT_LIT { Index($1, IntLit($3)) }
 
 add_on_expr:
   DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(4, 4))}
@@ -276,7 +280,8 @@ funk_args:
 
 arithmeticID_arg:
    /* {0} no clue why we'd have nothing */ 
-	app_gen {$1}
+    list_index {$1}
+   | app_gen {$1}
    /*| arithmetic {$1}*/
     | arith {$1}
     | add_on_expr { $1 }

@@ -2,12 +2,28 @@
 Tests reference list item by index
 */
 
+/* 
 measure swag = $() [55.q, 56.q];
-
-
 note out = swag&0;
 
 (print()) [(swag&0)];
+
+
+
+int_list i = [42, 12, 13];
+int i2 = i&2;
+
+
+
+(print()) [i&2]; 
+
+*/
+
+str_list str = ["hello", "Hello", "World"];
+string s = str&1;
+
+(print()) [s];
+
 
 /*
 int_list swagOut = (print()) [out];

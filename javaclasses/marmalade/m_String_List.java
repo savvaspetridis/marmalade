@@ -7,7 +7,7 @@ public class m_String_List implements JMC {
 	String[] s;
 	
 	public m_String_List(String[] x) {
-		s = x;
+		this.s = x;
 	}
 	
 	public m_String_List(m_String[] x) {
@@ -15,5 +15,9 @@ public class m_String_List implements JMC {
 		for (int i = 0; i < x.length; i++) {
 			s[i] = x[i].get();
 		}
+	}
+	
+	public String[] getList() {
+		return s;
 	}
 }

@@ -3,7 +3,7 @@ open Sast
 
 let write_type = function 
 	| Int -> "j_int"
-	| String -> "String"
+	| String -> "j_string"
 	| Note -> "j_note"
 	| Measurepoo -> "j_measure"
 	| Phrase -> "j_phrase"
@@ -12,7 +12,7 @@ let write_type = function
     | Instr -> "int"
     | Tempo -> "int"
 	| Intlist -> "j_intlist"
-	| Stringlist -> "String[]"
+	| Stringlist -> "j_stringlist"
 	| _ -> raise(Failure "Type string of PD_Tuple or Null_Type being generated")
 
 let write_op_primitive op e1 e2 = 
@@ -62,7 +62,7 @@ let write_op_compares e1 op e2 =
 
 let rec write_expr = function
 	S_Int_Lit(intLit, t) -> "(new j_int(" ^ string_of_int intLit ^ "))"
-	| S_String_Lit(strLit, t) -> "\"" ^ strLit ^ "\""
+	| S_String_Lit(strLit, t) -> "(new j_string(\"" ^ strLit ^ "\"))"
 	| S_Id (str, yt) -> str
 	| S_Arr(dexpr_list, t) -> write_array_expr dexpr_list t
 	| S_Binop (dexpr1, op, dexpr2, t) -> write_binop_expr dexpr1 op dexpr2 t
@@ -137,10 +137,11 @@ and write_binop_expr expr1 op expr2 t =
 
 and write_array_expr dexpr_list t =
 	  match t with
-	 (* Int -> "[" ^ String.concat "," (List.map write_expr dexpr_list) ^ "]"
-              |*) Int -> "new j_intlist (new j_int[] {" ^ String.concat ","
+        Int -> "new j_intlist (new j_int[] {" ^ String.concat ","
               (List.map write_expr dexpr_list) ^ "})" 
-     | _ -> "new " ^ write_type t ^ " []"  ^ " {" ^ String.concat "," (List.map write_expr dexpr_list) ^ "}"
+        | String -> "new j_stringlist (new j_string[] {" ^ String.concat ","
+        (List.map write_expr dexpr_list) ^ "})" 
+        | _ -> "new " ^ write_type t ^ " []"  ^ " {" ^ String.concat "," (List.map write_expr dexpr_list) ^ "}"
 
 
 and tostring_str dexpr =
@@ -239,6 +240,20 @@ let gen_pgm pgm name =
      "public j_int get(int i) {\n" ^
      "return new j_int(getList()[i]);\n}" ^
      (write_func_wrapper pgm.s_pfuncs Intlist) ^
+     "\n}\n\n" ^
+     "public static class j_string extends m_String {\n" ^
+     "public j_string(j_string x) {\n" ^
+     "super(x);\n}" ^
+     "public j_string(String x) {\n" ^
+     "super(x);\n}" ^
+     (write_func_wrapper pgm.s_pfuncs String) ^
+     "\n}\n\n" ^
+     "public static class j_stringlist extends m_String_List {\n" ^
+     "public j_stringlist(j_string[] j) {\n" ^
+     "super(j);\n}" ^
+     "public j_string get(int i) {\n" ^
+     "return new j_string(getList()[i]);\n}" ^
+     (write_func_wrapper pgm.s_pfuncs Stringlist) ^
      "\n}\n\n" ^
      "public static class j_note extends m_Note {\n" ^
      "public j_note(Note n) {\n" ^

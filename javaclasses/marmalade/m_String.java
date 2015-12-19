@@ -22,6 +22,10 @@ public class m_String implements JMC {
 		s = x;
 	}
 	
+	public String toString() {
+		return s;
+	}
+	
 	public void print() {
 		System.out.println(s);
 	}
