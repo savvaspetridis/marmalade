@@ -30,6 +30,13 @@ public class Song implements JMC {
 		setTempo(tempo.get());
 	}
 	
+	// return m_Phrase
+	public m_Phrase get(int i) {
+		Part p = s.getPart(i);
+		m_Phrase mp = new m_Phrase(p);
+		return mp;
+	}
+	
 	/*
 	// constructor
 	public Song(m_Note[][][] array) {
