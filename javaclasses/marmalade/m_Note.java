@@ -29,9 +29,10 @@ public class m_Note implements JMC {
 	}
 	
 	// get duration
-	public int getLength(){
-		return (int) n.getDuration();
+	public double getLength(){
+		return n.getDuration();
 	}
+
 	
 	// set pitch
 	public void setPitch(int pitch) {

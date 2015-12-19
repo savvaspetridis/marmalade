@@ -31,10 +31,10 @@ let write_op_primitive op e1 e2 =
 
 let write_rhythm dr =
 	match dr with 
-	's' -> "0.25"
-	| 'e' -> "0.5"
-    | 'q' -> "1.0"
-	| 'h' -> "1.5"
+	's' -> "0.125"
+	| 'e' -> "0.25"
+    | 'q' -> "0.5"
+	| 'h' -> "1.0"
 	| 'w' -> "2.0"
 
 let rec get_typeof_dexpr = function

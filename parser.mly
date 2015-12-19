@@ -160,7 +160,7 @@ app_gen  {$1}
 add_on_expr:
   DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(4, 4))}
 |	DOLLAR DOLLAR LPAREN RPAREN reg_list  { Phrase( $5, Instr("PIANO")) }
-|	DOLLAR DOLLAR DOLLAR LPAREN RPAREN reg_list { Song($6, Tempo(1))}
+|	DOLLAR DOLLAR DOLLAR LPAREN RPAREN reg_list { Song($6, Tempo(60))}
 |   DOLLAR LPAREN INT_LIT COLON INT_LIT RPAREN reg_list { Measure($7, TimeSig($3, $5)) }  
 |   DOLLAR LPAREN ID RPAREN reg_list { Phrase( $5, Instr($3))  }
 |   DOLLAR LPAREN INT_LIT RPAREN reg_list { Song( $5, Tempo($3)) }
@@ -191,6 +191,7 @@ literal:
 | */	INT_LIT {IntLit($1)}
 |	note 			{$1}
 |   STRING_LIT {String_Lit($1)} 
+
 
 multi_expr:
 	primary_expr /*lit*/		{ $1 }
