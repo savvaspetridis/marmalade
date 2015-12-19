@@ -30,6 +30,11 @@ public class Song implements JMC {
 		setTempo(tempo.get());
 	}
 	
+	// return part
+	public Score getScore() {
+		return s;
+	}
+	
 	// return m_Phrase
 	public m_Phrase get(int i) {
 		Part p = s.getPart(i);

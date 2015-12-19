@@ -292,6 +292,9 @@ let gen_pgm pgm name =
      "super(m, n);\n}" ^
      "public j_song(j_phrase[] m, j_int n) {\n" ^
      "super(m, n);\n}\n" ^
+     "public j_phrase get(int i) {\n" ^
+     "Part s = getScore().getPart(i);\n" ^
+     "return (new j_phrase(s));\n}" ^
      (write_func_wrapper pgm.s_pfuncs Song) ^
      "\n}\n}\n"
 

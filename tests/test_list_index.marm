@@ -5,10 +5,16 @@ Tests reference list item by index
 
 measure swag = $() [55.q, 56.q];
 phrase s = $$() [swag, swag];
- measure p = s&0;
-(print()) [p];
+song lol = $$$() [s, s, s];
+
+phrase h = lol&2;
+(print()) [h];
 
 /*
+measure p = s&0;
+(print()) [p];
+
+
 phrase s = $() [[55.q, 56.q], [55.q, 56.q]];
 */
 
