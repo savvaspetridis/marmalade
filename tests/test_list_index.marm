@@ -2,7 +2,13 @@
 Tests reference list item by index
 */
 
-int_list swag = [0, 1, 2];
-int out = swag[1];
+measure swag = $() [55.q, 56.q];
 
+
+note out = swag&0;
+
+(print()) [(swag&0)];
+
+/*
 int_list swagOut = (print()) [out];
+*/

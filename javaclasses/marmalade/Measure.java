@@ -10,6 +10,10 @@ public class Measure implements JMC {
 	
 	Phrase p;
 	
+	public Measure(Phrase p) {
+		this.p = p;
+	}
+	
 	// constructor
 	public Measure(m_Note[] array) {
 		p = new Phrase();
@@ -36,6 +40,13 @@ public class Measure implements JMC {
 	public Phrase getPhrase() {
 		return p;
 	}
+	
+	public m_Note get(int i) {
+		Note n = getNote(i);
+		m_Note m = new m_Note(n);
+		return m;
+	}
+	
 	
 	// play measure
 	public void play() {

@@ -81,7 +81,10 @@ let rec write_expr = function
     | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
     | S_Instr(str, tp) -> str
     | S_Tempo(i, tp) -> string_of_int i
-	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
+    | S_Index(str, i, tp) -> (* "(" ^ (match tp with
+        String | Int | Note | Measurepoo | Phrase -> write_type tp)
+    ^ ") " ^ *) str ^ ".get(" ^ string_of_int i ^ ")"
+    | S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
         "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
         (*| "play" -> "Play.midi(" ^ (*(String.concat "," (List.map write_expr
          * args)*) write_expr exp ^ ");\n"*)
@@ -228,6 +231,8 @@ let gen_pgm pgm name =
      (write_func_wrapper pgm.s_pfuncs Int) ^ 
      "\n}\n\n" ^ 
      "public static class j_note extends m_Note {\n" ^
+     "public j_note(Note n) {\n" ^
+     "super(n);\n}" ^
      "public j_note(int pitch, double length) {\n" ^
      "super(pitch, length);\n}" ^
      "public j_note(j_int pitch, double length) {\n" ^
@@ -237,10 +242,16 @@ let gen_pgm pgm name =
      "public static class j_measure extends Measure {\n" ^ 
      "public j_measure(j_note[] m, TimeSig n) {\n" ^
      "super(m, n);\n}" ^
+     "public j_measure(Phrase p) {\n" ^
+     "super(p);\n}" ^
+     "public j_note get(int i) {\n" ^
+     "Note n= getPhrase().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
      (write_func_wrapper pgm.s_pfuncs Measurepoo) ^ 
      "\n}\n" ^ 
      "public static class j_phrase extends
      m_Phrase {\n" ^
+     "public j_phrase(Part p) {\n" ^
+     "super(p);\n}" ^
      "public j_phrase(j_measure[] m, int n) {\n" ^
      "super(m, n);\n}" ^
      "public j_phrase(j_measure[] m, j_int n) {\n" ^

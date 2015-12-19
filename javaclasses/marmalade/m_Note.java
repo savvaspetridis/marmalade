@@ -8,6 +8,10 @@ public class m_Note implements JMC {
 
 	Note n;
 	
+	public m_Note(Note n) {
+		this.n = n;
+	}
+	
 	// constructor
 	public m_Note(int pitch, double length) {
 		n = new Note(pitch, length);

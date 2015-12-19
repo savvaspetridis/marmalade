@@ -9,7 +9,11 @@ import jm.JMC;
 public class m_Phrase implements JMC {
 
 	Part p;
-
+	
+	public m_Phrase(Part p) {
+		this.p = p;
+	}
+	
 	// constructor
 	public m_Phrase(Measure[] array, int instrument) {
 		Phrase[] phr = new Phrase[array.length];
@@ -32,6 +36,13 @@ public class m_Phrase implements JMC {
 	// return part
 	public Part getPart() {
 		return p;
+	}
+	
+	// return Measure
+	public Measure get(int i) {
+		Phrase phr = p.getPhrase(i);
+		Measure m = new Measure(phr);
+		return m;
 	}
 	
 	/*// constructor
