@@ -401,8 +401,8 @@ and check_arr arr env =
 				| hd :: tl -> 
 					let ve = verify_expr hd e false in
 					let te = type_of_expr ve in
-					if t = te then (ve :: (fst (verify_list_and_type tl te e)), t) 
-					else raise (Failure "Elements of inconsistent types in Array")
+					(*if t = te then*) (ve :: (fst (verify_list_and_type tl te e)), t) 
+					(*else raise (Failure "Elements of inconsistent types in Array")*)
 			in
 		(verified_head :: (fst (verify_list_and_type tail head_type env)), head_type) 
 
