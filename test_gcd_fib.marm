@@ -1,5 +1,7 @@
 /* gcd and Fibinnaci algorithm */
 
+
+
 /* 
 
 fibinacci number algorithm
@@ -16,7 +18,7 @@ funk int int fib(int n, int val)
 
 	else{
 
-		val = $factorial(n-1, 0);
+		val = $fib(n-1, 0);
 
 		n = val * n;
 
@@ -46,6 +48,7 @@ funk int int gcd(int a, int b){
 /* prints the gcd and factorial */
 
 (print(), print()) [gcd(30, 90), fib(2, 0)]; 
+
 
 
 
