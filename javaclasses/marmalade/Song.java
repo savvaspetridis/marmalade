@@ -16,6 +16,7 @@ public class Song implements JMC {
 		Part[] p = new Part[array.length];
 		for (int i = 0; i < p.length; i++) {
 			p[i] = array[i].getObj();
+			p[i].setChannel(i);
 		}
 		s = new Score(p);
 		setTempo(tempo);
@@ -26,6 +27,7 @@ public class Song implements JMC {
 		for (int i = 0; i < p.length; i++) {
 			p[i] = array[i].getObj();
 			p[i].setChannel(i);
+			//System.out.println("p " + i + ": channel " + p[i].getChannel());
 		}
 		s = new Score(p);
 		setTempo(tempo.get());
