@@ -16,6 +16,10 @@ public class m_String_List implements JMC {
 			s[i] = x[i].get();
 		}
 	}
+
+	public int length(){
+		return this.s.length;
+	}
 	
 	public String[] getList() {
 		return s;

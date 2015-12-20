@@ -24,7 +24,7 @@ type s_expr =
     | S_Tempo of int * declare_type
     | S_Binop of s_expr * op * s_expr * declare_type
 	| S_Call of string * s_expr * s_expr list * declare_type list * declare_type
-	| S_Index of string * int * declare_type
+	| S_Index of string * s_expr * declare_type
 	| S_Arr of s_expr list * declare_type
 	| S_Db_Arr of s_expr * s_expr
 	| S_Call_lst of s_expr list
@@ -43,6 +43,8 @@ type s_stmt =
 	| S_For of s_stmt * s_stmt * s_stmt * s_block (* stmts of type D_Assign | D_Noexpr * D_Expr of type bool * D_Assign | D_Noexpr *)
 	| S_While of s_expr * s_block
 	| S_Append_Assign of declare_type * string * s_expr list
+	| S_Index_Update of string * s_expr * s_expr * declare_type
+
 
 and s_block = {
 	s_locals : scope_var_decl list;
@@ -196,6 +198,9 @@ let get_vars li =
                         | _ -> (iden, true, dt))
 				| Update(iden, v)	-> let () = Printf.printf "UPDATE - SAST \n" in
 					("", false, Wild)
+				| Index_Update(expr_1, expr_2) -> (*let nme = (match expr_1 with 
+											Id(str) -> str) in *) ("", false, Wild)
+
 				| Append_Assign(dt, iden, aplist) ->
 					let () = Printf.printf "APPEND ASSIGN - SAST \n" in
 					(match dt with
@@ -309,7 +314,8 @@ let rec verify_expr ex env boo =
     | Tempo(i)          -> S_Tempo(i, Tempo)
     | Index(str, i)     ->
             let st = verify_id_get_type str env in
-            let rl_int = (match i with IntLit(v) -> v) in
+            let rl_int = (match i with IntLit(v) -> S_Int_Lit(v, Int)
+        			| Id(nme) -> S_Id(nme, Int)) in
             S_Index(str, rl_int, st)
 	| Binop(lft, op, rgt) ->
 		let l = verify_expr lft env false in
@@ -343,7 +349,11 @@ let rec verify_expr ex env boo =
 					let (ty_funk, _, _ ) = get_dt f_decl in ty_funk
                 | Index(id, place) -> let var_dec = Table.get_decl id env in
                     let (t_obj, _, _) = get_dt var_dec in t_obj
-				) in
+                 | Measure(_, _) -> Measurepoo
+                 | Phrase(_, _) -> Phrase
+                 | Song(_, _) -> Song
+                 | _ -> raise(Failure("A function cannot be called on this type."))
+ 				) in
 			let verify_type_and_vars tok = 
 				let nwvar =  check_ex_list tok env in
 				let nwtp = check_call_and_type nme nwvar env in
@@ -377,7 +387,10 @@ let rec verify_expr ex env boo =
 				| FunkCall(nme, arg_vals) -> Wild
                 | Index(id, place) -> let var_dec = Table.get_decl id env in
                     let (t_obj, _, _) = get_dt var_dec in t_obj
-				| _ -> raise(Failure("no match"))
+                 | Measure(_, _) -> Measurepoo
+                 | Phrase(_, _) -> Phrase
+                 | Song(_, _) -> Song
+                 | _ -> raise(Failure("A function cannot be called on this type."))
 				) in
 			let verify_type_and_vars tok = 
 				let nwvar =  check_ex_list tok env in
@@ -387,6 +400,7 @@ let rec verify_expr ex env boo =
 			let ags = verify_type_and_vars ag in
 			let i_arg = verify_mod_expr arg in
 			(*let (lis, tp) = *)
+			(*let () = Printf.printf string_of_prim_type typ in*)
 			if List.mem typ it then
 			(match dt with 
 			Null_Type ->
@@ -397,7 +411,7 @@ let rec verify_expr ex env boo =
 		let l_calls =  List.map2 mapval li fl in
 		(*S_Noexpr in
 		if boo = true then l_calls = List.map2 mapval li fl else l_calls = S_Noexpr in *)
-		let r_calls = List.map2 mapcall li fl in
+		let r_calls = List.map2 mapcall (List.rev li) fl in
 		let (it, ty) = check_arr fl env in
 		let ret = (match boo with 
 			 true -> S_Db_Arr(S_Call_lst(r_calls), S_Arr(l_calls, ty))
@@ -443,6 +457,7 @@ and check_call_and_type name vargs env =
 	if name = "print" then Int (* note returns wrong type *)
 	else if name = "write" then Wild (* note returns wrong type *)
 	else if name = "play" then Wild (* note returns wrong type *)
+	else if name = "evaluate" then Wild
 	else 
 		let (_,rtype, _, params,_) = fdecl in
 		if (List.length params) = (List.length vargs) then
@@ -814,6 +829,19 @@ let rec verify_stmt stmt ret_type env =
 				if de_tp = vid_type then let () = Printf.printf " sub 4" in S_Assign(st, de, de_tp)
 				else raise(Failure("Attempting to assign variable name " ^ st ^ " to value of type " ^ string_of_prim_type de_tp  ^ " 
 					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
+			| Index_Update(expr_1, expr_2) -> let type_1 = (match expr_1 with
+						Index(str, exp) -> let typ_known = Table.get_decl str env in
+							let (plz, typ, den) = get_dt typ_known in plz
+							| _ -> raise(Failure("Error in matching index type"))
+						) in
+						let iden = (match expr_1 with
+						Index(str, exp) -> str
+						) in
+						let idx = (match expr_1 with
+						Index(str, exp) -> exp
+						)  in let v_exp1 = verify_expr idx env false in
+						 let v_exp2 = verify_expr expr_2 env false in
+						 S_Index_Update(iden, v_exp1, v_exp2, type_1)
 			(*| Append(iden, ap_l) -> 
 				let typ = get_id_typ iden env in
 				let  app_lis = verify_app_list_mod ap_l typ env in

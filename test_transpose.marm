@@ -1,0 +1,119 @@
+/* 99 bottles of beer */ 
+
+measure t_1 = $(6:8) [67.e, 67.e, 67.e, 62.e, 62.e, 62.e];
+measure t_2 = $(6:8) [67.e, 67.e, 67.e, 67.h];
+measure t_3 = $(6:8) [69.e, 69.e, 69.e, 64.e, 64.e, 64.e];
+measure t_4 = $(6:8) [69.h, 0.e, 0.e, 67.e];
+measure t_5 = $(6:8) [65.e, 65.e, 65.e, 62.e, 62.e, 62.e];
+measure t_6 = $(6:8) [65.e, 65.e, 65.e, 65.e, 65.e, 64.e];
+measure t_7 = $(6:8) [62.e, 62.e, 62.e, 62.e, 64.e, 65.e]; 
+measure t_8 = $(6:8) [67.e, 67.e, 67.e, 67.h];
+
+phrase ph1 = $(HARP) [t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8];
+phrase ph2 = $(HARP) [t_2, t_3, t_4, t_5, t_6, t_7, t_8];
+
+song s1 = $(60) [ph1];
+
+int offset = 0;
+
+
+while(offset < 30)
+{
+	offset = offset + 15;
+	(print(), play(), print(), play()) ["Original song:", s1, "Transposed song", $transpose_song(s1, offset)];
+	
+
+}
+
+while(offset < 60)
+{
+	offset = offset + 15;
+	(print(), play(), print(), play()) ["Piano", $(PIANO) [t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8], "Harp", ph2]; 	
+
+}
+
+/*while(offset < 10){
+	t_1 = $transpose_measure(t_1, 1, 0, 0, 44.q);
+	t_2 = $transpose_measure(t_2, 1, 0, 0, 44.q);
+	t_3 = $transpose_measure(t_3, 1, 0, 0, 44.q);
+	t_4 = $transpose_measure(t_4, 1, 0, 0, 44.q);
+	t_5 = $transpose_measure(t_5, 1, 0, 0, 44.q);
+	t_6 = $transpose_measure(t_6, 1, 0, 0, 44.q);
+	t_7 = $transpose_measure(t_7, 1, 0, 0, 44.q);
+	t_8 = $transpose_measure(t_8, 1, 0, 0, 44.q);
+
+	phrase ph1 = $(HARP) [t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8];
+	phrase ph2 = $(HARP) [t_2, t_3, t_4, t_5, t_6, t_7, t_8];
+	song s1 = $(60) [ph1, ph2];
+		 
+	(play()) [s1];
+	offset = offset + 1;
+
+}*/
+
+
+
+funk song song transpose_song_w(song s, int n, int counter, int j, phrase k, song g)
+{
+	j = $length_song(s);
+	counter = 0;
+	g = $evaluate_song(s);
+
+	while(counter < j)
+	{
+		k = s&counter;
+		g&counter = $transpose_phrase(k, n);
+		counter = counter + 1;
+	}
+
+	return g;
+}
+
+funk song song transpose_song(song s, int n)
+{
+	return $transpose_song_w(s, n, 0, 0, $$() [$() [44.q]], $$$() [$$() [$() [44.q]]]);
+}
+
+funk phrase phrase transpose_phrase_w(phrase p, int n, int counter, int j, measure k, phrase h){
+	j = $length_phrase(p);
+	counter = 0;
+	h = $evaluate_phrase(p);
+
+	while(counter < j)
+	{
+		k = p&counter;
+		h&counter = $transpose_measure(k, n);
+		counter = counter + 1;
+	}
+
+	return h;
+}
+
+funk phrase phrase transpose_phrase(phrase p, int n)
+{
+	return $transpose_phrase_w(p, n, 0, 0, $() [44.q], $$() [$() [44.h]]);
+}
+
+funk measure measure transpose_measure_w(measure m, int n, int counter, int j, note k, measure l)
+{
+	j = $length_measure(m);
+	counter = 0;
+	l = $evaluate_measure(m);
+	
+
+	while(counter < j)
+	{
+		k = l&counter;
+		l&counter = k + n;
+		counter = counter + 1;
+	}
+
+	return l;
+}
+
+funk measure measure transpose_measure(measure m, int n)
+{
+	return $transpose_measure_w(m, n, 0, 0, 44.q, $() [55.h]);	
+}
+
+

@@ -9,7 +9,7 @@ import jm.JMC;
 
 public class Song implements JMC {
 
-	Score s;
+	public Score s;
 
 	// constructor
 	public Song(m_Phrase[] array, int tempo) {
@@ -32,10 +32,30 @@ public class Song implements JMC {
 		s = new Score(p);
 		setTempo(tempo.get());
 	}
+
+	public Song(Song val)
+	{
+		this.s = val.s.copy();
+		/*Part [] p = val.s.getPartArray();
+		s = new Score(p);
+		s.setTempo(val.getTempo());*/
+	}
 	
 	// return part
 	public Score getObj() {
 		return s;
+	}
+
+	public void set_Part(int n, m_Phrase p_rep){
+		Part [] curr_parts = s.getPartArray();
+		curr_parts[n] = p_rep.p;
+
+		s = new Score(curr_parts);
+
+	}
+
+	public int length(){
+		return this.s.length();
 	}
 	
 	// return m_Phrase

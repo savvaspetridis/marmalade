@@ -8,10 +8,10 @@ import jm.JMC;
 
 public class m_Phrase implements JMC {
 
-	Part p;
+	public Part p;
 	
 	public m_Phrase(Part p) {
-		this.p = p;
+		this.p = p.copy();
 	}
 	
 	// constructor
@@ -38,11 +38,27 @@ public class m_Phrase implements JMC {
 		return p;
 	}
 	
+	public int length(){
+		return this.p.length();
+	}
+
 	// return Measure
 	public Measure get(int i) {
 		Phrase phr = p.getPhrase(i);
 		Measure m = new Measure(phr);
 		return m;
+	}
+
+	public void set_Measure(int n, Measure m_rep){
+		Phrase [] curr_phrases = p.getPhraseArray();
+
+
+		curr_phrases[n] = m_rep.p;
+
+
+
+		p = new Part(curr_phrases);
+
 	}
 	
 	/*// constructor

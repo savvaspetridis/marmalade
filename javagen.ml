@@ -83,13 +83,26 @@ let rec write_expr = function
     | S_Tempo(i, tp) -> string_of_int i
     | S_Index(str, i, tp) -> (* "(" ^ (match tp with
         String | Int | Note | Measurepoo | Phrase -> write_type tp)
-    ^ ") " ^ *) str ^ ".get(" ^ string_of_int i ^ ")"
+    ^ ") " ^ *) str ^ ".get(" ^ write_expr i ^ ")"
 	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
        					 "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
     					| "play" -> write_expr exp ^ ".play();\n"
 						| "write" -> "Write.midi(" ^ (*(String.concat ","
                         (List.map write_expr args)*) write_expr exp ^ ".getObj(), \"out.mid\");\n"
-						| "evaluate" -> (*let () = Printf.printf "waz good" in str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"	*) write_expr exp				 
+						| "evaluate_measure" -> "new j_measure(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "
+                        | "evaluate_phrase" -> "new j_phrase(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "  
+                        | "evaluate_song" -> "new j_song(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") " 
+                        | "evaluate_note" -> "new j_note(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "   (*(match exp with
+                                            S_Id(nme, dtype) -> let to_write = (match dtype with 
+                                                Measurepoo -> Phrase
+                                                | Phrase -> Song
+                                                | Song -> SongArr ) in  
+                                            "new " ^ write_type to_write ^ "( " ^ nme ^ " )" )  *)
+                        | "length_measure" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"		
+                        | "length_phrase" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"             
+                        | "length_song" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"            
+                        | "length_int_list" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"            
+                        | "length_string_list" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"                                 	 
 						| _ -> ( match exp with 
 								  	S_Noexpr -> str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"
 								  | _ -> write_expr exp ^ "." ^ str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ");/n")
@@ -112,6 +125,11 @@ and write_stmt d vg = match d with
     | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 vg ^ "else"  ^ write_stmt dstmt2 vg
     | S_While(dexpr, dblock) -> "while(" ^ write_expr dexpr ^ ")"  ^ write_block dblock vg (* check true *)
     (*| S_Array_Assign(str,dexpr_value, dexpr_index, t) -> str ^ ".set(" ^ write_expr dexpr_index ^ "," ^ write_expr dexpr_value ^ ");"*)
+    | S_Index_Update(nme, expr_1, expr_2, typ) -> 
+    (match typ with 
+        Measurepoo -> nme ^ ".set_Note(" ^ write_expr expr_2 ^ "," ^ write_expr expr_1 ^ ");\n" 
+        | Phrase -> nme ^ ".set_Measure( " ^ write_expr expr_1 ^ ", " ^ write_expr expr_2 ^ ");\n"
+        | Song -> nme ^ ".set_Part( " ^ write_expr expr_1 ^ ", " ^ write_expr expr_2 ^ ");\n" )
     | S_Append_Assign(ty, st, ap_list) -> String.concat "GOD" (List.map write_expr ap_list) ^ "IS DEAD"
     | _ -> raise(Failure(" is not a valid statement"))
 
@@ -206,6 +224,8 @@ let write_func_wrapper x str =
 
 
 (*
+
+
 let write_func dfunc =
         match dfunc.s_fname with
             "main" -> "public static void main(String[] args)" ^ write_block
@@ -225,9 +245,12 @@ let gen_pgm pgm name =
 	"import jm.util.*;\n" ^
     "import marmalade.*;\n" ^
     "import jm.midi.event.TimeSig;\n" ^
+
+
     "public class " ^ name ^ " implements JMC{\n" ^ String.concat "\n" (List.map write_global_scope_var_decl pgm.s_gvars) ^ 
      (write_func_wrapper pgm.s_pfuncs String) ^ 
     "\n\n" ^
+
     "public static class j_int extends m_Int {\n" ^
     "public j_int(int n) {\n" ^
     "super(n);\n}\n" ^
@@ -235,6 +258,7 @@ let gen_pgm pgm name =
      "super(n);\n}" ^
      (write_func_wrapper pgm.s_pfuncs Int) ^ 
      "\n}\n\n" ^
+
      "public static class j_intlist extends m_Int_List {\n" ^
      "public j_intlist(j_int[] j) {\n" ^
      "super(j);\n}" ^
@@ -242,6 +266,8 @@ let gen_pgm pgm name =
      "return new j_int(getList()[i]);\n}" ^
      (write_func_wrapper pgm.s_pfuncs Intlist) ^
      "\n}\n\n" ^
+
+
      "public static class j_string extends m_String {\n" ^
      "public j_string(j_string x) {\n" ^
      "super(x);\n}" ^
@@ -249,6 +275,8 @@ let gen_pgm pgm name =
      "super(x);\n}" ^
      (write_func_wrapper pgm.s_pfuncs String) ^
      "\n}\n\n" ^
+
+
      "public static class j_stringlist extends m_String_List {\n" ^
      "public j_stringlist(j_string[] j) {\n" ^
      "super(j);\n}" ^
@@ -256,6 +284,8 @@ let gen_pgm pgm name =
      "return new j_string(getList()[i]);\n}" ^
      (write_func_wrapper pgm.s_pfuncs Stringlist) ^
      "\n}\n\n" ^
+
+
      "public static class j_note extends m_Note {\n" ^
      "public j_note(Note n) {\n" ^
      "super(n);\n}" ^
@@ -265,37 +295,86 @@ let gen_pgm pgm name =
      "super(pitch, length);\n}" ^ 
      (write_func_wrapper pgm.s_pfuncs Note) ^
      "\n}\n\n" ^ 
-     "public static class j_measure extends Measure {\n" ^ 
+
+
+     "public static class j_measure extends Measure {\n\n" ^ 
      "public j_measure(j_note[] m, TimeSig n) {\n" ^
-     "super(m, n);\n}" ^
+     "  super(m, n);\n}" ^
      "public j_measure(Phrase p) {\n" ^
-     "super(p);\n}" ^
+     "  super(p);\n}" ^
+     "public j_measure(j_measure l) \n
+     {\n    super(l.getObj()); \n}\n"^
      "public j_note get(int i) {\n" ^
-     "Note n = getObj().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
+     "  Note n = getObj().getNote(i);\n     j_note m = new j_note(n);\n     return m;\n}" ^
+     "public j_note get(j_int i) {\n" ^
+     "  Note n = getObj().getNote(i.get());\n   j_note m = new j_note(n);\n     return m;\n}" ^
+     "public void set_Note(j_note i, j_int k){
+        this.p.setNote(i.getObj(), k.get());\n
+     }\n" ^
+     "public void set_Note(j_note i, int k){
+        this.p.setNote(i.getObj(), k);
+     }\n" ^     
      (write_func_wrapper pgm.s_pfuncs Measurepoo) ^ 
      "\n}\n" ^ 
+
+
      "public static class j_phrase extends
      m_Phrase {\n" ^
-     "public j_phrase(Part p) {\n" ^
+     "  public j_phrase(Part p) {\n" ^
      "super(p);\n}" ^
-     "public j_phrase(j_measure[] m, int n) {\n" ^
+     "  public j_phrase(j_measure[] m, int n) {\n" ^
      "super(m, n);\n}" ^
-     "public j_phrase(j_measure[] m, j_int n) {\n" ^
+     "  public j_phrase(j_measure[] m, j_int n) {\n" ^
      "super(m, n);\n}\n" ^
-     "public j_measure get(int i) {\n" ^
+    "public j_phrase(j_phrase l) \n 
+     {\n    super(l.getObj()); \n}\n" ^ 
+     "  public j_measure get(int i) {\n" ^
      "Phrase p = getObj().getPhrase(i);\n" ^
-     "return (new j_measure(p));\n}" ^
+     "  return (new j_measure(p));\n}" ^
+     "public j_measure get(j_int i) {\n" ^
+     "  Phrase p = getObj().getPhrase(i.get());\n" ^
+     "return (new j_measure(p));\n}" ^  
+
+     "public void set_Measure(j_int idx, j_measure n_measure)\n
+     {\n
+        this.set_Measure(idx.get(), (Measure) n_measure); \n
+    }\n" ^
+
+    "public void set_Measure(int idx, j_measure n_measure)\n
+     {\n
+        this.set_Measure(idx, (Measure) n_measure); \n
+    }\n" ^
+
      (write_func_wrapper pgm.s_pfuncs Phrase) ^
      "\n}\n" ^ 
+
+
      "public static class j_song
      extends Song {\n" ^
      "public j_song(j_phrase[] m, int n) {\n" ^
-     "super(m, n);\n}" ^
+     "  super(m, n);\n}" ^
      "public j_song(j_phrase[] m, j_int n) {\n" ^
-     "super(m, n);\n}\n" ^
+     "  super(m, n);\n}\n" ^
+     "public j_song(j_song l) \n
+     {\n   super(l); \n}\n" ^
      "public j_phrase get(int i) {\n" ^
-     "Part s = getObj().getPart(i);\n" ^
+     "  Part s = getObj().getPart(i);\n" ^
      "return (new j_phrase(s));\n}" ^
+
+     "public j_phrase get(j_int i) {\n" ^
+     "Part s = getObj().getPart(i.get());\n
+     return (new j_phrase(s));\n}" ^
+
+    "public void set_Part(j_int idx, j_phrase n_phrase)\n
+     {\n
+        this.set_Part(idx.get(), (m_Phrase) n_phrase); \n
+    }\n" ^
+
+    "public void set_Part(int idx, j_phrase n_phrase)\n
+     {\n
+        this.set_Part(idx, (m_Phrase) n_phrase); \n
+    }\n" ^
+
      (write_func_wrapper pgm.s_pfuncs Song) ^
      "\n}\n}\n"
 

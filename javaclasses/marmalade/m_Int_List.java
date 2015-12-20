@@ -17,6 +17,10 @@ public class m_Int_List implements JMC {
 	public m_Int_List(int[] x) {
 		this.t = x;
 	}
+
+	public int length(){
+		return this.t.length;
+	}
 	
 	public int[] getList() {
 		return t;

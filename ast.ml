@@ -13,7 +13,7 @@ type note_type =
 	| W of string 
 *)
 type declare_type = Int | Note | String | Song | Phrase | Measurepoo | TimeSig |
-Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default
+Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default | SongArr
 (*
 type funk_expr = 
     IntLit of int

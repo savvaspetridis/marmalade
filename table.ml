@@ -92,7 +92,8 @@ let rec add_stmt stmt env =
 	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*)
 		| Append(str, appL) -> env
 		| Append_Assign(typ, str, appL) -> let () = Printf.printf "adding appendassign \n" in
-			add_var (str, typ) env)
+			add_var (str, typ) env
+		| Index_Update(_, _) -> env)
 	| _ ->	env
 
 and add_block block return_tp env =  
@@ -117,9 +118,20 @@ and add_func func env =
 let base_env = 
 	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note;
     String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [], 0)) StrMap.empty in
-    let table = StrMap.add "evaluate_0" (Func_Decl("evaluate", Int, [Int; Note;
-    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [], 0)) table in
-	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
+    let table = StrMap.add "evaluate_note_0" (Func_Decl("evaluate_note", Note, [Int; Note;
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [Note], 0)) table in
+     let table = StrMap.add "evaluate_measure_0" (Func_Decl("evaluate_measure", Measurepoo, [Int; Note;
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [Measurepoo], 0)) table in
+    let table = StrMap.add "evaluate_phrase_0" (Func_Decl("evaluate_phrase", Phrase, [Int; Note;
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [Phrase], 0)) table in
+    let table = StrMap.add "evaluate_song_0" (Func_Decl("evaluate_song", Song, [Int; Note;
+    String; Song; Phrase; Measurepoo; TimeSig; Instr; Tempo; List ; Intlist ; Stringlist; Wild], [Song], 0)) table in
+    let table = StrMap.add "length_measure_0" (Func_Decl("length_measure", Int, [Measurepoo; Note; Phrase; Song; Intlist; Stringlist], [Measurepoo], 0)) table in
+    let table = StrMap.add "length_phrase_0" (Func_Decl("length_phrase", Int, [Measurepoo; Note; Phrase; Song; Intlist; Stringlist], [Phrase], 0)) table in
+    let table = StrMap.add "length_song_0" (Func_Decl("length_measure", Int, [Measurepoo; Note; Phrase; Song; Intlist; Stringlist], [Song], 0)) table in
+    let table = StrMap.add "length_int_list_0" (Func_Decl("length_int_list", Int, [Measurepoo; Note; Phrase; Song; Intlist; Stringlist], [Intlist], 0)) table in
+    let table = StrMap.add "length_string_list_0" (Func_Decl("length_string_list", Int, [Measurepoo; Note; Phrase; Song; Intlist; Stringlist], [Stringlist], 0)) table in
+	let table = StrMap.add "play_0"  (Func_Decl("play", Null_Type, [Note; String; Song; Phrase; Measurepoo; Wild], [], 0)) table in
 	let table = StrMap.add "write_0" (Func_Decl("write", Null_Type, [Note; String; Song; Phrase; Measurepoo], [], 0)) table in
 	let table = StrMap.add "main_0" (Func_Decl("main", Null_Type, [], [], 0)) table in
 	(table, 0)

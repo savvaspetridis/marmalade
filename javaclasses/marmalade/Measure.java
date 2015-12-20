@@ -8,10 +8,10 @@ import jm.JMC;
 
 public class Measure implements JMC {
 	
-	Phrase p;
+	public Phrase p;
 	
 	public Measure(Phrase p) {
-		this.p = p;
+		this.p = p.copy();
 	}
 	
 	// constructor
@@ -39,6 +39,10 @@ public class Measure implements JMC {
 	// return phrase
 	public Phrase getObj() {
 		return p;
+	}
+
+	public int length(){
+		return this.p.length();
 	}
 	
 	public m_Note get(int i) {

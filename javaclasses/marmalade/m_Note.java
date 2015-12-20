@@ -6,10 +6,10 @@ import jm.JMC;
 
 public class m_Note implements JMC {
 
-	Note n;
+	public Note n;
 	
 	public m_Note(Note n) {
-		this.n = n;
+		this.n = n.copy();
 	}
 	
 	// constructor
