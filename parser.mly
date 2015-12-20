@@ -120,16 +120,9 @@ stmt_list:
     | stmt_list stmt { $2 :: $1 } 
 	
 vmod:
-
-	type_dec ID APPEND ASSIGN append_list {Append_Assign($1, $2, List.rev $5)}
 |	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
 |	list_index ASSIGN expr { Index_Update($1, $3) }
-|	ID APPEND ASSIGN append_list {Append($1, List.rev $4)} 
-
-append_list:
-	append_list APPEND expr {$3 :: $1}
-|	expr {[$1]}
 
 expr:
 app_gen  {$1}

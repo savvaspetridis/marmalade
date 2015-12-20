@@ -1,17 +1,9 @@
 (*
-* Marmadizzle
-*)
-
+ * Marmalade Abstract Syntax Tree
+ *)
 
 type op = Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | Geq | And | Or
-(*
-type note_type = 
-	S of string
-	| E of string
-	| Q of string 
-	| H of string
-	| W of string 
-*)
+
 type declare_type = Int | Note | String | Song | Phrase | Measurepoo | TimeSig |
 Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default | SongArr
 (*
@@ -46,6 +38,7 @@ type prim_type =
 
 (*type scope_var_decl = string * declare_type * int*)
 
+
 type char_pair = Ranges of char * char
 
 type var = string * bool * declare_type
@@ -57,44 +50,31 @@ type expr =
 	| Id of string
 	| String_Lit of string
 	| Note of int * char
-    | TimeSig of int * int
+    | TimeSig of int * int 
     | Instr of string
     | Tempo of int
     | Index of string * expr
     | Default
     | Msk_list of expr * expr
-    (* PARSE THESE *)
-    | Measure of expr list * expr (* list of notes, TimeSig *)
-    | Phrase of expr list * expr (* list of 'measures' (Notes in them), list of their Time-signatures, 
-													and an instrument *)
-    | Song of expr list * expr (* list of phrases (Notes in them), 
-																	list of each measure in each phrase's
-																	 time-signature, list of all instruments for each
-																	 phrase, and a BPM *)
+    | Measure of expr list * expr (* list of notes, and its time signature *)
+    | Phrase of expr list * expr (* list of measures and an instrument *)
+    | Song of expr list * expr (* list of phrases and a BPM *)
 	| Regex of special_exp
 	| Binop of expr * op * expr
 	| BasicList of expr list
 	| FuncList of expr list * expr list
     | FunkCall of string * expr list
 
-(*type invocation = 
-    FunkCall of string * expr list
-*)
 and special_exp = {ids: string list; bounds: char_pair list list}
 
-
 type vmod =
-	Assign of declare_type * string * expr 
-	| Append of string * expr list
-	| Append_Assign of declare_type * string * expr list
-	| Update of string * expr
+	Assign of declare_type * string * expr  (* declare a new variable with its type *)
+	| Update of string * expr (* reassign a value to a previously declared variable *)
 	| Index_Update of expr * expr
-
 
 type stmt = 
 	Expr of expr
 	| VarDecl of vmod
-	(*| Fdecl of string * declare_type * expr list * stmt list*)
 	| If of expr * block * block
 	| While of expr * block
 	| Return of expr
@@ -102,22 +82,23 @@ type stmt =
 	| Null_Type
 	| None
 
+(* each block has a list of variables, statments, and an id *)
+
 and block = {
 	locals: var list;
 	statements: stmt list;
 	block_id: int
 }
 
+(* function declaration *)
+
 and fdecl = {
     fname : string;
     ret_type : declare_type;
     f_type : declare_type list;
     args : var list;
-(*  formals : string list;
-    locals : string list; *)
     body : block;
 }
-
 
 type scope_var_decl = string * bool * declare_type * int
 

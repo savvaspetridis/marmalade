@@ -59,7 +59,7 @@ rule token = parse
 |   '&'         { INDEX }
 |   '$'         { DOLLAR }
 |   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }
-|   ((('-')(digit)+) | (digit)+) as lxm { INT_LIT(int_of_string lxm) }
+|    (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ' | '.' | ',' |'!' | '$' | ':' | ';' |'(' | ')' | '[' | ']' | '{' |'}' | '&' | '&' | '#' | '@' | '?' | '<' | '>' | '+' | '=' | '-'  )* as lxm) '"' { STRING_LIT(lxm) }
 |   (letter | digit | '_')+ (*('[' (digit)+ ']')**) as lxm  { ID(lxm) } (* not sure if this is what we're going for*)
 |	''' ((letter | digit | ' ') as lxm) ''' { BOUND(lxm) }
