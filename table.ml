@@ -1,8 +1,6 @@
 (* 
-	Creates table for checking SAST
-
-	Pretty much entirely taken from Corgi
-
+ *	Creates table for checking SAST
+ *	much of this was adapted from Corgi
  *)
 
 open Ast
@@ -36,83 +34,58 @@ let name_scope_str (name:string) env =
 
 let rec get_scope name env =
     if StrMap.mem (name_scope_str name env) (fst env) then (snd env)
-    else if (snd env) = 0 then raise(Failure("symbol " ^ name ^ " not declared. " ^ string_of_int (snd env)))
+    else if (snd env) = 0 then raise(Failure("Error: Symbol " ^ name ^ " not declared. " ^ string_of_int (snd env)))
     else get_scope name (fst env, parent_scope.(snd env))
 
 let rec get_decl name env =
 	let key = name_scope_str name env in 
 	if StrMap.mem key (fst env) then StrMap.find key (fst env)
 	else
-		if (snd env) = 0 then raise (Failure("symbol " ^ name ^ " not declared in current scope" ^ string_of_int (snd env)))
+		if (snd env) = 0 then raise (Failure("Error: Symbol " ^ name ^ " not declared in current scope" ^ string_of_int (snd env) ^ "."))
     	else get_decl name ((fst env), parent_scope.(snd env))
 
 let add_symbol (name:string) (decl:decl) env =
 	let () = Printf.printf "adding symbol \n" in
 	let key = name_scope_str name env in
     if StrMap.mem key (env_table env)
-    then raise(Failure("symbol " ^ name ^ " declared twice in same scope"))
-    else let () = Printf.printf "in symbol \n" in 
-    ((StrMap.add key decl (env_table env)), (env_scope env))
-
+    then raise(Failure("Error: Symbol " ^ name ^ " declared twice in same scope."))
+    else ((StrMap.add key decl (env_table env)), (env_scope env))
 
 let add_var var env =
 	let (name, p_type) = var in
 	let is_implicit_array = 
 		(match p_type with
 		  (Int | Note | String | TimeSig | Instr | Tempo) -> false
-		  | _ -> true) in let () = Printf.printf "trying to add a var \n" in 
-	add_symbol name (Var_Decl(name, is_implicit_array, p_type, (env_scope env))) env
+		  | _ -> true) in add_symbol name (Var_Decl(name, is_implicit_array, p_type, (env_scope env))) env
 
 let add_ast_var var env =
 	let (name, arr_b, typ) = var in
 	add_var (name, typ) env
 
-let rec add_stmt stmt env = 
-	let () = Printf.printf "adding stmt \n" in 
-	match stmt with
-	Expr(exp) -> 	let () = Printf.printf "in expr \n" in  env(*(match exp with 
-	  Block(block) -> add_block block env
-	  | If(expr, block1, block2) -> 
-	  		let env = add_block block1 env in add_block block2 env
-	  (*| For(expr1, expr2, expr3, block) -> add_block block env*)
-	  | While(expr, block) -> add_block block env
-	  | '_' -> env )*)
-	| If(e, bl_1, bl_2) -> let () = Printf.printf "in expr \n" in let env_1 = add_block bl_1 Wild env in add_block bl_2 Wild env_1
-	| While(e, bl) -> let () = Printf.printf "in expr \n" in add_block bl Wild env
+let rec add_stmt stmt env =  
+	(match stmt with
+	Expr(exp) -> env
+	| If(e, bl_1, bl_2) -> let env_1 = add_block bl_1 Wild env in add_block bl_2 Wild env_1
+	| While(e, bl) -> add_block bl Wild env
 	| Fdecl(fdec) -> add_func fdec env
-	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
-		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
-		add_var (id, typ) env
-	 	| Update(str, exr) -> let () = Printf.printf "adding update \n" in
-	 		env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
-	 	let () = Printf.printf "printing update \n" in
-	 		(match dec with 
-	 			(*Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
-	 			|*) _ -> raise(Failure("A function cannot be redefined as a variable"))
-	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*)
-		| Append(str, appL) -> env
-		| Append_Assign(typ, str, appL) -> let () = Printf.printf "adding appendassign \n" in
-			add_var (str, typ) env)
-	| _ ->	env
+	| VarDecl(chan) -> (match chan with 
+		Assign(typ, id, blah) -> add_var (id, typ) env
+	 	| Update(str, exr) -> env)
+	| _ ->	env)
 
 and add_block block return_tp env =  
 	let (table, scope) = env in 
 	let id = block.block_id in
-	let () = Printf.printf "adding block" in
 	let env = map_to_list_env add_ast_var block.locals (table, id) in
 	let env = map_to_list_env add_stmt block.statements env in
-	(*let env = add_var ("this", return_tp) env in*)
-	parent_scope.(id) <- scope; (* insert scope value into idth element of parent array *)
+	parent_scope.(id) <- scope; 
 	((env_table env), scope)
 
 and add_func func env =
 	let (table, scope) = env in
 	let arg_names = List.map type_of_funct_args func.args in
-	let () = Printf.printf "trying to add function\n" in 
 	let env = add_symbol func.fname (Func_Decl(func.fname, func.ret_type, func.f_type, arg_names, scope)) env in
-	(*let env = map_to_list_env add_var func.formals ((env_table env), func.fblock.block_id) in*)
 	add_block func.body (func.ret_type) ((env_table env), scope)
-
 
 let base_env = 
 	let table = StrMap.add "print_0" (Func_Decl("print", Null_Type, [Int; Note;
@@ -125,7 +98,6 @@ let base_env =
 	(table, 0)
 
 let build_table p = 
-	(*let (vars, funcs) = p in*)
 	let env = base_env in
 	let env =  map_to_list_env add_stmt (List.rev p.stmts) env in
 	let env = map_to_list_env add_func (List.rev p.funcs) env in 

@@ -1,6 +1,6 @@
 (*
-* Marmalade Abstract Syntax Tree
-*)
+ * Marmalade Abstract Syntax Tree
+ *)
 
 type op = Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | Geq | And | Or
 
@@ -18,7 +18,7 @@ type expr =
 	| Id of string
 	| String_Lit of string
 	| Note of int * char
-    | TimeSig of int * int
+    | TimeSig of int * int 
     | Instr of string
     | Tempo of int
     | Index of string * expr
@@ -38,6 +38,7 @@ and special_exp = {ids: string list; bounds: char_pair list list}
 type vmod =
 	Assign of declare_type * string * expr  (* declare a new variable with its type *)
 	| Update of string * expr (* reassign a value to a previously declared variable *)
+	| Index_Update of expr * expr
 
 type stmt = 
 	Expr of expr

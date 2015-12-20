@@ -122,7 +122,7 @@ stmt_list:
 vmod:
 |	type_dec ID ASSIGN expr {Assign($1, $2, $4)}
 |	ID ASSIGN expr {Update($1, $3)}
-
+|	list_index ASSIGN expr { Index_Update($1, $3) }
 
 expr:
 app_gen  {$1}
@@ -134,6 +134,7 @@ app_gen  {$1}
 
 list_index:
     ID INDEX INT_LIT { Index($1, IntLit($3)) }
+ |	ID INDEX ID {Index($1, Id($3))}
 
 add_on_expr:
   DOLLAR LPAREN RPAREN reg_list { Measure($4, TimeSig(4, 4))}
