@@ -88,6 +88,7 @@ type vmod =
 	| Append of string * expr list
 	| Append_Assign of declare_type * string * expr list
 	| Update of string * expr
+	| Index_Update of expr * expr
 
 
 type stmt = 
