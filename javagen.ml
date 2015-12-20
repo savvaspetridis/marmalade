@@ -87,7 +87,8 @@ let rec write_expr = function
 	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
        					 "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
     					| "play" -> write_expr exp ^ ".play();\n"
-						| "write" -> "Write.midi(" ^ (*(String.concat "," (List.map write_expr args)*) write_expr exp ^ ", \"out.mid\");\n"
+						| "write" -> "Write.midi(" ^ (*(String.concat ","
+                        (List.map write_expr args)*) write_expr exp ^ ".getObj(), \"out.mid\");\n"
 						| "evaluate" -> (*let () = Printf.printf "waz good" in str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"	*) write_expr exp				 
 						| _ -> ( match exp with 
 								  	S_Noexpr -> str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ")"
@@ -270,7 +271,7 @@ let gen_pgm pgm name =
      "public j_measure(Phrase p) {\n" ^
      "super(p);\n}" ^
      "public j_note get(int i) {\n" ^
-     "Note n = getPhrase().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
+     "Note n = getObj().getNote(i);\nj_note m = new j_note(n);\nreturn m;\n}" ^
      (write_func_wrapper pgm.s_pfuncs Measurepoo) ^ 
      "\n}\n" ^ 
      "public static class j_phrase extends
@@ -282,7 +283,7 @@ let gen_pgm pgm name =
      "public j_phrase(j_measure[] m, j_int n) {\n" ^
      "super(m, n);\n}\n" ^
      "public j_measure get(int i) {\n" ^
-     "Phrase p = getPart().getPhrase(i);\n" ^
+     "Phrase p = getObj().getPhrase(i);\n" ^
      "return (new j_measure(p));\n}" ^
      (write_func_wrapper pgm.s_pfuncs Phrase) ^
      "\n}\n" ^ 
@@ -293,7 +294,7 @@ let gen_pgm pgm name =
      "public j_song(j_phrase[] m, j_int n) {\n" ^
      "super(m, n);\n}\n" ^
      "public j_phrase get(int i) {\n" ^
-     "Part s = getScore().getPart(i);\n" ^
+     "Part s = getObj().getPart(i);\n" ^
      "return (new j_phrase(s));\n}" ^
      (write_func_wrapper pgm.s_pfuncs Song) ^
      "\n}\n}\n"

@@ -23,7 +23,7 @@ public class m_Note implements JMC {
 	}
 	
 	// cast to Note
-	public Note toNote() {
+	public Note getObj() {
 		return n;
 	}
 	

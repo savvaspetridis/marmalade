@@ -341,6 +341,8 @@ let rec verify_expr ex env boo =
 					t_st
 				| FunkCall(id, args) -> let f_decl = Table.get_decl id env in
 					let (ty_funk, _, _ ) = get_dt f_decl in ty_funk
+                | Index(id, place) -> let var_dec = Table.get_decl id env in
+                    let (t_obj, _, _) = get_dt var_dec in t_obj
 				) in
 			let verify_type_and_vars tok = 
 				let nwvar =  check_ex_list tok env in
@@ -373,6 +375,8 @@ let rec verify_expr ex env boo =
 					t_st
 				| Default -> Wild
 				| FunkCall(nme, arg_vals) -> Wild
+                | Index(id, place) -> let var_dec = Table.get_decl id env in
+                    let (t_obj, _, _) = get_dt var_dec in t_obj
 				| _ -> raise(Failure("no match"))
 				) in
 			let verify_type_and_vars tok = 

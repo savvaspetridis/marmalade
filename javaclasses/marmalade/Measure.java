@@ -19,7 +19,7 @@ public class Measure implements JMC {
 		p = new Phrase();
 		Note[] a = new Note[array.length];
 		for (int i = 0; i < a.length; i++) {
-			a[i] = array[i].toNote();
+			a[i] = array[i].getObj();
 		}
 		p.addNoteList(a);
 	}
@@ -29,7 +29,7 @@ public class Measure implements JMC {
 		p = new Phrase();
 		Note[] a = new Note[array.length];
 		for (int i = 0; i < a.length; i++) {
-			a[i] = array[i].toNote();
+			a[i] = array[i].getObj();
 		}
 		p.addNoteList(a);
 		setTimesig(t.getNumerator(), t.getDenominator());
@@ -37,7 +37,7 @@ public class Measure implements JMC {
 
 	
 	// return phrase
-	public Phrase getPhrase() {
+	public Phrase getObj() {
 		return p;
 	}
 	
