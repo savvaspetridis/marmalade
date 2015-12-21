@@ -1,0 +1,5 @@
+/* Testing print */
+
+(print()) [42];
+
+(print(), print(), print()) [21, 21, 21];

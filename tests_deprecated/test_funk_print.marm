@@ -6,13 +6,13 @@ Tests a funktion definition & call
 
 
 
-funk int int marmout() {
-	int_list foo = (print()) [42];	
-		/* this print isn't working!!! */
-	return 42;
+funk int void marmout(int ft) {
+	/*(print()) [ft];*/	
+	/*int foo  = 42;*/
+	return $print(ft);
 }
 
-(marmout()) [42];
+(marmout(42)) [42];
 (print()) [42];
 
 

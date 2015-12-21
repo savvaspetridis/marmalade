@@ -1,0 +1,11 @@
+/*
+Tests a funktion declaration
+*/
+
+
+funk int_list int marmOut() {
+	return [42];
+}
+
+
+int_list success = (print()) [42];
