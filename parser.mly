@@ -128,7 +128,7 @@ expr:
 app_gen  {$1}
 | list_index {$1}
 | arith {$1}
-| AT LPAREN special_expression RPAREN /*{Regex({$3.ids; $3.bounds})}*/ {Regex($3)}
+| AT LPAREN special_expression RPAREN {Regex($3)}
 | add_on_expr {$1}
 
 
@@ -249,32 +249,8 @@ arithmeticID_arg:
     | add_on_expr { $1 }
     | function_invocation { $1 }
 
-
-/*reg_list_list_wrapper:
-	LBRACK reg_list_list RBRACK {List.rev $2} 
-
-reg_list_list:
-	reg_list_list COMMA reg_list {$3 :: $1}
-|	reg_list_list COMMA ID {[Id($3)] :: $1}
-| reg_list {[$1]} 
-
-reg_list_list_list_wrapper:
-	LBRACK reg_list_list_list RBRACK {List.rev $2}
-
-reg_list_list_list:
-	reg_list_list_list COMMA reg_list_list_wrapper {$3 :: $1}
-|	reg_list_list_list COMMA ID {[[Id($3)]] :: $1}
-| 	reg_list_list_wrapper {[$1]}*/
-
-
-
 reg_list:
 	LBRACK funk_args RBRACK {List.rev $2}
 
 note:
 	INT_LIT NOTE_TYPE {Note($1, $2)}
-/*|   INT_LIT PERIOD S {Note($1, $3)}
-|	INT_LIT PERIOD E {Note($1, $3)}
-|	INT_LIT PERIOD Q {Note($1, $3)}
-|	INT_LIT PERIOD H {Note($1, $3)}
-|	INT_LIT PERIOD W {Note($1, $3)}*/
