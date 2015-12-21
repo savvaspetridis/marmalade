@@ -27,7 +27,6 @@ type expr =
     | Measure of expr list * expr (* list of notes, and its time signature *)
     | Phrase of expr list * expr (* list of measures and an instrument *)
     | Song of expr list * expr (* list of phrases and a BPM *)
-	| Regex of special_exp
 	| Binop of expr * op * expr
 	| BasicList of expr list
 	| FuncList of expr list * expr list
