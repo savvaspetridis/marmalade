@@ -28,11 +28,6 @@ rule token = parse
 |   '-'         { DASH }
 |   "<<"        { APPEND } 
 |   '!'         { NOT }
-(*|   's'         { S }
-|   'e'         { E }
-|   'q'         { Q }
-|   'h'         { H }
-|   'w'         { W }*)
 |   "if"        { IF }
 |   "else"      { ELSE }
 |   "elif"      { ELIF }
@@ -61,11 +56,11 @@ rule token = parse
 |   '.' (('s'|'e'|'q'|'h'|'w') as lxm) { NOTE_TYPE(lxm) }
 |    (digit)+ as lxm { INT_LIT(int_of_string lxm) }
 |   '"' ((letter | digit | '_' | ' ' | '.' | ',' |'!' | '$' | ':' | ';' |'(' | ')' | '[' | ']' | '{' |'}' | '&' | '&' | '#' | '@' | '?' | '<' | '>' | '+' | '=' | '-'  )* as lxm) '"' { STRING_LIT(lxm) }
-|   (letter | digit | '_')+ (*('[' (digit)+ ']')**) as lxm  { ID(lxm) } (* not sure if this is what we're going for*)
+|   (letter | digit | '_')+ as lxm  { ID(lxm) }
 |	''' ((letter | digit | ' ') as lxm) ''' { BOUND(lxm) }
 |   (letter)+ as lxm { INSTRUMENT(lxm) }
 |   eof       { EOF }
-|   _ as char { raise (Failure("illegal character: " ^ Char.escaped char)) }
+|   _ as char { raise (Failure("Error: Illegal character: " ^ Char.escaped char)) }
 
 and comment = parse
     "*/"        { token lexbuf }
