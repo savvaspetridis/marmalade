@@ -1,27 +1,42 @@
 /* 99 bottles of beer */ 
 
+
 measure t_1 = $(6:8) [67.e, 67.e, 67.e, 62.e, 62.e, 62.e];
 measure t_2 = $(6:8) [67.e, 67.e, 67.e, 67.h];
 measure t_3 = $(6:8) [69.e, 69.e, 69.e, 64.e, 64.e, 64.e];
+measure t_4 = $(6:8) [69.w];
+measure t_5 = $(6:8) [66.q, 66.e, 66.h];
+measure t_6 = $(6:8) [66.e, 66.e, 66.e, 66.h];
+
+/*
 measure t_4 = $(6:8) [69.h, 0.e, 0.e, 67.e];
 measure t_5 = $(6:8) [65.e, 65.e, 65.e, 62.e, 62.e, 62.e];
 measure t_6 = $(6:8) [65.e, 65.e, 65.e, 65.e, 65.e, 64.e];
-measure t_7 = $(6:8) [62.e, 62.e, 62.e, 62.e, 64.e, 65.e]; 
+*/
+
+measure t_7 = $(6:8) [62.e, 62.e, 62.e, 62.e, 64.e, 66.e]; 
 measure t_8 = $(6:8) [67.e, 67.e, 67.e, 67.h]; 
 
 
 
 phrase ph1 = $(HARP) [t_1, t_2, t_3, t_4, t_5, t_6, t_7, t_8];
-phrase ph2 = $(HARP) [t_2, t_3, t_4, t_5, t_6, t_7, t_8];
+phrase ph2 = $(BANJO) [t_2, t_3, t_4, t_5, t_6, t_7, t_8];
 song s1 = $(60) [ph1, ph2]; 
-
-
 
 
 
 (play()) [s1];
 (write()) [s1];
 
-
+/*
+funk phrase phrase transpose(phrase p) {
+    int i = 0;
+    
+    while (i == 0) {
+    
+    }
+    return p;
+}
+*/
 
 
