@@ -17,18 +17,18 @@ type s_expr =
 	| S_String_Lit of string * declare_type
 	| S_Note of int * char * declare_type
 	| S_Measure of s_expr list * s_expr * declare_type (* S_Note list, S_TimeSig, declare_type *)
-	| S_Phrase of s_expr list * s_expr * declare_type (* S_Measure list, S_Instr, declare_type *)
-	| S_Song of s_expr list  * s_expr * declare_type (* S_Phrase list, *)
-    | S_TimeSig of int * int * declare_type
-    | S_Instr of string * declare_type
-    | S_Tempo of int * declare_type
+	| S_Phrase of s_expr list * s_expr * declare_type  (* S_Measure list, S_Instr, declare_type *)
+	| S_Song of s_expr list  * s_expr * declare_type   (* S_Phrase list, *)
+    | S_TimeSig of int * int * declare_type 		   (* ex: ((4:4), TimeSig) *)
+    | S_Instr of string * declare_type 				   (* ex: (BASS, Instr) *)
+    | S_Tempo of int * declare_type					   (* ex: (120, Tempo) *)
     | S_Binop of s_expr * op * s_expr * declare_type
 	| S_Call of string * s_expr * s_expr list * declare_type list * declare_type
 	| S_Index of string * s_expr * declare_type
 	| S_Arr of s_expr list * declare_type
 	| S_Db_Arr of s_expr * s_expr
 	| S_Call_lst of s_expr list
-	| S_Noexpr 
+	| S_Noexpr											(* Default - No value *)
 
 (* verified statemnets *)	
 
@@ -165,7 +165,6 @@ let confirm_func_decl name env =
 		| _ -> raise(Failure("Error: id " ^ name ^ " not a function"))
 
 let confirm_id_get_type id env = 
-	let () = print_string (id ^ " Nulled7??") in
 	let decl = Table.get_decl id env in
 	match decl with
 		Var_Decl(v) -> let (_, _, t, _) = v in t
@@ -174,7 +173,7 @@ let confirm_id_get_type id env =
 (* get variables *)
 
 let get_vars li =
-	match li with 
+	(match li with 
 		VarDecl(v) -> 	
 			(match v with
 				Assign(dt, iden, v) -> 
@@ -187,11 +186,9 @@ let get_vars li =
                         | Instr -> (iden, false, dt)
                         | Tempo -> (iden, false, dt)
                         | _ -> (iden, true, dt))
-				| Update(iden, v)	-> let () = Printf.printf "UPDATE - SAST \n" in
-					("", false, Wild)
-				| Index_Update(expr_1, expr_2) -> (*let nme = (match expr_1 with 
-											Id(str) -> str) in *) ("", false, Wild))
-		| _ ->						("", false, Wild) 
+				| Update(iden, v) -> ("", false, Wild)
+				| Index_Update(expr_1, expr_2) -> ("", false, Wild))
+		| _ ->	("", false, Wild)) 
 
 (* confirm correct format of a binary operation *)
 
@@ -351,8 +348,6 @@ let rec confirm_expr ex env boo =
 			| _ -> S_Noexpr)
 			else  raise(Failure("Error: Illegal function call " ^ nme ^ " on an argument.")) in
 		let l_calls =  List.map2 mapval li fl in
-		(*S_Noexpr in
-		if boo = true then l_calls = List.map2 mapval li fl else l_calls = S_Noexpr in *)
 		let r_calls = List.map2 mapcall (List.rev li) fl in
 		let (it, ty) = check_arr fl env in
 		let ret = (match boo with 
@@ -406,6 +401,8 @@ and check_call_and_type name vargs env =
 			else raise(Failure("Error: Argument types in " ^ name ^ " call do not match formal parameters."))
 		else raise(Failure("Error: Function " ^ name ^ " takes " ^ string_of_int (List.length params) ^ " arguments, called with " ^ string_of_int (List.length vargs))) 
 
+(* get the type of an id of a variable *)
+
 and get_id_type den env =
 	let mark = Table.get_decl den env in
 	let var = match mark with
@@ -413,7 +410,6 @@ and get_id_type den env =
 	| _ -> raise(Failure ("Error: " ^ den ^ " is not a variable.")) in
 	let  (_, _, tp, _)  = var in
 	tp 
-
 
 (* convert AST statements into SAST statements *)
 
@@ -436,39 +432,20 @@ let rec confirm_stmt stmt ret_type env =
 				let vid_type = get_id_type st env in
 				let de = confirm_expr ex env true in
 				let de_tp = type_of_expr de in
-				let () = Printf.printf "yo sub 3" in
-				if de_tp = vid_type then let () = Printf.printf " sub 4" in S_Assign(st, de, de_tp)
+				if de_tp = vid_type then S_Assign(st, de, de_tp)
 				else raise(Failure("Attempting to assign variable name " ^ st ^ " to value of type " ^ string_of_prim_type de_tp  ^ " 
 					when " ^ st ^ " is already defined as a variable of type " ^ string_of_prim_type vid_type ^ "."))
 			| Index_Update(expr_1, expr_2) -> let type_1 = (match expr_1 with
 						Index(str, exp) -> let typ_known = Table.get_decl str env in
 							let (plz, typ, den) = get_dt typ_known in plz
-							| _ -> raise(Failure("Error in matching index type"))
-						) in
+							| _ -> raise(Failure("Error in matching index type"))) in
 						let iden = (match expr_1 with
-						Index(str, exp) -> str
-						) in
+						Index(str, exp) -> str) in
 						let idx = (match expr_1 with
-						Index(str, exp) -> exp
-						)  in let v_exp1 = confirm_expr idx env false in
-						 let v_exp2 = confirm_expr expr_2 env false in
-						 S_Index_Update(iden, v_exp1, v_exp2, type_1)
-			(*| Append(iden, ap_l) -> 
-				let typ = get_id_typ iden env in
-				let  app_lis = verify_app_list_mod ap_l typ env in
-				app_lis*)
-			(*| Append_Assign(ty, stri, ap_l) -> 
-
-				let verified_app_list = compress_append ty [] ap_l env in
-				S_Append_Assign(ty, stri, verified_app_list)*)
-				(*let app_block = S_Append_block(verified_app_list) in*)
-				(*let app_lis = verify_app_list_def ap_l typ env in
-				let eval_typ = verify_expr app_lis env true in
-				let eid_typ = type_of_expr eval_typ in
-				if typ = eid_type
-				then (*let () = Printf.printf "got typ \n" in*) S_Assign(stri, app_lis, ty)
-			else raise(Failure("return type does not match* " ^ string_of_prim_type eid_type ^ " " ^ string_of_prim_type typ))*)
-				)
+						Index(str, exp) -> exp) in 
+						let v_exp1 = confirm_expr idx env false in
+						let v_exp2 = confirm_expr expr_2 env false in
+						S_Index_Update(iden, v_exp1, v_exp2, type_1))
 	| If(e, b1, b2) ->
 		let verified_expr = confirm_expr e env false in
 		if (type_of_expr verified_expr) = Int then
@@ -485,15 +462,21 @@ let rec confirm_stmt stmt ret_type env =
 		else raise(Failure("Error: Condition in WHILE statement must be boolean expression.")) 
 	| _ -> raise(Failure("Error: Can't map to statement.")))
 
+(* iterates through a list of statements and confirms them *)
+
 and confirm_stmt_list stmt_list ret_type env = 
 	match stmt_list with
 		  [] -> []
 		| head :: tail -> (confirm_stmt head ret_type env) :: (confirm_stmt_list tail ret_type env)
 
+(* function to confirm a block --> confirms each variable and statement *)
+
 and confirm_block block ret_type env =
 	let verified_vars = map_to_list_env confirm_var block.locals (fst env, block.block_id) in
 	let verified_stmts = confirm_stmt_list block.statements ret_type env in 
 	{ s_locals = verified_vars; s_statements = verified_stmts; s_block_id = block.block_id } 
+
+(* goes through each fun, verifies block, arguments, and finally the declaration *)
 
 let confirm_func func env =
 	let verified_block = confirm_block func.body func.ret_type (fst env, func.body.block_id) in
@@ -501,16 +484,14 @@ let confirm_func func env =
 	let verified_func_decl = confirm_func_decl func.fname env in 
     { s_f_type = func.f_type; s_fname = verified_func_decl; s_ret_type = func.ret_type; s_formals = verified_args; s_fblock = verified_block }
 
+(* SAST begins here - first function called: confirm_semantics *)
+
 let confirm_semantics program env = 
-	let main_stmts = traverse_main drop_funk ((*List.rev*) program.stmts) in 
+	let main_stmts = traverse_main drop_funk (program.stmts) in 
 	let main_vars = traverse_main get_vars main_stmts in 
 	let g_var_val = List.filter (fun x -> x <> ("", false, Wild)) main_vars in
 	let verified_gvar_list = map_to_list_env confirm_var g_var_val env in  
-	let main_func = confirm_func ({fname = "main"; ret_type = Null_Type; f_type = []; args = []; body = {locals = (*verified_gvar_list*) (*List.rev main_vars*) []; statements = List.rev main_stmts; block_id = 0}}) env in 
-	(*let () = Printf.printf "created main \n" in *)
-	(*let print = confirm_func ({fname = "print"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
-	let play = confirm_func ({fname = "play"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in 
-	let write = confirm_func ({fname = "main"; ret_type = Null_Type; f_type = Null_Type; args = []; body = {locals = (*verified_gvar_list*) []; statements = []; block_id = 0}}) env in *)
-	let verified_func_list = (*write :: play :: print ::*)  main_func :: map_to_list_env confirm_func program.funcs env in
+	let main_func = confirm_func ({fname = "main"; ret_type = Null_Type; f_type = []; args = []; body = {locals = []; statements = List.rev main_stmts; block_id = 0}}) env in 
+	let verified_func_list = main_func :: map_to_list_env confirm_func program.funcs env in
 	let () = prerr_endline "// Passed semantic checking \n" in
 		{ s_pfuncs = List.rev verified_func_list; s_gvars = List.rev verified_gvar_list} 
