@@ -3,6 +3,7 @@ measure c_2 = $(4:4) [62.e, 70.e, 65.e, 62.e, 70.e, 65.e, 62.e, 70.e];
 measure c_3 = $(4:4) [62.e, 70.e, 65.e, 62.e, 70.e, 65.e, 62.e, 70.e];
 measure c_4 = $(4:4) [60.e, 69.e, 65.e, 60.e, 69.e, 65.e, 60.e, 69.e];
 
+
 measure b_1 = $(4:4) [48.e, 48.e, 48.e, 48.e, 48.e, 48.e, 48.e, 48.e];
 measure b_2 = $(4:4) [67.e, 67.e, 67.e, 67.e, 67.e, 67.e, 67.e, 67.e]; 
 
@@ -10,20 +11,33 @@ measure t_1 = $(4:4) [63.h, 70.h];
 measure t_2 = $(4:4) [62.h, 70.h]; 
 measure t_3 = $(4:4) [60.h, 69.h];
 
+
+
 measure s_1 = $(4:4) [63.w]; 
 measure s_2 = $(4:4) [62.w];
 measure s_3 = $(4:4) [60.w];
 
 measure w_1 = $(4:4) [60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.q, 60.q];
 
+measure rest_1 = $(4:4) [0.w];
 
-phrase ph_1 = $(PIANO) [c_1, c_2, c_3, c_4];
-phrase ph_2 = $(BASS) [b_1, b_2, b_1, b_2];
-phrase ph_3 = $(TIMPANI) [t_1, t_2, t_2, t_3];
-phrase ph_4 = $(TENOR_SAX) [s_1, s_2, s_2, s_3];
-phrase ph_5 = $(PIPES) [w_1, w_1, w_1, w_1]; 
 
-song clocks = $(80) [ph_1, ph_2, ph_3, ph_5];
+phrase ph_1_0 = $(PIANO)    [ c_1, c_2, c_3, c_4, rest_1, rest_1, rest_1, rest_1, c_1, c_2, c_3, c_4, rest_1, rest_1, rest_1, rest_1 ];
+phrase ph_2_0 = $(BASS)     [ b_1, b_2, b_1, b_2, rest_1, rest_1, rest_1, rest_1, b_1, b_2, b_1, b_2, rest_1, rest_1, rest_1, rest_1 ];
+phrase ph_3_0 = $(TIMPANI)  [ t_1, t_2, t_2, t_3, rest_1, rest_1, rest_1, rest_1, t_1, t_2, t_2, t_3, rest_1, rest_1, rest_1, rest_1 ];
+phrase ph_4_0 = $(TENOR_SAX)[ s_1, s_2, s_2, s_3, rest_1, rest_1, rest_1, rest_1, s_1, s_2, s_2, s_3, rest_1, rest_1, rest_1, rest_1 ];
+phrase ph_5_0 = $(PIPES)    [ w_1, w_1, w_1, w_1, rest_1, rest_1, rest_1, rest_1, w_1, w_1, w_1, w_1, rest_1, rest_1, rest_1, rest_1 ]; 
+
+phrase ph_1_1 = $(PIANO)    [ rest_1, rest_1, rest_1, rest_1, c_1, c_2, c_3, c_4, rest_1, rest_1, rest_1, rest_1, c_1, c_2, c_3, c_4 ];
+phrase ph_2_1 = $(BASS)     [ rest_1, rest_1, rest_1, rest_1, b_1, b_2, b_1, b_2, rest_1, rest_1, rest_1, rest_1, b_1, b_2, b_1, b_2 ];
+phrase ph_3_1 = $(TIMPANI)  [ rest_1, rest_1, rest_1, rest_1, t_1, t_2, t_2, t_3, rest_1, rest_1, rest_1, rest_1, t_1, t_2, t_2, t_3 ];
+phrase ph_5_1 = $(PIPES)    [ rest_1, rest_1, rest_1, rest_1, w_1, w_1, w_1, w_1, rest_1, rest_1, rest_1, rest_1, w_1, w_1, w_1, w_1 ]; 
+
+song clocks = $(80) [ph_1_0, ph_2_0, ph_3_0, ph_4_0, ph_5_0, ph_1_1, ph_2_1, ph_3_1, ph_5_1 ];
+
+(play()) [clocks];
+
+/*song clocks = $(80) [ph_1, ph_2, ph_3, ph_5];
 
 song clocks_with_sax = $(80) [ph_1, ph_2, ph_3, ph_4, ph_5];
 
@@ -39,4 +53,4 @@ while(i < 2){
 
 i = i + 1;
 
-}
+}*/
