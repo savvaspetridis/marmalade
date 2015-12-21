@@ -6,38 +6,6 @@ type op = Plus | Minus | Times | Divide | Equal | Neq | Less | Leq | Greater | G
 
 type declare_type = Int | Note | String | Song | Phrase | Measurepoo | TimeSig |
 Instr | Tempo | List | Intlist | Stringlist | Wild | Null_Type | Default | SongArr
-(*
-type funk_expr = 
-    IntLit of int
-    | ID of string
-    | String_Lit of string
-    | Note of int * note_type
-    | Binop of funk_expr * op * funk_expr 
-    | BasicList of funk_expr list
-
-type invocation = 
-    FunkCall of string * funk_expr list
-*)
-
-(*
-type prim_type = 
-	Int
-	| Note
-	| String
-	| Song
-	| Phrase
-	| Measure
-	| List
-	| Intlist
-	| Stringlist
-
-*)
-
-
-
-
-(*type scope_var_decl = string * declare_type * int*)
-
 
 type char_pair = Ranges of char * char
 
