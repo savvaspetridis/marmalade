@@ -40,8 +40,8 @@ let write_op_primitive op e1 e2 =
 
 let write_rhythm dr =
     match dr with 
-    's' -> "0.125"
-    | 'e' -> "0.25"
+    's' -> "0.125"  (* sixteenth note maps to 0.125 *)
+    | 'e' -> "0.25" (* eigth note maps to 0.25 *)
     | 'q' -> "0.5"
     | 'h' -> "1.0"
     | 'w' -> "2.0"
@@ -54,7 +54,6 @@ let rec get_typeof_dexpr = function
     | S_Id (str, t) -> t
     | S_Arr(dexpr_list, t) -> t
     | S_Binop (dexpr1, op, dexpr2, t) -> t
-    (* | D_Null_Lit -> "null" *)
     | S_Noexpr -> Null_Type
     | S_Call(str, _, dexpr_list, _, t) -> t
 
@@ -86,28 +85,19 @@ let rec write_expr = function
     | S_Phrase(s_measure_list, s_instr, typ) -> "new j_phrase(new j_measure[] {" ^ (String.concat ", " (List.map write_expr s_measure_list)) ^ "}, " ^ write_expr s_instr ^ ")"
     | S_Song(s_phrase_list, s_tempo, typ) -> "new j_song(new j_phrase[] {" ^ (String.concat ", " (List.map write_expr s_phrase_list)) ^ "}, " ^ write_expr s_tempo ^ ")"
     | S_Noexpr -> ""
-    | S_Note(i, ch, tp) -> "new j_note(" ^ string_of_int i ^ ", " ^
-        write_rhythm ch ^ ")"
+    | S_Note(i, ch, tp) -> "new j_note(" ^ string_of_int i ^ ", " ^ write_rhythm ch ^ ")"
     | S_TimeSig(i, i_2, tp) -> string_of_int i ^ ", " ^ string_of_int i_2 
     | S_Instr(str, tp) -> str
     | S_Tempo(i, tp) -> string_of_int i
-    | S_Index(str, i, tp) -> (* "(" ^ (match tp with
-        String | Int | Note | Measurepoo | Phrase -> write_type tp)
-    ^ ") " ^ *) str ^ ".get(" ^ write_expr i ^ ")"
+    | S_Index(str, i, tp) -> str ^ ".get(" ^ write_expr i ^ ")"
 	| S_Call(str, exp, dexpr_list,t_ret, t_send) -> (match str with 
        					 "print" -> "System.out.println("  ^ write_expr exp ^ ");\n"							  
     					| "play" -> write_expr exp ^ ".play();\n"
-						| "write" -> "Write.midi(" ^ (*(String.concat ","
-                        (List.map write_expr args)*) write_expr exp ^ ".getObj(), \"out.mid\");\n"
+						| "write" -> "Write.midi(" ^ write_expr exp ^ ".getObj(), \"out.mid\");\n"
 						| "evaluate_measure" -> "new j_measure(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "
                         | "evaluate_phrase" -> "new j_phrase(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "  
                         | "evaluate_song" -> "new j_song(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") " 
-                        | "evaluate_note" -> "new j_note(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "   (*(match exp with
-                                            S_Id(nme, dtype) -> let to_write = (match dtype with 
-                                                Measurepoo -> Phrase
-                                                | Phrase -> Song
-                                                | Song -> SongArr ) in  
-                                            "new " ^ write_type to_write ^ "( " ^ nme ^ " )" )  *)
+                        | "evaluate_note" -> "new j_note(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ") "
                         | "length_measure" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"		
                         | "length_phrase" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"             
                         | "length_song" -> "new j_int(" ^ String.concat "" (List.map write_expr dexpr_list) ^ ".length())"            
@@ -118,10 +108,12 @@ let rec write_expr = function
 								  | _ -> write_expr exp ^ "." ^ str ^ "(" ^ String.concat "," (List.map write_expr dexpr_list) ^ ");/n")
 								)
 	| S_Call_lst(s) -> String.concat "" (List.map write_expr s)
-	| _ -> raise(Failure(" is not a valid expression"))
+	| _ -> raise(Failure("Error: Not a valid expression."))
 
 
-and write_stmt d vg = match d with
+(* this function matches to each kind of s_stmt, calling the function write_expr to write each of them in Java. *)
+
+and write_stmt d vg = (match d with
       S_CodeBlock(dblock) -> write_block dblock vg
     | S_expr(dexpr) -> write_expr dexpr ^ ";"
     | S_Assign (name, dexpr, t) -> (match vg with
@@ -135,21 +127,20 @@ and write_stmt d vg = match d with
     | S_Return(dexpr) -> "return " ^ write_expr dexpr ^ ";\n"
     | S_If(dexpr, dstmt1, dstmt2) -> "if(" ^ write_expr dexpr ^  ")" ^  write_stmt dstmt1 vg ^ "else"  ^ write_stmt dstmt2 vg
     | S_While(dexpr, dblock) -> "while(" ^ write_expr dexpr ^ ")"  ^ write_block dblock vg (* check true *)
-    (*| S_Array_Assign(str,dexpr_value, dexpr_index, t) -> str ^ ".set(" ^ write_expr dexpr_index ^ "," ^ write_expr dexpr_value ^ ");"*)
     | S_Index_Update(nme, expr_1, expr_2, typ) -> 
     (match typ with 
+        
+        (* jMusic syntax for setting a note, measure, and part (which is the same as a phrase in marmalade) *)
         Measurepoo -> nme ^ ".set_Note(" ^ write_expr expr_2 ^ "," ^ write_expr expr_1 ^ ");\n" 
         | Phrase -> nme ^ ".set_Measure( " ^ write_expr expr_1 ^ ", " ^ write_expr expr_2 ^ ");\n"
         | Song -> nme ^ ".set_Part( " ^ write_expr expr_1 ^ ", " ^ write_expr expr_2 ^ ");\n" )
-    | S_Append_Assign(ty, st, ap_list) -> String.concat "GOD" (List.map write_expr ap_list) ^ "IS DEAD"
-    | _ -> raise(Failure(" is not a valid statement"))
-
+    | _ -> raise(Failure(" is not a valid statement")))
 
 and write_stmt_true d = write_stmt d true 
 
 and write_stmt_false d = write_stmt d false
 
-(* write binary operation expression in java *)
+(* function that matches the expression on each side of the binop, then writes it *)
 
 and write_binop_expr expr1 op expr2 t =
     let e1 = write_expr expr1 and e2 = write_expr expr2 in 
@@ -168,13 +159,17 @@ and write_binop_expr expr1 op expr2 t =
               | _ -> raise(Failure("Error: " ^ write_op_primitive op e1 e2 ^ " is not a supported operation for " ^ write_type t ^ "."))
         in write_binop_expr_help e1 op e2 
 
+(* writes an array expression *)
+
 and write_array_expr dexpr_list t =
       match t with
-        Int -> "new j_intlist (new j_int[] {" ^ String.concat ","
+        Int -> "new j_intlist (new j_int[] {" ^ String.concat "," (* if Int, then write an int list *)
               (List.map write_expr dexpr_list) ^ "})" 
-        | String -> "new j_stringlist (new j_string[] {" ^ String.concat ","
+        | String -> "new j_stringlist (new j_string[] {" ^ String.concat "," (* if String, then write a string list *)
         (List.map write_expr dexpr_list) ^ "})" 
         | _ -> "new " ^ write_type t ^ " []"  ^ " {" ^ String.concat "," (List.map write_expr dexpr_list) ^ "}"
+
+(* helper function to apply java toString function *)
 
 and tostring_str dexpr =
     let t = get_typeof_dexpr dexpr in
@@ -200,12 +195,10 @@ and write_assign name dexpr t vg =
 
     true -> (match t with
       String | Instr | Tempo | Intlist | Stringlist -> name ^ " = " ^ write_expr dexpr
-    (*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
     | Int | Note | TimeSig | Measurepoo | Phrase | Song  -> name ^ " = " ^ "(" ^ write_expr dexpr ^ ")"
     | _ -> raise(Failure("Error: " ^ write_type t ^ " is not a valid assign_type.")))
     | false -> (match t with
       String | Instr | Tempo | Intlist | Stringlist -> write_type t ^ " " ^ name ^ " = " ^ write_expr dexpr
-    (*| Int | Note | TimeSig | Measurepoo | Phrase | Song  -> write_type t ^ " " ^  name ^ " = new " ^ write_type t ^ "(" ^ write_expr dexpr ^ ")"*)
     | _ -> raise(Failure("Error: " ^ write_type t ^ " is not a valid assign_type."))) 
 
 and write_block dblock vg =
@@ -229,22 +222,6 @@ let write_func_wrapper x str =
         | _ -> "" in
         List.map match_type dfunc.s_f_type)) in
     List.map write_func x)
-
-
-(*
-
-
-=======
->>>>>>> f98214fb3c7b8dbfd0b7ccffe4fa8627b6fb769e
-let write_func dfunc =
-        match dfunc.s_fname with
-            "main" -> "public static void main(String[] args)" ^ write_block
-            dfunc.s_fblock true
-                | _ -> "static " ^ write_type dfunc.s_ret_type ^ " " ^
-                dfunc.s_fname ^ "("  ^ String.concat "," (List.map
-                write_scope_var_decl_func dfunc.s_formals) ^ ")" ^ write_block
-                dfunc.s_fblock false
-*)
 
 (* Below is necessary java placed into the file *)
 
@@ -358,7 +335,6 @@ let gen_pgm pgm name =
 
      (write_func_wrapper pgm.s_pfuncs Phrase) ^
      "\n}\n" ^ 
-
 
      "public static class j_song
      extends Song {\n" ^
