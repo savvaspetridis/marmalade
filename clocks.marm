@@ -1,0 +1,42 @@
+measure c_1 = $(4:4) [63.e, 70.e, 66.e, 63.e, 70.e, 66.e, 63.e, 70.e];
+measure c_2 = $(4:4) [62.e, 70.e, 65.e, 62.e, 70.e, 65.e, 62.e, 70.e];
+measure c_3 = $(4:4) [62.e, 70.e, 65.e, 62.e, 70.e, 65.e, 62.e, 70.e];
+measure c_4 = $(4:4) [60.e, 69.e, 65.e, 60.e, 69.e, 65.e, 60.e, 69.e];
+
+measure b_1 = $(4:4) [48.e, 48.e, 48.e, 48.e, 48.e, 48.e, 48.e, 48.e];
+measure b_2 = $(4:4) [67.e, 67.e, 67.e, 67.e, 67.e, 67.e, 67.e, 67.e]; 
+
+measure t_1 = $(4:4) [63.h, 70.h];
+measure t_2 = $(4:4) [62.h, 70.h]; 
+measure t_3 = $(4:4) [60.h, 69.h];
+
+measure s_1 = $(4:4) [63.w]; 
+measure s_2 = $(4:4) [62.w];
+measure s_3 = $(4:4) [60.w];
+
+measure w_1 = $(4:4) [60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.s, 60.q, 60.q];
+
+
+phrase ph_1 = $(PIANO) [c_1, c_2, c_3, c_4];
+phrase ph_2 = $(BASS) [b_1, b_2, b_1, b_2];
+phrase ph_3 = $(TIMPANI) [t_1, t_2, t_2, t_3];
+phrase ph_4 = $(TENOR_SAX) [s_1, s_2, s_2, s_3];
+phrase ph_5 = $(PIPES) [w_1, w_1, w_1, w_1]; 
+
+song clocks = $(80) [ph_1, ph_2, ph_3, ph_5];
+
+song clocks_with_sax = $(80) [ph_1, ph_2, ph_3, ph_4, ph_5];
+
+
+int i = 0; 
+
+
+while(i < 2){
+
+
+(play()) [clocks];
+(play()) [clocks_with_sax];
+
+i = i + 1;
+
+}
