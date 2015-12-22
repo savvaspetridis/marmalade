@@ -20,15 +20,6 @@ let rec map_to_list_env func lst env =
 			let new_env = func head env in 
 				map_to_list_env func tail new_env
 
-(*   need to rewrite 
-let string_of_table env =
-    let symlist = StrMap.fold
-        (fun s t prefix -> (string_of_decl t) :: prefix) (fst env) [] in
-    let sorted = List.sort Pervasives.compare symlist in
-    String.concat "\n" sorted
-
- ______________________________________________ *)
-
 let name_scope_str (name:string) env =
 	name ^ "_" ^ (string_of_int (env_scope env))
 
@@ -45,7 +36,6 @@ let rec get_decl name env =
     	else get_decl name ((fst env), parent_scope.(snd env))
 
 let add_symbol (name:string) (decl:decl) env =
-	let () = Printf.printf "adding symbol \n" in
 	let key = name_scope_str name env in
     if StrMap.mem key (env_table env)
     then raise(Failure("Error: Symbol " ^ name ^ " declared twice in same scope."))
@@ -68,16 +58,9 @@ let rec add_stmt stmt env =
 	| If(e, bl_1, bl_2) -> let env_1 = add_block bl_1 Wild env in add_block bl_2 Wild env_1
 	| While(e, bl) -> add_block bl Wild env
 	| Fdecl(fdec) -> add_func fdec env
-	| VarDecl(chan) -> let () = Printf.printf "in vdec \n" in (match chan with 
-		Assign(typ, id, blah) -> let () = Printf.printf "adding assignment \n" in
-		add_var (id, typ) env
-	 	| Update(str, exr) -> let () = Printf.printf "adding update \n" in
-	 		env (*let () = Printf.printf "printing update \n" in let dec = get_decl str env in 
-	 	let () = Printf.printf "printing update \n" in
-	 		(match dec with 
-	 			(*Var_Decl(nm, ar, t, _) -> add_var (nm, t) ar env
-	 			|*) _ -> raise(Failure("A function cannot be redefined as a variable"))
-	 	| _ -> 	let () = Printf.printf "in expr \n" in env ))*)
+	| VarDecl(chan) -> (match chan with 
+		Assign(typ, id, blah) -> add_var (id, typ) env
+	 	| Update(str, exr) -> env 
 		| Index_Update(_, _) -> env)
 	| _ ->	env )
 
