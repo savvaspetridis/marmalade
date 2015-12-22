@@ -34,6 +34,8 @@ let write_op_primitive op e1 e2 =
     | Leq -> "j_int.leq(" ^ e1 ^ ", " ^ e2 ^ ")"
     | Greater -> "j_int.gt(" ^ e1 ^ ", " ^ e2 ^ ")"
     | Geq -> "j_int.geq(" ^ e1 ^ ", " ^ e2 ^ ")"
+    | And -> "(" ^ e1 ^ ") && (" ^ e2 ^ ")"  
+    | Or -> "(" ^ e1 ^ ") || (" ^ e2 ^ ")"  
     | _ -> raise (Failure "Error: and/or begin applied to a java primitive")
 
 (* notes map to values in jmusic *)
