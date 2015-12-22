@@ -1,0 +1,12 @@
+/*
+Testing note declaration and note play
+*/
+
+
+/*
+note ping = 44.q;
+
+(play()) [ping];
+*/
+
+(play()) [44.q];

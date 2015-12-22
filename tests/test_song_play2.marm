@@ -1,0 +1,14 @@
+/* TESTING SONG PLAY (w/ pipes)*/
+
+
+measure a_1 = $(4:4) [44.q, 45.q, 46.q, 47.q];
+measure a_2 = $(4:4) [47.q, 48.q, 49.q, 50.q];
+measure a_3 = $(4:4) [50.q, 51.q, 52.q, 53.q];
+
+phrase ph_1 = $(PIPES) [a_1];
+phrase ph_2 = $(PIPES) [a_2];
+phrase ph_3 = $(PIPES) [a_3];
+
+song s_1 = $(80) [ph_1, ph_2, ph_3];
+
+(play()) [s_1];

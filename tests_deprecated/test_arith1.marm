@@ -1,0 +1,15 @@
+/*
+Tests the basic arithmetic operations
+*/
+
+int a = 10 + 35;
+int b = 30 - 25;
+int c = 25 * 3;
+int d = 18 / 6;
+
+
+int_list h = (print()) [a];
+int_list fe = (print()) [b];
+int_list ge = (print()) [c];
+int_list ke = (print()) [d];
+

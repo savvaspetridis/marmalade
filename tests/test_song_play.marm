@@ -1,0 +1,15 @@
+/* TESTING SONG PLAY */
+
+
+measure a_1 = $(4:4) [47.e, 47.e, 47.e, 47.e, 47.e, 47.e, 47.e, 47.e];
+measure a_2 = $(4:4) [52.e, 52.e, 52.e, 52.e, 52.e, 52.e, 52.e, 52.e];
+
+measure c_1 = $(4:4) [62.e, 62.e, 0.e, 62.e, 59.e, 0.e, 57.e, 0.e];
+measure c_2 = $(4:4) [56.e, 56.e, 0.e, 56.e, 59.e, 0.e, 62.e, 0.e];
+
+phrase ph_1 = $(BASS) [a_1, a_2];
+phrase ph_2 = $(BASS) [c_1, c_2];
+
+song s_1 = $(80) [ph_1, ph_2];
+
+(play()) [s_1];

@@ -1,0 +1,12 @@
+/*
+Testing while loop (v2)
+*/
+
+int a = 5;
+int b = 2;
+
+while (a + b < 10) {
+	a = a + 1; 
+}
+
+(print(), print()) [a, b];
