@@ -1,0 +1,13 @@
+/* Test std lib function: length_song */
+
+measure m_1 = $(4:4) [44.q, 44.q, 44.q, 44.q];
+measure m_2 = $() [44.h, 44.h];
+
+phrase p_1 = $(BASS) [m_1, m_2, m_1, m_2];
+phrase p_2 = $(BASS) [m_2, m_1, m_2, m_1];
+
+song s_1 = $(96) [p_1, p_1, p_2];
+
+int out = $length_song(s_1);
+
+(print()) [out];

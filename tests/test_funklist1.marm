@@ -1,0 +1,5 @@
+/*Test multiple funktion calls in list*/
+
+measure m_1 = $() [44.q, 45.q, 46.q, 47.q];
+
+(print(), print(), play()) ["Hello", "World", m_1];
