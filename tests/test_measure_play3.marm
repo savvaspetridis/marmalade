@@ -1,0 +1,14 @@
+/*
+Testing measure play:	indexing from phrase
+*/
+
+
+measure a_1 = $(4:4) [47.e, 0.e, 47.e, 0.e, 47.e, 0.e, 47.e, 0.e];
+measure a_2 = $(4:4) [52.e, 0.e, 52.e, 0.e, 52.e, 0.e, 52.e, 0.e];
+measure a_3 = $(4:4) [0.w];
+
+phrase ph_1 = $(BASS) [a_1, a_2, a_3];
+
+measure swag = ph_1&1;
+
+(play()) [swag];

@@ -1,0 +1,9 @@
+/*
+Testing note play:	indexing from measure
+*/
+
+
+measure m_1 = $() [44.q, 44.q, 44.q, 44.q];
+
+note n_1 = m_1&2;
+(play()) [n_1];
