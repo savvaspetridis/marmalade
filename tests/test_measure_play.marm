@@ -1,0 +1,6 @@
+/*TEST MEASURE PLAY*/
+
+measure a_1 = $(4:4) [44.e, 45.e, 46.e, 47.e, 48.e, 49.e, 50.e, 51.e];
+
+(play()) [a_1];
+

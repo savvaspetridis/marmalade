@@ -1,0 +1,8 @@
+/*TEST PLAY PHRASE*/
+
+measure a_1 = $(4:4) [47.e, 47.e, 47.e, 47.e, 47.e, 47.e, 47.e, 47.e];
+measure a_2 = $(4:4) [52.e, 52.e, 52.e, 52.e, 52.e, 52.e, 52.e, 52.e];
+
+phrase ph_1 = $(BASS)    [a_1, a_2];
+
+(play()) [ph_1];
