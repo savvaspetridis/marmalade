@@ -1,0 +1,9 @@
+/* Test std lib function: length_measure */
+
+measure m_1 = $(4:4) [44.q, 44.q, 44.q, 44.q];
+measure m_2 = $() [44.h, 44.h];
+
+int out = $length_measure(m_1);
+int ouz = $length_measure(m_2);
+
+(print(), print()) [out, ouz];

@@ -1,0 +1,6 @@
+/* Test std lib function: length_string_list */
+
+str_list lst = ["foo", "foo"];
+int out = $length_string_list(lst);
+
+(print()) [out];
