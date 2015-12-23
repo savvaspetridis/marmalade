@@ -2,16 +2,11 @@ OBJS = ast.cmo table.cmo sast.cmo parser.cmo scanner.cmo javagen.cmo marmalade.c
 
 TESTS = \
 
-# Choose one
 YACC = ocamlyacc
-#YACC = menhir --explain
 
 marmalade : $(OBJS)
 	ocamlc -o marmalade $(OBJS)
 
-# 	.PHONY : test
-# 	test : microc testall.sh
-# 		./testall.sh
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
@@ -39,8 +34,8 @@ sast.cmx: ast.cmx
 
 javagen.cmo: ast.cmo 
 javagen.cmx: bytecode.cmx ast.cmx 
-marmalade.cmo: scanner.cmo parser.cmi compile.cmo 
-marmalade.cmx: scanner.cmx parser.cmx compile.cmx
+marmalade.cmo: scanner.cmo parser.cmi
+marmalade.cmx: scanner.cmx parser.cmx
 parser.cmo: ast.cmo parser.cmi 
 parser.cmx: ast.cmx parser.cmi 
 scanner.cmo: parser.cmi 
