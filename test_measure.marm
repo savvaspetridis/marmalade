@@ -1,5 +1,0 @@
-note j = 44.q;
-measure q = $() [j];
-phrase d = $() [q];
-song s = $() [d];
-song g = $() [d, $() [q], $() [[$() q]]];
